@@ -43,7 +43,7 @@ install:
   - pip install coveralls
 
   # Install sh and binstar to support upload to Anaconda
-  - conda install sh anaconda-client
+  - conda install sh anaconda-client conda
 
 script:
   - nosetests --with-coverage --cover-package=plio
