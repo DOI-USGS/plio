@@ -34,7 +34,7 @@ install:
   - pip install coveralls
 
 script:
-  - nosetests --with-coverage --cover-package=autocnet
+  - nosetests --with-coverage --cover-package=plio
 
 after_success:
   - coveralls
