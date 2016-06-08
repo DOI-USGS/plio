@@ -4,7 +4,7 @@ channels:
 dependencies:
   - pip:
     - pvl
-    - protobuf=3.0.0b2
+    - protobuf==3.0.0b2
   - gdal>2.x
   - h5py
   - pandas
