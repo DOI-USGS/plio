@@ -13,7 +13,7 @@ setup(
     install_requires=[
         'gdal>=2',
         'pvl',
-        'protobuf=3.0.0b2',
+        'protobuf==3.0.0b2',
         'h5py',
         'pandas',
         'sqlalchemy',
