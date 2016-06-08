@@ -5,6 +5,10 @@ branches:
 only:
   - master
 
+os: 
+  - linux
+  - osx
+
 python:
   - "3.5"
 
@@ -35,6 +39,8 @@ install:
 
 script:
   - nosetests --with-coverage --cover-package=plio
+  # After test success, package and upload to Anaconda
+  - python build.py --project plio
 
 after_success:
   - coveralls
