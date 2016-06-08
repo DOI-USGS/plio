@@ -9,7 +9,7 @@ from argparse import ArgumentParser
 
 # Initialize
 try:
-    token = os.environ['BINSTAR_KEYN']
+    token = os.environ['BINSTAR_KEY']
 except KeyError:
     sys.exit("Must set $BINSTAR_KEY")
 binstar = sh.Command('binstar').bake(t=token)
