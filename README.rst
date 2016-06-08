@@ -1,5 +1,5 @@
 ===============================
-AutoCNet
+Planetary Input / Output
 ===============================
 
 .. image:: https://badges.gitter.im/USGS-Astrogeology/autocnet.svg
