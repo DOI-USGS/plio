@@ -34,7 +34,7 @@ install:
   - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
-
+  - conda install conda
   - conda env create
   - source activate plio
 
@@ -43,7 +43,7 @@ install:
   - pip install coveralls
 
   # Install sh and binstar to support upload to Anaconda
-  - conda install sh anaconda-client conda
+  - conda install sh anaconda-client
 
 script:
   - nosetests --with-coverage --cover-package=plio
