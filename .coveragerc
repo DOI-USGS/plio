@@ -1,0 +1,12 @@
+[run]
+source = autocnet
+[report]
+omit =
+    plio/ControlNetFileV0002_pb2.py
+    */tests/*
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == __main__:

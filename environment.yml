@@ -1,0 +1,12 @@
+name: plio
+channels:
+  - conda-forge
+dependencies:
+  - pip:
+    - pvl
+    - protobuf=3.0.0b2
+  - gdal>2.x
+  - h5py
+  - pandas
+  - sqlalchemy
+  - pyyaml
