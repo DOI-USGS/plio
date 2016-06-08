@@ -87,6 +87,7 @@ def to_isis(path, obj, mode='w', version=VERSION,
                                                                        point_sizes,
                                                                        creation_date,
                                                                        modified_date)
+        print(point_sizes)
         # Write the buffer header
         store.write(buffer_header, HEADERSTARTBYTE)
         # Then write the points, so we know where to start writing, + 1 to avoid overwrite

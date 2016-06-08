@@ -3,6 +3,7 @@ source = autocnet
 [report]
 omit =
     plio/ControlNetFileV0002_pb2.py
+    */sqlalchemy_json/*
     */tests/*
 exclude_lines =
     pragma: no cover

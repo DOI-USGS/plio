@@ -1,7 +1,7 @@
 import os
 import sys
+from time import strftime, gmtime
 import unittest
-import numpy as np
 import pandas as pd
 import pvl
 
@@ -22,29 +22,21 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
         serial_times = {295: '1971-07-31T01:24:11.754',
                         296: '1971-07-31T01:24:36.970'}
         cls.serials = ['APOLLO15/METRIC/{}'.format(i) for i in serial_times.values()]
-        net = CandidateGraph({'a': ['b'], 'b': ['a']})
-        for i, n in net.nodes_iter(data=True):
-            n._keypoints = pd.DataFrame(np.arange(10).reshape(cls.npts,-1), columns=['x', 'y'])
-            n._isis_serial = cls.serials[i]
+        columns = ['point_id', 'point_type', 'serialnumber', 'measure_type', 'x', 'y', 'node_id']
 
-        source = np.zeros(cls.npts)
-        destination = np.ones(cls.npts)
-        pid = np.arange(cls.npts)
+        data = []
+        for i in range(cls.npts):
+            data.append((i, 2, cls.serials[0], 2, 0, 0, 0))
+            data.append((i, 2, cls.serials[1], 2, 0, 0, 1))
 
-        matches = pd.DataFrame(np.vstack((source, pid, destination, pid)).T, columns=['source_image',
-                                                                                      'source_idx',
-                                                                                      'destination_image',
-                                                                                      'destination_idx'])
+        dfs = [pd.DataFrame(data, columns=columns)]
 
-        net.edge[0][1].matches = matches
-        net.generate_cnet(clean_keys=[])
+        cls.creation_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+        cls.modified_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+        io_controlnetwork.to_isis('test.net', dfs, mode='wb', targetname='Moon')
 
-        cls.creation_date = net.creationdate
-        cls.modified_date = net.modifieddate
-        io_controlnetwork.to_isis('test.net', net, mode='wb', targetname='Moon')
-
-        cls.header_message_size = 98
-        cls.point_start_byte = 65634
+        cls.header_message_size = 78
+        cls.point_start_byte = 65614
 
     def test_create_buffer_header(self):
         with open('test.net', 'rb') as f:
@@ -94,7 +86,7 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
         self.assertEqual(675, points_bytes)
 
         points_start_byte = find_in_dict(pvl_header, 'PointsStartByte')
-        self.assertEqual(65634, points_start_byte)
+        self.assertEqual(self.point_start_byte, points_start_byte)
 
     @classmethod
     def tearDownClass(cls):
