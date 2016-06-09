@@ -5,6 +5,12 @@ branches:
 only:
   - master
 
+env:
+  global:
+    - BINSTAR_USER: jlaura
+  matrix:
+    - PYTHON_VERSION: 3.5
+
 os: 
   - linux
   - osx
@@ -21,7 +27,7 @@ install:
         wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
       fi
     else
-      if ["$TRAVIS_PYTHON_VERSION" == "2.7"]; then
+      if ["$TRAVIS_PYTHON_VERSION" == "3.5"]; then
         curl -o miniconda.sh  https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh;
       else
         curl -o miniconda.sh  https://repo.continuum.io/miniconda/Miniconda-latest-MacOSX-x86_64.sh;
