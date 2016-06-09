@@ -48,11 +48,20 @@ install:
   - conda config --add channels jlaura
   - conda install -n root conda-build
   - conda install sh anaconda-client
+  
+  # Straight from the menpo team
+  - if [["$TRAVIS_OS_NAME" == "osx"]]; then
+      curl -o condaci.py https://raw.githubusercontent.com/menpo/condaci/v0.4.8/condaci.py;
+    else
+      wget https://raw.githubusercontent.com/menpo/condaci/v0.4.8/condaci.py -O condaci.py;
+    fi
+  - python condaci.py setup
+
 
 script:
   - nosetests --with-coverage --cover-package=plio
   # After test success, package and upload to Anaconda
-  - python build.py --project plio
+  - ~/miniconda/bin/python condaci.py build ./conda
 
 after_success:
   - coveralls
