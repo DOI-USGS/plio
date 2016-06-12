@@ -12,8 +12,8 @@ def get_data(filename):
     return fullname
 
 # Submodule imports
-from . import sqlalchemy_json
-from . import isis_serial_number
-from . import io_controlnetwork
-from . import io_gdal
-from . import utils
+from plio import sqlalchemy_json
+from plio import isis_serial_number
+from plio import io_controlnetwork
+from plio import io_gdal
+from plio import utils
