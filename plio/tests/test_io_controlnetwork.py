@@ -63,7 +63,6 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
             raw_header_message = f.read(self.header_message_size)
             header_protocol = cnf.ControlNetFileHeaderV0002()
             header_protocol.ParseFromString(raw_header_message)
-            print(header_protocol)
             #Non-repeating
             #self.assertEqual('None', header_protocol.networkId)
             self.assertEqual('Moon', header_protocol.targetName)
@@ -87,7 +86,6 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
                 self.assertEqual(str(i), point_protocol.id)
                 self.assertEqual(2, point_protocol.type)
                 for m in point_protocol.measures:
-                    print(m.serialnumber)
                     self.assertTrue(m.serialnumber in self.serials)
                     self.assertEqual(2, m.type)
 

@@ -109,7 +109,6 @@ def to_isis(path, obj, mode='w', version=VERSION,
         for i, point in enumerate(point_messages):
             store.write(point, point_start_offset)
             point_start_offset += point_sizes[i]
-        print(point_start_offset)
         header = store.create_pvl_header(version, headerstartbyte, networkid,
                                          targetname, description, username,
                                          buffer_header_size, points_bytes,
@@ -270,7 +269,6 @@ class IsisStore(object):
         header_message_size : int
                               The size of the serialized header, in bytes
         """
-        print('NID', networkid)
         raw_header_message = cnf.ControlNetFileHeaderV0002()
         raw_header_message.created = creation_date
         raw_header_message.lastModified = modified_date
