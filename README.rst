@@ -21,3 +21,19 @@ Planetary Input / Output
 
 
 A planetary file I/O API
+
+Installation
+------------
+Installation is unfortunately complicated due to the difficulty in installing GDAL.  These are the steps that have been successfully tested on Linux and OSX.
+
+1. Install Anaconda or Miniconda with Python 3.5
+2. In your ~/.condarc file add the following two lines in the channels section.
+   
+    `- conda-forge`
+    
+    `- jlaura`
+3. Create a new environment to ensure that the installed packge is not going to collide with existing packages
+   
+   ` conda create --name <somename> python=3`
+   
+3. Install `plio` with `conda install plio`.
