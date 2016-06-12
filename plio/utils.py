@@ -97,3 +97,22 @@ def find_nested_in_dict(data, key_list):
             The value in the dict
     """
     return reduce(lambda d, k: d[k], key_list, data)
+
+def xstr(s):
+    """
+    Return an empty string if the input is a NoneType.  Otherwise
+    cast to string and return
+
+    Parameters
+    ----------
+    s : obj
+        An input object castable to a string
+
+    Returns
+    -------
+     : str
+       The input object cast to a string
+    """
+    if s is None:
+        return ''
+    return str(s)

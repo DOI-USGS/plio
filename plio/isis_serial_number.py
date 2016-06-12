@@ -1,3 +1,4 @@
+import warnings
 import plio
 from plio import get_data
 from plio.io_db import Translations, StringToMission, setup_db_session
@@ -34,7 +35,6 @@ def get_isis_translation(label):
 
     # Grab the spacecraft name and run it through the ISIS lookup
     spacecraft_name = find_in_dict(label, 'SpacecraftName')
-
     for row in plio.data_session.query(StringToMission).filter(StringToMission.key==spacecraft_name):
         spacecraft_name = row.value.lower()
 
@@ -44,6 +44,7 @@ def get_isis_translation(label):
     except:
         instrumentid = None
 
+    translation = None
     # Grab the translation PVL object using the lookup
     for row in plio.data_session.query(Translations).filter(Translations.mission==spacecraft_name,
                                                             Translations.instrument==instrumentid):
@@ -73,6 +74,10 @@ def generate_serial_number(label):
         label = pvl.load(label, cls=SerialNumberDecoder)
     # Get the translation information
     translation = get_isis_translation(label)
+    if not translation:
+        warnings.warn('Unable to load an appropriate image translation.')
+        return
+
     serial_number = []
 
     # Sort the keys to ensure proper iteration order
@@ -83,7 +88,6 @@ def generate_serial_number(label):
             search_key = group['InputKey']
             search_position = group['InputPosition']
             search_translation = {group['Translation'][1]:group['Translation'][0]}
-
             sub_group = find_nested_in_dict(label, search_position)
             serial_entry = sub_group[search_key]
             if serial_entry in search_translation.keys():

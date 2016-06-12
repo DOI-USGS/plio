@@ -2,6 +2,13 @@ from time import gmtime, strftime
 import pvl
 
 from plio import ControlNetFileV0002_pb2 as cnf
+from plio.utils import xstr
+
+try:
+    import spiceypy
+    spicey_available = True
+except:
+    spicey_available = False
 
 VERSION = 2
 HEADERSTARTBYTE = 65536
@@ -30,7 +37,8 @@ def to_isis(path, obj, mode='w', version=VERSION,
             headerstartbyte=HEADERSTARTBYTE,
             networkid='None', targetname='None',
             description='None', username=DEFAULTUSERNAME,
-            creation_date=None, modified_date=None):
+            creation_date=None, modified_date=None,
+            pointid_prefix=None, pointid_suffix=None):
     """
     Parameters
     ----------
@@ -70,6 +78,14 @@ def to_isis(path, obj, mode='w', version=VERSION,
 
     username : str
                The name of the user / application that created the control network
+
+    pointid_prefix : str
+                     Prefix to be added to the pointid.  If the prefix is 'foo_', pointids
+                     will be in the form 'foo_1, foo_2, ..., foo_n'
+
+    pointid_suffix : str
+                     Suffix to tbe added to the point id.  If the suffix is '_bar', pointids
+                     will be in the form '1_bar, 2_bar, ..., n_bar'.
     """
 
     with IsisStore(path, mode) as store:
@@ -77,8 +93,7 @@ def to_isis(path, obj, mode='w', version=VERSION,
             creation_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
         if not modified_date:
             modified_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-
-        point_messages, point_sizes = store.create_points(obj)
+        point_messages, point_sizes = store.create_points(obj, pointid_prefix, pointid_suffix)
         points_bytes = sum(point_sizes)
         buffer_header, buffer_header_size = store.create_buffer_header(networkid,
                                                                        targetname,
@@ -87,7 +102,6 @@ def to_isis(path, obj, mode='w', version=VERSION,
                                                                        point_sizes,
                                                                        creation_date,
                                                                        modified_date)
-        print(point_sizes)
         # Write the buffer header
         store.write(buffer_header, HEADERSTARTBYTE)
         # Then write the points, so we know where to start writing, + 1 to avoid overwrite
@@ -95,7 +109,7 @@ def to_isis(path, obj, mode='w', version=VERSION,
         for i, point in enumerate(point_messages):
             store.write(point, point_start_offset)
             point_start_offset += point_sizes[i]
-
+        print(point_start_offset)
         header = store.create_pvl_header(version, headerstartbyte, networkid,
                                          targetname, description, username,
                                          buffer_header_size, points_bytes,
@@ -118,6 +132,16 @@ class IsisStore(object):
     def __init__(self, path, mode=None, **kwargs):
         self.pointid = 0
         self.nmeasures = 0
+
+        # Conversion from buffer types to Python types
+        bt = {1: float,
+              5: int,
+              8: bool,
+              9: str,
+              11: None,
+              14: None}
+        self.point_attrs = [(i.name, bt[i.type]) for i in cnf._CONTROLPOINTFILEENTRYV0002.fields]
+        self.measure_attrs = [(i.name, bt[i.type]) for i in cnf._CONTROLPOINTFILEENTRYV0002_MEASURE.fields]
 
         self._path = path
         if not mode:
@@ -146,7 +170,7 @@ class IsisStore(object):
         self._handle.seek(offset)
         self._handle.write(data)
 
-    def create_points(self, obj):
+    def create_points(self, obj, pointid_prefix, pointid_suffix):
         """
         Step through a control network (C) and return protocol buffer point objects
 
@@ -165,13 +189,27 @@ class IsisStore(object):
         point_sizes : list
                       of integer point sizes
         """
+        def _set_pid(pointid):
+            return '{}{}{}'.format(xstr(pointid_prefix),
+                                   pointid,
+                                   xstr(pointid_suffix))
+
         # TODO: Rewrite using apply syntax for performance
         point_sizes = []
         point_messages = []
         for df in obj:
             for i, g in df.groupby('point_id'):
                 point_spec = cnf.ControlPointFileEntryV0002()
-                point_spec.id = str(self.pointid)
+                point_spec.id = _set_pid(self.pointid)
+
+                for attr, attrtype in self.point_attrs:
+                    if attr in g.columns:
+                        # As per protobuf docs for assigning to a repeated field.
+                        if attr == 'aprioriCovar':
+                            arr = g.iloc[0]['aprioriCovar']
+                            point_spec.aprioriCovar.extend(arr.ravel().tolist())
+                        else:
+                            setattr(point_spec, attr, attrtype(g.iloc[0][attr]))
                 point_spec.type = int(g.point_type.iat[0])
 
                 # The reference index should always be the image with the lowest index
@@ -182,13 +220,11 @@ class IsisStore(object):
 
                 for node_id, m in g.iterrows():
                     measure_spec = point_spec.Measure()
-                    try:
-                        measure_spec.serialnumber = m.serialnumber
-                    except:
-                        measure_spec.serialnumber = str(m.serialnumber)
-                    measure_spec.type = m.measure_type
-                    measure_spec.sample = float(m.x)
-                    measure_spec.line = float(m.y)
+                    # For all of the attributes, set if they are an dict accessible attr of the obj.
+                    for attr, attrtype in self.measure_attrs:
+                        if attr in g.columns:
+                            setattr(measure_spec, attr, attrtype(m[attr]))
+                    measure_spec.type = int(m.measure_type)
 
                     measure_iterable.append(measure_spec)
                     self.nmeasures += 1
@@ -234,6 +270,7 @@ class IsisStore(object):
         header_message_size : int
                               The size of the serialized header, in bytes
         """
+        print('NID', networkid)
         raw_header_message = cnf.ControlNetFileHeaderV0002()
         raw_header_message.created = creation_date
         raw_header_message.lastModified = modified_date
