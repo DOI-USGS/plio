@@ -1,6 +1,6 @@
 import warnings
 import plio
-from plio import get_data
+from plio.data import get_data
 from plio.io_db import Translations, StringToMission, setup_db_session
 from plio.utils import find_in_dict, find_nested_in_dict
 
@@ -27,6 +27,7 @@ def get_isis_translation(label):
     """
     # Instantiate a DB session if not already instantiated
     if not hasattr(plio, 'data_session'):
+        print(get_data('data.db'))
         plio.data_session = setup_db_session(get_data('data.db'))
 
     # Grab the label is not already read

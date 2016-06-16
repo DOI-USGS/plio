@@ -1,8 +1,8 @@
 [run]
-source = autocnet
+source = plio
 [report]
 omit =
-    plio/ControlNetFileV0002_pb2.py
+    */ControlNetFileV0002_pb2.py
     */sqlalchemy_json/*
     */tests/*
 exclude_lines =
