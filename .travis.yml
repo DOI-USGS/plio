@@ -43,7 +43,8 @@ install:
   # Install not using env because build needs to be in root env
   - conda install -c conda-forge gdal h5py
   - conda install pandas sqlalchemy pyyaml
-  - conda install -c jlaura pvl protobuf==3.0.0.b2
+  - conda install -c jlaura pvl 
+  - conda install -c jlaura protobuf==3.0.0.b2
 
   # Development installation
   - conda install nose coverage
