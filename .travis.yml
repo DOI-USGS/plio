@@ -41,6 +41,8 @@ install:
   - conda info -a
 
   # Install not using env because build needs to be in root env
+  - conda config --add channels conda-forge
+  - conda config --add channels jlaura
   - conda install -c conda-forge gdal h5py
   - conda install pandas sqlalchemy pyyaml
   - conda install -c jlaura pvl protobuf
