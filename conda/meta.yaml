@@ -12,6 +12,7 @@ requirements:
     - pvl
     - protobuf 3.0.0b2
     - gdal >=2
+    - icu
     - h5py
     - pandas
     - sqlalchemy
@@ -22,6 +23,7 @@ requirements:
     - pvl
     - protobuf 3.0.0b2
     - gdal >=2
+    - icu
     - h5py
     - pandas
     - sqlalchemy
