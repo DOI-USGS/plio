@@ -12,7 +12,8 @@ Planetary Input / Output
 .. image:: https://travis-ci.org/USGS-Astrogeology/plio.svg?branch=master
     :target: https://travis-ci.org/USGS-Astrogeology/plio
 
-.. image:: https://coveralls.io/repos/github/USGS-Astrogeology/plio/badge.svg?branch=master :target: https://coveralls.io/github/USGS-Astrogeology/plio?branch=master
+.. image:: https://coveralls.io/repos/github/USGS-Astrogeology/plio/badge.svg?branch=master 
+    :target: https://coveralls.io/github/USGS-Astrogeology/plio?branch=master
 
 .. image:: https://readthedocs.org/projects/plio/badge/?version=latest
     :target: http://plio.readthedocs.io/en/latest/?badge=latest
