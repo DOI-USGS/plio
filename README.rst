@@ -2,6 +2,10 @@
 Planetary Input / Output
 ===============================
 
+.. image:: https://badges.gitter.im/USGS-Astrogeology/plio.svg
+   :alt: Join the chat at https://gitter.im/USGS-Astrogeology/plio
+   :target: https://gitter.im/USGS-Astrogeology/plio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
 .. image:: https://badges.gitter.im/USGS-Astrogeology/autocnet.svg
    :alt: Join the chat at https://gitter.im/USGS-Astrogeology/autocnet
    :target: https://gitter.im/USGS-Astrogeology/autocnet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
