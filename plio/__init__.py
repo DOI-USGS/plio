@@ -5,6 +5,7 @@ from . import isis_serial_number
 from . import io_controlnetwork
 from . import io_gdal
 from . import io_json
+from . import io_krc
 from . import io_yaml
 from . import io_db
 from . import io_hdf
