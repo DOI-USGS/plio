@@ -5,14 +5,6 @@ import warnings
 import numpy as np
 import pandas as pd
 
-try:
-    import krc
-except:
-    import os
-    import sys
-    sys.path.append(os.path.basename('..'))
-    import krc
-
 idl2np_dtype = {1: np.byte, 2: np.int16, 3: np.int32, 4: np.float32,
                 5: np.float64}
 idl2struct = {4: 'f', 5:'d'}
@@ -24,86 +16,89 @@ class ReadBin52(object):
     """
     Class to read a bin 52 and organize the output
 
-    Parameters
-    ----------
-
-    filename    (str) The file to read
 
     Attributes
     ----------
-
-    filename : str
-               The file that was parsed
-
-    header : str
-             The header from the bin52 file
-
     bin52data : ndarray
-                RAW bin52 binary read into an n-dim array
+                The raw, n-dimensional KRC data
 
-    ncases : int
-            The number of available cases (1 based)
+    casesize : int
+               The number of bytes in each KRC case
 
-    nlat : int
-           The number of latitudes
-
-    nhours : int
-             The number of hours
-
-    nseasons : int
-               The number of seasons
-
-    ntau : int
-           The number of opacity (tau) steps
-
-    nalbedos : int
-               The number of albedo steps
-
-    nslope : int
-             The number of slope steps
-
-    transferedlayers : int
-                       The number of transfered layers in the model
-
-    tlabels : list
-              Labels for the hourly tabel
-
-    latelv : ndarray
-             Array of model latitudes and elevations
-
-    pd_latelv : dataframe
-                Pandas dataframe reshape of latelv
-
-    ttt : ndarray
-          Hourly parameters as a vector
-
-    pd_ttt : dataframe
-             Pandas dataframe of the reshape ttt
-
-    seasitems : ndarray
-                Array of seasonal parameters (DJU5, Ls, PZREF, TAUD, SUMF)
-
-    pd_seasitems : dataframe
-                   Pandas dataframe reshape of seasitems
+    date : bytes
+           The date the read file was created
 
     ddd : ndarray
-          Model temperatures by layer
+          Raw temperature data
 
-    pd_ddd : dataframe
-             Pandas dataframe reshape of ddd
+    ddd_pd : dataframe
+             A pandas dataframe of surface temperature data
 
-    pd_itemg : dataframe
-               Pandas dataframe of ggg
+    filename : str
+               The name of the KRC file that was input
+
+    header : list
+             The KRC header unpack to a list of ints
+
+    headerlength : int
+                   The length, in bytes, of the KRC header
+
+    ncases : int
+             The number of different cases the model was run for
+
+    ndim : int
+           TBD
+
+    ndx : int
+          The number of indices for a single KRC run
+
+    nhours : int
+             The number of hour bins per 24 Mars hours
+
+    nlats : int
+            The number of valid, non-zero latitude bins
+
+    nseasons : int
+               The number of seasons the model was run for
+
+    nvariables : int
+                 The number of variables contained within the KRC
+                 lookup table
+
+    structdtype : str
+                  Describing endianess and data type
+
+    temperature_data : dataframe
+                       A multi-indexed dataframe of surface temperatures
+
+    transferedlayers : int
+                       The number of KRC transfered layers
+
+    version : list
+              The krc verison used to create the file in the form
+              [major, minor, release]
+
+    words_per_krc : int
+                    The number of bytes per krc entry
     """
 
     def __init__(self, filename, headerlen=512):
+        """
+        Parameters
+        ----------
+        filename : str
+                   The file to read
 
+        headerlength : int
+                       The length, in bytes, of the text header.
+                       Default: 512
+        """
         # Get or setup the logging object
         self.logger = logging.getLogger(__name__)
 
         self.filename = filename
         self.readbin5(headerlen)
-
+        print(self.ncases)
         assert(self.ncases == self.bin52data.shape[0])
 
     def definekrc(self, what='KRC', endianness='<'):
@@ -129,7 +124,7 @@ class ReadBin52(object):
 
             #Define the structure of the KRC file
             if self.structdtype == '<f':
-                self._krcstructure = np.dtype([('fd','{}{}f'.format(e, numfd)),
+                self._krcstructure= np.dtype([('fd','{}{}f'.format(e, numfd)),
                                         ('id','{}{}i'.format(e, numid)),
                                         ('ld','{}{}i'.format(e, numld)),
                                         ('title','{}{}a'.format(e, 4 * numtit)),
@@ -167,7 +162,7 @@ class ReadBin52(object):
             self.headerlength = header[8]
             self.ncases = header[0 + self.ndim]
             self.header = header
-
+            print(self.header)
             # Compute how large each case is
             self.casesize = self.nhours
             if self.ndim > 1:
@@ -189,12 +184,39 @@ class ReadBin52(object):
             indices = arraysize[1: -1]
             self.bin52data = self.bin52data.reshape(indices[: : -1])
 
+        def _read_metadata():
+            if self.structdtype == '<f':
+                j = self.headerlength + 16  # Skip header plus 1 16bit entry
+            elif self.structdtype == '<d':
+                j = self.headerlength + 32 # Skip header plus 1 32bit entry
+
+            bin5.seek(j)
+            self.definekrc('KRC')
+            structarr = np.fromfile(bin5, dtype=self._krcstructure, count=1)
+
+            if self.structdtype == '<f':
+                self.structarr = {'fd': structarr[0][0],
+                    'id': structarr[0][1],
+                    'ld': structarr[0][2],
+                    'title': structarr[0][3],
+                    'date': structarr[0][4],
+                    'alat': structarr[0][5],
+                    'elevation': structarr[0][6]
+                    }
+            elif self.structdtype == '<d':
+                self.structarr = {'fd': structarr[0][0],
+                        'alat': structarr[0][1],
+                        'elevation': structarr[0][2],
+                        'id': structarr[0][3],
+                        'ld': structarr[0][4],
+                        'title': structarr[0][5],
+                        'date':structarr[0][6]}
+
         def _get_version():
             ver = re.findall(b'\d+', head)
             ver = list(map(int, ver))
             self.version = ver[: 3]
 
-        #Add smarter filename handling
         with open(self.filename, 'rb') as bin5:
 
             #To handle endianness and architectures
@@ -203,7 +225,7 @@ class ReadBin52(object):
 
             fullheader = bin5.read(headerlen)
             _parse_header()
-
+            print(self.header)
             arraysize = self.header[0: self.ndim + 2]
             arraydtypecode = arraysize[arraysize[0] + 1]
             try:
@@ -238,211 +260,202 @@ class ReadBin52(object):
             _get_version()
             _parse_front()
             _read_data()
+            _read_metadata()
 
-    def readcase(self, case=1):
+
+    def readcase(self, case=0):
         """
         Read a single dimension (case) from a bin52 file.
 
         Parameters
         -----------
-        case       (int) The case to be extracted
-
-        Returns
-        -------
-        casearr    (ndarray) The extracted KRC model for
-                             the case.
+        case : int
+               The case to be extracted
         """
 
-        if self.structdtype == '<f':
-            j = 512 + (1 - 1) * 4 * self.casesize + 16
-        elif self.structdtype == '<d':
-            j = 512 + (1 - 1) * 4 * self.casesize + 32
-        with open(self.filename, 'r') as krc:
-            # Skip to the correct case
-            krc.seek(j)
-            self.definekrc('KRC')
-            structarr = np.fromfile(krc, dtype=self._krcstructure, count=1)
-        if self.structdtype == '<f':
-            self.structarr = {'fd': structarr[0][0],
-                'id': structarr[0][1],
-                'ld': structarr[0][2],
-                'title': structarr[0][3],
-                'date': structarr[0][4],
-                'alat': structarr[0][5],
-                'elevation': structarr[0][6]
-                }
-        elif self.structdtype == '<d':
-            self.structarr = {'fd': structarr[0][0],
-                    'alat': structarr[0][1],
-                    'elevation': structarr[0][2],
-                    'id': structarr[0][3],
-                    'ld': structarr[0][4],
-                    'title': structarr[0][5],
-                    'date':structarr[0][6]}
+        def latitems2dataframe():
+            """
+            Converts Latitude items to a dataframe
+            """
+            columns = ['# Days to Compute Soln.',
+                      'RMS Temp. Change on Last Day',
+                      'Predicted Final Atmospheric Temp.',
+                      'Predicted frost amount, [kg/m^2]',
+                      'Frost albedo (at the last time step)',
+                      'Mean upward heat flow into soil surface on last day, [W/m^2]']
 
-        self.nlayers = nlayers = self.structarr['id'][0]
-        itemt = ['Final Hourly Surface Temp.',
-                 'Final Hourly Planetary Temp.',
-                 'Final Hourly Atmospheric Temp.',
-                 'Hourly net downward solar flux [W/m^2]',
-                 'Hourly net downward thermal flux [W/m^2]']
+            # Grab the correct slice from the data cube and reshape
+            latitems = layeritems[: ,: ,: ,: ,0: 3].reshape(self.ncases,
+                                                     self.nseasons,
+                                                     self.nlats, len(columns))
 
-        itemu = ['Lat', 'Elev']
-        itemv = ['Current Julian date (offset from J2000.0)',
+            # Multi-index generation
+            idxcount = self.nseasons * self.nlats * self.ncases
+            idxpercase = self.nseasons * self.nlats
+            caseidx = np.empty(idxcount)
+            for c in range(self.ncases):
+                start = c * idxpercase
+                caseidx[start:start+idxpercase] = np.repeat(c, idxpercase)
+            nseasvect = np.arange(self.nseasons)
+            seasonidx = np.repeat(np.arange(self.nseasons), self.nlats)
+            latidx = np.tile(self.latitudes.values.ravel(), self.nseasons)
+
+            # Pack the dataframe
+            self.latitude = pd.DataFrame(latitems.reshape(self.nseasons * self.nlats, -1),
+                                        index=[caseidx, seasonidx, latidx],
+                                        columns=columns)
+
+            self.latitude.index.names = ['Case','Season' ,'Latitude']
+
+        def layer2dataframe():
+            """
+            Converts layeritems into
+            """
+            columns = ['Tmin', 'Tmax']
+
+            ddd = layeritems[: ,: ,: ,: ,3: 3 + self.transferedlayers].reshape(self.ncases,
+                                                                   self.nseasons,
+                                                                   self.nlats,
+                                                                   len(columns),
+                                                                   self.transferedlayers)
+
+            idxcount = self.nseasons * self.nlats * self.transferedlayers * self.ncases
+            caseidx = np.empty(idxcount)
+            idxpercase = self.nseasons * self.nlats * self.transferedlayers
+            for c in range(self.ncases):
+                start = c * idxpercase
+                caseidx[start:start + idxpercase] = np.repeat(c, idxpercase)
+
+            seasonidx = np.repeat(np.arange(self.nseasons), idxcount / self.nseasons / self.ncases)
+            nlatidx = np.repeat(self.latitudes.values.ravel(), idxcount / self.transferedlayers / self.ncases)
+            tranlayeridx = np.tile(np.repeat(np.arange(self.transferedlayers), self.nlats), self.nseasons)
+            self.layers = pd.DataFrame(ddd.reshape(idxcount, -1),
+                                       columns=columns,
+                                       index=[caseidx, seasonidx, nlatidx, tranlayeridx])
+            self.layers.index.names = ['Case', 'Season', 'Latitude', 'Layer']
+
+        def latelv2dataframes():
+            """
+            Convert the latitude and elevation arrays to dataframes
+            """
+            #All latitudes
+            #Hugh made some change to the krcc format, but I cannot find documentation...
+            if self.structdtype == '<f':
+                alllats = krcc[:,prelatwords:].reshape(2, nlat_include_null, self.ncases)
+            elif self.structdtype == '<d':
+                alllats = krcc[:,96:170].reshape(2, nlat_include_null, self.ncases)
+                #Latitudes and elevations for each case
+            latelv = alllats[: ,0: nlat]
+            if latelv.shape[-1] == 1:
+                latelv = latelv[:,:,0]
+            self.latitudes = pd.DataFrame(latelv[0], columns=['Latitude'])
+            self.elevations = pd.DataFrame(latelv[1], columns=['Elevation'])
+
+        def season2dataframe():
+            columns = ['Current Julian date (offset from J2000.0)',
                  'Seasonal longitude of Sun (in degrees)',
                  'Current surface pressure at 0 elevation (in Pascals)',
                  'Mean visible opacity of dust, solar wavelengths',
                  'Global average columnar mass of frost [kg /m^2]']
-        itemd = ['Tmin', 'Tmax']
-        itemg = ['# Days to Compute Soln.',
-         'RMS Temp. Change on Last Day',
-         'Predicted Final Atmospheric Temp.',
-         'Predicted frost amount, [kg/m^2]',
-         'Frost albedo (at the last time step)',
-         'Mean upward heat flow into soil surface on last day, [W/m^2]']
 
-        self.glabels = itemg
-        self.tlabels = itemt
-        self.ulabels = itemu
-        self.vlabels = itemv
-        self.dlabels = itemd
+            # Build a dataframe of the seasonal information
+            seasitems = header[:, 4 + self.words_per_krc: k ].reshape(self.ncases,
+                                                                      len(columns),
+                                                                      self.nseasons)
+            caseidx = np.repeat(np.arange(self.ncases), self.nseasons)
+            seasonidx = np.repeat(np.arange(self.nseasons), self.ncases)
+            flt_seasitems = seasitems.reshape(len(self.vlabels),
+                                              self.ncases * self.nseasons)
+            self.seasons = pd.DataFrame(flt_seasitems,
+                                          index=[caseidx,seasonidx],
+                                          columns=columns)
+            self.seasons.index.names = ['Case', 'Season']
 
+        def hourly2dataframe():
+            """
+            Converts the hourly 'ttt' vector to a
+            labelled Pandas dataframe.
+            """
+            columns = ['Final Hourly Surface Temp.',
+                     'Final Hourly Planetary Temp.',
+                     'Final Hourly Atmospheric Temp.',
+                     'Hourly net downward solar flux [W/m^2]',
+                     'Hourly net downward thermal flux [W/m^2]']
+            ttt = self.bin52data[: ,self.ndx: ,: ,0: len(columns),: ].reshape(self.ncases,
+                                                                         self.nseasons,
+                                                                         self.nlats,
+                                                                         len(columns),
+                                                                         self.nhours)
+
+            reshapettt = np.swapaxes(ttt.reshape(self.ncases * self.nseasons * self.nlats,
+                                                 len(columns),
+                                                 self.nhours),1,2)
+            shp = reshapettt.shape
+            reshapettt = reshapettt.reshape((shp[0] * shp[1], shp[2])).T
+            #Indices
+            caseidx = np.repeat(np.arange(self.ncases), self.nseasons * self.nlats * self.nhours)
+            seasonidx = np.tile(np.repeat(np.arange(self.nseasons), self.nlats * self.nhours), self.ncases)
+            latidx = np.tile(np.repeat(self.latitudes.values.ravel(), self.nhours), self.nseasons)
+            houridx = np.tile(np.tile(np.tile(np.arange(self.nhours), self.nlats), self.nseasons), self.ncases)
+
+            #DataFrame
+            self.temperatures = pd.DataFrame(reshapettt.T,
+                                       index=[caseidx, seasonidx, latidx, houridx],
+                                       columns=columns)
+            self.temperatures.index.names = ['Case', 'Season', 'Latitude', 'Hour']
+
+
+
+        self.nlayers = nlayers = self.structarr['id'][0]
         nlat = len(self.structarr['alat'])
-        transferedlayers = nlayers - 1
-        if self.nhours - 3 < transferedlayers:
-            transferedlayers = self.nhours - 3
+        self.transferedlayers = nlayers - 1
+        if self.nhours - 3 < self.transferedlayers:
+            self.transferedlayers = self.nhours - 3
+
         wordsperlat = self.nhours * self.nvariables
         wordsperseason = wordsperlat * self.nlats
-
-        if self.nvariables != len(itemt) + len(itemd):
-            self.logger.error("Error! Size mismatch")
 
         # Each case has a header that must be extracted:
         header = self.bin52data[:,0:self.ndx,: ,: ,: ].reshape(self.ncases,
                                                                wordsperseason * self.ndx)
-        #krccomm
         k = 4 + self.words_per_krc + 5 * self.nseasons
         krcc = header[:, 4: 4 + self.words_per_krc]
 
-        # Build a dataframe of the seasonal information
-        seasitems = header[:, 4 + self.words_per_krc: k ].reshape(self.ncases,
-                                                                  len(itemv),
-                                                                  self.nseasons)
-        # Good to HERE.
-        caseidx = np.repeat(np.arange(self.ncases), self.nseasons)
-        seasonidx = np.repeat(np.arange(self.nseasons), self.ncases)
-        flt_seasitems = seasitems.reshape(len(self.vlabels),
-                                          self.ncases * self.nseasons)
-        self.seasitems = pd.DataFrame(flt_seasitems,
-                                      columns=[caseidx,seasonidx],
-                                      index=[self.vlabels])
-        self.seasitems.columns.names = ['Case', 'Season']
-
-        # TODO: Can nlat_include_null be replaced with self.nlats?
         nlat_include_null = len(self.structarr['alat'])
         prelatwords = self.words_per_krc - 2 * nlat_include_null
-        #All latitudes
-        #Hugh made some change to the krcc format, but I cannot find documentation...
-        if self.structdtype == '<f':
-            alllats = krcc[:,prelatwords:].reshape(2, nlat_include_null, ncases)
-        elif self.structdtype == '<d':
-            alllats = krcc[:,96:170].reshape(2, nlat_include_null, self.ncases)
-        self.alllats = alllats
-        #Latitudes and elevations for each case
-        self.latelv = alllats[: ,0: nlat]
-        if self.latelv.shape[-1] == 1:
-            self.latelv = self.latelv[:,:,0]
-        self.pd_latelv = pd.DataFrame(self.latelv.T, columns=['Latitude', 'Elevation'])
-        wordspercase = wordsperseason * self.nseasons  # arrshp[1] = nseasons
-        jword = [4,wordspercase, self.ncases]
 
+        wordspercase = wordsperseason * self.nseasons
 
-        self.ttt = self.bin52data[: ,self.ndx: ,: ,0: len(itemt),: ].reshape(self.ncases,
-                                                                             self.nseasons,
-                                                                             self.nlats,
-                                                                             len(itemt),
-                                                                             self.nhours)
-        self.hourly2dataframe()
+        # Extract the latitude and elevation metadata
+        latelv2dataframes()
 
+        #Extract the hourly temperature data
+        hourly2dataframe()
+
+        # Extract by layer data from the data cube
         layeritems = self.bin52data[: , self.ndx: , : , 5: 7, : ]
-        self.latitems = layeritems[: ,: ,: ,: ,0: 3].reshape(self.ncases,
-                                                             self.nseasons,
-                                                             self.nlats, len(itemg))
-        self.latitems2dataframe()
-
-        self.ddd = layeritems[: ,: ,: ,: ,3: 3 + transferedlayers].reshape(self.ncases,
-                                                                               self.nseasons,
-                                                                               self.nlats,
-                                                                               len(itemd),
-                                                                               transferedlayers)
-        self.transferedlayers = transferedlayers
-        self.layer2dataframe()
-
-    def latitems2dataframe(self):
-        """
-        Converts Latitude items to a dataframe
-        """
-        idxcount = self.nseasons * self.nlats * self.ncases
-        idxpercase = self.nseasons * self.nlats
-        caseidx = np.empty(idxcount)
-        for c in range(self.ncases):
-            start = c * idxpercase
-            caseidx[start:start+idxpercase] = np.repeat(c, idxpercase)
-        nseasvect = np.arange(self.nseasons)
-        seasonidx = np.repeat(np.arange(self.nseasons), self.nlats)
-        latidx = np.tile(self.latelv[0].ravel(), self.nseasons)
-
-        self.pd_itemg = pd.DataFrame(self.latitems.reshape(self.nseasons * self.nlats, -1).T,
-                                     columns=[caseidx, seasonidx, latidx], index=self.glabels)
-        self.pd_itemg.columns.names = ['Case','Season', 'Latitude']
-
-    def layer2dataframe(self):
-        """
-        Converts layeritems into
-        """
-        self.logger.debug((self.nseasons, self.nlats, self.transferedlayers, self.ncases))
-        idxcount = self.nseasons * self.nlats * self.transferedlayers * self.ncases
-        caseidx = np.empty(idxcount)
-        idxpercase = self.nseasons * self.nlats * self.transferedlayers
-        for c in range(self.ncases):
-            start = c * idxpercase
-            caseidx[start:start + idxpercase] = np.repeat(c, idxpercase)
-
-        seasonidx = np.repeat(np.arange(self.nseasons), idxcount / self.nseasons / self.ncases)
-        nlatidx = np.repeat(self.latelv[0].ravel(), idxcount / self.transferedlayers / self.ncases)
-        tranlayeridx = np.tile(np.repeat(np.arange(self.transferedlayers), self.nlats), self.nseasons)
-        self.pd_ddd = pd.DataFrame(self.ddd.reshape(idxcount, -1).T, index=[self.dlabels], columns=[caseidx, seasonidx, nlatidx, tranlayeridx])
-        self.pd_ddd.columns.names = ['Case', 'Season', 'Latitude', 'Layer']
-
-    def seas2dataframe(self):
-        """
-        converts seasitems 'vvv' vector to a
-        labelled Pandas dataframe
-        """
+        latitems2dataframe()
+        layer2dataframe()
 
 
-    def hourly2dataframe(self):
-        """
-        Converts the hourly 'ttt' vector to a
-        labelled Pandas dataframe.
-        """
-        reshapettt = np.swapaxes(self.ttt.reshape(self.ncases * self.nseasons * self.nlats, len(self.tlabels), self.nhours),1,2)
-        shp = reshapettt.shape
-        reshapettt = reshapettt.reshape((shp[0] * shp[1], shp[2])).T
-        #Indices
-        caseidx = np.repeat(np.arange(self.ncases), self.nseasons * self.nlats * self.nhours)
-        seasonidx = np.tile(np.repeat(np.arange(self.nseasons), self.nlats * self.nhours), self.ncases)
-        latidx = np.tile(np.repeat(self.latelv[0].ravel(), self.nhours), self.nseasons)
-        houridx = np.tile(np.tile(np.tile(np.arange(self.nhours), self.nlats), self.nseasons), self.ncases)
-
-        #DataFrame
-        self.pd_ttt = pd.DataFrame(reshapettt.T,
-                                   index=[caseidx, seasonidx, latidx, houridx],
-                                   columns=self.tlabels)
-        self.pd_ttt.index.names = ['Case', 'Season', 'Latitude', 'Hour']
-        self.temperature_data = self.pd_ttt
-        #self.pd_ttt = self.pd_ttt.T
 
 class ReadTds(object):
-    def __init__(self):
-        pass
+
+    def __init__(self, filename, headerlength=512):
+        """
+        Parameters
+        ----------
+        filename : str
+                   The file to read
+
+        headerlength : int
+                       The length, in bytes, of the text header.
+                       Default: 512
+        """
+        # Get or setup the logging object
+        self.logger = logging.getLogger(__name__)
+
+        self.filename = filename
+        self.readbin5(headerlen)
+        print(self.ncases)
+        assert(self.ncases == self.bin52data.shape[0])
