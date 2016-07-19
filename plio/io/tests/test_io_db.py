@@ -1,14 +1,14 @@
 import os
+import sys
 import unittest
 
 from sqlalchemy.orm import session
 
 from plio.data import get_data
 
-import sys
 sys.path.insert(0, os.path.abspath('..'))
 
-from .. import io_db
+from plio.io import io_db
 
 
 class TestDataDB(unittest.TestCase):

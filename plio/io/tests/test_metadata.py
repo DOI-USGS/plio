@@ -1,8 +1,11 @@
 import unittest
+
 from osgeo import osr
+
 osr.UseExceptions()
 
-from .. import extract_metadata as em
+from plio.io import extract_metadata as em
+
 
 class TestSRSProjectionExtraction(unittest.TestCase):
 

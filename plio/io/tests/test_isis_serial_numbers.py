@@ -1,12 +1,12 @@
 import os
+import sys
 import unittest
 
 from plio.examples import get_path
 
-import sys
 sys.path.insert(0, os.path.abspath('..'))
 
-from .. import isis_serial_number
+from plio.io import isis_serial_number
 
 
 class TestIsisSerials(unittest.TestCase):

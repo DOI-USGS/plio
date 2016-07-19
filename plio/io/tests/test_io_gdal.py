@@ -1,13 +1,14 @@
 import os
+import sys
 import unittest
+
 import numpy as np
 
 from plio.examples import get_path
 
-import sys
 sys.path.insert(0, os.path.abspath('..'))
 
-from .. import io_gdal
+from plio.io import io_gdal
 
 
 class TestMercator(unittest.TestCase):
@@ -176,12 +177,12 @@ class TestWriter(unittest.TestCase):
     def test_with_no_data_value(self):
         no_data_value = 0.0
         #nd array
-        io_gdal.array_to_raster(self.ndarr,'test.tif', ndv=no_data_value)
+        io_gdal.array_to_raster(self.ndarr, 'test.tif', ndv=no_data_value)
         dataset = io_gdal.GeoDataset('test.tif')
         self.assertEqual(dataset.no_data_value, no_data_value)
 
         #array
-        io_gdal.array_to_raster(self.arr,'test.tif', ndv=no_data_value)
+        io_gdal.array_to_raster(self.arr, 'test.tif', ndv=no_data_value)
         dataset = io_gdal.GeoDataset('test.tif')
         self.assertEqual(dataset.no_data_value, no_data_value) 
 

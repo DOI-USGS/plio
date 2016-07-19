@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, create_engine, orm
 from sqlalchemy.ext import declarative
 
-from .sqlalchemy_json.alchemy import NestedJsonObject
+from plio.sqlalchemy_json.alchemy import NestedJsonObject
 
 Base = declarative.declarative_base()
 

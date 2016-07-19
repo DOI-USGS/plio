@@ -1,7 +1,7 @@
 import unittest
 
-from .. import io_yaml
 from .. import io_json
+from .. import io_yaml
 
 try:
     import yaml

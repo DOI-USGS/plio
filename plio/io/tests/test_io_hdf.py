@@ -4,7 +4,7 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from .. import io_hdf
+from plio.io import io_hdf
 
 
 class TestHDF(unittest.TestCase):

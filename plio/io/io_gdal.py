@@ -1,16 +1,15 @@
+import os
 import warnings
 
-import pvl
-import os
-
-from plio.utils.utils import find_in_dict
-from osgeo import ogr
-import numpy as np
 import gdal
 import gdalconst
+import numpy as np
 import osr
+import pvl
+from osgeo import ogr
 
-from plio import extract_metadata
+from plio.io import extract_metadata
+from plio.utils.utils import find_in_dict
 
 gdal.UseExceptions()
 
