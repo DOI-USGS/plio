@@ -2,7 +2,10 @@ import os
 import json
 import logging.config
 
-def setup_logging(default_path='logging.json',
+from ..examples import get_path
+
+
+def setup_logging(default_path=get_path('logging.json'),
                   default_level='INFO',
                   env_key='LOG_CFG'):
     """
@@ -28,7 +31,8 @@ def setup_logging(default_path='logging.json',
         logtype = os.path.splitext(os.path.basename(path))[1]
         with open(path, 'rt') as f:
             if logtype == '.json':
-                config = json.load(f)
+                config = json.load(f, parse_float=True,
+                                   parse_int=True)
             elif logtype == '.yaml':
                 import yaml
                 config = yaml.load(f.read())
