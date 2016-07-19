@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from ..examples import get_path
+from plio.examples import get_path
 from .. import utils
 
 class TestUtils(unittest.TestCase):

@@ -3,10 +3,11 @@ import warnings
 import pvl
 import os
 
-from plio.utils import find_in_dict
+from plio.utils.utils import find_in_dict
 from osgeo import ogr
 import numpy as np
 import gdal
+import gdalconst
 import osr
 
 from plio import extract_metadata
@@ -149,8 +150,6 @@ class GeoDataset(object):
         self.dataset = gdal.Open(file_name)
         if self.dataset is None:
           raise IOError('File not found :', file_name)
-
-
 
     def __repr__(self):
         return os.path.basename(self.file_name)
@@ -465,6 +464,7 @@ class GeoDataset(object):
             array = band.ReadAsArray(xstart, ystart, xextent, yextent).astype(dtype)
         return array
 
+
 def array_to_raster(array, file_name, projection=None,
                     geotransform=None, outformat='GTiff',
                     ndv=None):
@@ -525,3 +525,40 @@ def array_to_raster(array, file_name, projection=None,
                 bnd.SetNoDataValue(ndv)
             bnd.WriteArray(array[:,:,i - 1])
             dataset.FlushCache()
+
+
+def match_rasters(match_to, match_from, destination,
+                  resampling_method='GRA_Bilinear'):
+    """
+    Match a source raster to a match raster, including resolution and extent.
+
+    Parameters
+    ==========
+    match : object
+            A GeoDataSet object to be matched to
+
+    source : object
+             A GeoDataSet object to be clipped
+
+    destination : str
+                  PATH where the output will be written
+
+    resampling_method : str
+                        Resampling method to use.  Options include:
+                        {GRA_NearestNeighbor, GRA_Bilinear (Default),
+                        GRA_Cubic, GRA_CubicSpline, GRA_Lanczos, GRA_Average,
+                        GRA_Mode}
+    """
+    # TODO: If a destination is not provided create an in-memory GeoDataSet object
+    match_to_srs = match_to.ds.GetProjection()
+    match_to_gt = match_to.geotransform
+    width, height = match_to.rastersize
+
+    match_from__srs = match_from.ds.GetProjection()
+    match_from__gt = match_from.geotransform
+
+    dst = gdal.GetDriverByName('GTiff').Create(destination, width, height, 1, gdalconst.GDT_Float32)
+    dst.SetGeoTransform(match_to_gt)
+    dst.SetProjection(match_to_srs)
+
+    gdal.ReprojectImage(match_from.ds, dst, None, None, getattr(gdalconst, resampling_method))

@@ -2,7 +2,7 @@ from time import gmtime, strftime
 import pvl
 
 from plio import ControlNetFileV0002_pb2 as cnf
-from plio.utils import xstr
+from plio.utils.utils import xstr
 
 try:
     import spiceypy
