@@ -1,13 +1,20 @@
-import krc.config as config
-
-def j2season(_date):
+def j2season(_date, year=686.9799625, marsday=8.5875, startdate=144.61074994):
     """
-    Ls date to a KRC season.
+    Ls date to a KRC season to determine which KRC seasonal lookup tables to use
 
     Parameters
     -----------
     _date : float
-   	    The input date to be converted
+   	        The input date to be converted
+
+   	year : float
+   	       The mars year to search within
+
+   	marsday : float
+   	          The length of a Mars day
+
+   	startdate : float
+   	            The zero, start date
 
     Returns
     -------
@@ -17,11 +24,11 @@ def j2season(_date):
 		  The integer index to the stop season
     """
     date = _date
-    if date < config.RECORD_START_DATE:
-        remainder = (config.RECORD_START_DATE - date) / config.YEAR
-        date = date + int(remainder + 1.0) * config.YEAR
-    dateoffset = (date - config.RECORD_START_DATE) % config.YEAR
-    recordoffset = dateoffset / config.MARTIAN_DAY
+    if date < startdate:
+        remainder = (startdate - date) / year
+        date = date + int(remainder + 1.0) * year
+    dateoffset = (date - startdate) % year
+    recordoffset = dateoffset / marsday
     startseason = int(recordoffset)
     stopseason = startseason + 1
     return recordoffset, startseason, stopseason

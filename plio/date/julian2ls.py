@@ -6,8 +6,20 @@ import numpy as np
 
 def zero360(angles, rad=False):
     """
-    angles:  ndarray: a scalar or vector of float angles
-    rad:     boolean: flag whether angles are in radians
+    Convert angle to base 0-360
+
+    Parameters
+    ----------
+    angles : float
+             a scalar angle to convert
+
+    rad : boolean
+          flag whether angles are in radians
+
+    Returns
+    -------
+    bb : float
+         converted angle
     """
 
     if rad:
@@ -26,14 +38,29 @@ def zero360(angles, rad=False):
 
 def julian2ls(date, marsyear=None, reverse=False):
     """
-    date:       Scalar or NumPy ndarray
-    marsyear:
-    reverse:    Boolean
-                Reverse conversion from L_{s} to julian
 
     Original IDL from Hugh Keiffer
 
-    References:
+    Parameters
+    -----------
+    date : numeric
+           Scalar or NumPy ndarray or dates
+
+    marsyear : float
+              Mars year for use in reverse
+
+    reverse : bool
+              Reverse conversion from L_{s} to julian
+
+    Returns
+    -------
+    out : numeric
+          float or array of float LsubS or Julian dates
+
+    myn : float
+          If LsubS to Mars year, return the Mars year
+
+    References
     -----------
     [1] M. Allison and M. McEwen.' A post-Pathfinder evaluation of areocentric
     solar coordinates with improved timing recipes for Mars seasonal/diurnal

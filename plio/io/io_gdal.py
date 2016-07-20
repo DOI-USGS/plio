@@ -2,7 +2,6 @@ import os
 import warnings
 
 import gdal
-import gdalconst
 import numpy as np
 import osr
 import pvl
@@ -548,6 +547,7 @@ def match_rasters(match_to, match_from, destination,
                         GRA_Cubic, GRA_CubicSpline, GRA_Lanczos, GRA_Average,
                         GRA_Mode}
     """
+    import gdalconst  # import here so Sphinx can build the docos, mocking is not working
     # TODO: If a destination is not provided create an in-memory GeoDataSet object
     match_to_srs = match_to.dataset.GetProjection()
     match_to_gt = match_to.geotransform
