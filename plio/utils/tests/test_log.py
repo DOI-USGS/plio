@@ -12,17 +12,17 @@ class TestLog(unittest.TestCase):
         pass
 
     def test_setup_json(self):
-        log.setup_logging(default_path = get_path('logging.json'))
+        log.setup_logging(path=get_path('logging.json'))
         logger = logging.getLogger(__name__)
         self.assertEqual(logger.root.level, logging.DEBUG)
 
     def test_setup_yaml(self):
-        log.setup_logging(default_path=get_path('logging.yaml'))
+        log.setup_logging(path=get_path('logging.yaml'))
         logger = logging.getLogger(__name__)
         self.assertEqual(logger.root.level, logging.DEBUG)
 
     def test_setup(self):
-        log.setup_logging()
+        log.setup_logging(path='')
         logger = logging.getLogger(__name__)
         self.assertEqual(logger.root.level, logging.INFO)
 

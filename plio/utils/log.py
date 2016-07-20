@@ -5,39 +5,38 @@ import logging.config
 from ..examples import get_path
 
 
-def setup_logging(default_path=get_path('logging.json'),
-                  default_level='INFO',
+def setup_logging(path=get_path('logging.json'),
+                  level='INFO',
                   env_key='LOG_CFG'):
     """
     Read a log configuration file, written in JSON
 
     Parameters
     ----------
-    default_path : string
+    path : string
                    The path to the logging configuration file
-    default_level : object
+    level : object
                     The logger level at which to report
     env_key : str
               A potential environment variable where the user defaults logs
     """
-
-    path = default_path
     value = os.getenv(env_key, None)
     if value:
         path = value
 
-    default_level = getattr(logging, default_level.upper())
+    print(level)
+    level = getattr(logging, level.upper())
+    print(level)
     if os.path.exists(path):
         logtype = os.path.splitext(os.path.basename(path))[1]
         with open(path, 'rt') as f:
             if logtype == '.json':
-                config = json.load(f, parse_float=True,
-                                   parse_int=True)
+                config = json.load(f)
             elif logtype == '.yaml':
                 import yaml
                 config = yaml.load(f.read())
         logging.config.dictConfig(config)
     else:
-        logging.basicConfig(level=default_level)
+        logging.basicConfig(level=level)
         logger = logging.getLogger()
-        logger.setLevel(default_level)
+        logger.setLevel(level)
