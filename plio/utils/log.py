@@ -24,9 +24,7 @@ def setup_logging(path=get_path('logging.json'),
     if value:
         path = value
 
-    print(level)
     level = getattr(logging, level.upper())
-    print(level)
     if os.path.exists(path):
         logtype = os.path.splitext(os.path.basename(path))[1]
         with open(path, 'rt') as f:

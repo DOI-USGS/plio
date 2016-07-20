@@ -533,11 +533,11 @@ def match_rasters(match_to, match_from, destination,
 
     Parameters
     ==========
-    match : object
-            A GeoDataSet object to be matched to
+    match_to : object
+               A GeoDataSet object to be matched to
 
-    source : object
-             A GeoDataSet object to be clipped
+    match_from : object
+                 A GeoDataSet object to be clipped
 
     destination : str
                   PATH where the output will be written
@@ -549,15 +549,15 @@ def match_rasters(match_to, match_from, destination,
                         GRA_Mode}
     """
     # TODO: If a destination is not provided create an in-memory GeoDataSet object
-    match_to_srs = match_to.ds.GetProjection()
+    match_to_srs = match_to.dataset.GetProjection()
     match_to_gt = match_to.geotransform
-    width, height = match_to.rastersize
+    width, height = match_to.raster_size
 
-    match_from__srs = match_from.ds.GetProjection()
+    match_from__srs = match_from.dataset.GetProjection()
     match_from__gt = match_from.geotransform
 
     dst = gdal.GetDriverByName('GTiff').Create(destination, width, height, 1, gdalconst.GDT_Float32)
     dst.SetGeoTransform(match_to_gt)
     dst.SetProjection(match_to_srs)
 
-    gdal.ReprojectImage(match_from.ds, dst, None, None, getattr(gdalconst, resampling_method))
+    gdal.ReprojectImage(match_from.dataset, dst, None, None, getattr(gdalconst, resampling_method))
