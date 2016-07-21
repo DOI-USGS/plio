@@ -69,6 +69,13 @@
           {%- endif %}
           {%- block sidebarsearch %}
           {%- if pagename != "search" %}
+            <div>
+              <h3>Releases</h3>
+              <ul class="last simple">
+                  <li><a class="reference external" href="https://anaconda.org/jlaura/plio">Binary 0.1.0 release</a></li>
+                  <li><a class="reference external" href="http://github.com/USGS-Astrogeology/plio">Development 0.1.0dev</a></li>
+              </ul>
+          </div>
           <div id="searchbox" style="display: none">
             <h3>{{ _('Quick search') }}</h3>
               <form class="search" action="{{ pathto('search') }}" method="get">
@@ -81,6 +88,7 @@
               {{ _('Enter search terms or a module, class or function name.') }}
               </p>
           </div>
+
           <script type="text/javascript">$('#searchbox').show(0);</script>
           {%- endif %}
           {%- endblock %}

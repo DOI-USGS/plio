@@ -54,7 +54,7 @@ needs_sphinx = '1.3'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'sphinx.ext.napoleon']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'sphinx.ext.napoleon', 'nbsphinx']
 
 # NumpyDoc Options
 numpydoc_show_class_members = True
@@ -134,7 +134,9 @@ html_theme = 'alabaster'
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_theme_options = {
+    'page_width':940
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []

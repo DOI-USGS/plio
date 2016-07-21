@@ -6,29 +6,23 @@
 
 Planetary I/O
 =============
-
 .. raw:: html
 
  <div class="section" id="showcase">
-      <a href=""><img     src="_static/images/.png" border="0" alt="An image about planets and I/O"/></a>
-  </div>
+    <a href=""><img src="_static/images/splash.jpg" border="0" alt="An image about planets and I/O"/></a>
+ </div>
+
+Planetary I/O (Plio) is an open source collection of my commonly used I/O functionality. Plio is licensed in `the public domain`_.
+
+About the image: The `Walters Art Museum`_ has scanned and released into the public domain a twelfth century illuminated manuscript
+created by Christian monks that served as a scientific text.  The two reproduced pages illustrate 'the heavens'.
 
 
-.. sidebar:: Releases
 
-    - `Development 0.1.0dev  <http://github.com/USGS-Astrogeology/plio>`_
-
-Planetary I/O (Plio) is an open source collection of my commonly used I/O functionality. Plio is licensed in `the public domain`.
 
 .. _the public domain: license.html
+.. _ Walters Art Museusm: https://www.flickr.com/photos/medmss/albums/72157626360106319
 
-
-.. toctree::
-    :maxdepth: 1
-
-    users/index
-    developers/index
-    library/index
 
 .. raw:: html
 
@@ -62,7 +56,7 @@ Planetary I/O (Plio) is an open source collection of my commonly used I/O functi
       <a href="library/index.html">
         <img alt="Documentation" src="_static/images/documentation.png" title="Documentation"  height="80" style="display: block; margin-left: auto; margin-right: auto;"></a> </td>
     <td>
-      <a href="http://github.com/pysal/pysal/issues?state=open">
+      <a href=https://github.com/USGS-Astrogeology/plio/issues?state=open">
         <img alt="Bug Report" src="_static/images/bugs.png" title="Bug Report"  height="80" style="display: block; margin-left: auto; margin-right: auto;"></a> </td>
   </tr>
 
@@ -70,7 +64,7 @@ Planetary I/O (Plio) is an open source collection of my commonly used I/O functi
     <td><strong><small><a href="users/installation.html">Install</a></small></strong></td>
     <td><strong><small><a href="users/tutorials/index.html">Getting Started</a></small></strong></td>
     <td><strong><small><a href="library/index.html">Documentation</a></small></strong></td>
-    <td><strong><small><a href="https://github.com/USGS-Astrogeology/autocnet/issues">Report Bugs</a></small></strong></td>
+    <td><strong><small><a href="https://github.com/USGS-Astrogeology/plio/issues?state=open">Report Bugs</a></small></strong></td>
   </tr>
   </table>
 
