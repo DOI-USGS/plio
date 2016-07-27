@@ -321,15 +321,18 @@ class GeoDataset(object):
     @property
     def coordinate_transformation(self):
         if not getattr(self, '_ct', None):
+            print('Getting CT')
             self._ct = osr.CoordinateTransformation(self.spatial_reference,
                                                     self.geospatial_coordinate_system)
+            print('CT', self._ct)
         return self._ct
 
     @property
     def inverse_coordinate_transformation(self):
         if not getattr(self, '_ict', None):
-                       self._ict = osr.CoordinateTransformation(self.geospatial_coordinate_system,
-                                                                self.spatial_reference)
+            self._ict = osr.CoordinateTransformation(self.geospatial_coordinate_system,
+                                                     self.spatial_reference)
+            print(self._ict)
         return self._ict
 
     @property
