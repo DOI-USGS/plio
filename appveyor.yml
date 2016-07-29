@@ -17,7 +17,8 @@ install:
    - cmd: conda config --add channels jlaura
    - cmd: conda install -c conda-forge gdal h5py
    - cmd: conda install pandas sqlalchemy pyyaml
-   - cmd: conda install -c jlaura pvl protobuf
+   - cmd: pip install pvl
+   - cmd: pip install protobuf==3.0.0b2
 
    # Development installation
    - cmd: conda install nose coverage sh anaconda-client
