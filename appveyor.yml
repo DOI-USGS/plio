@@ -1,0 +1,36 @@
+environment:
+   BINSTAR_USER: jlaura
+
+platform:
+   - x64
+
+install:
+   - cmd: set PATH=C:\Miniconda3;C:\Miniconda3\Scripts;%PATH%
+   - cmd: - conda config --set always_yes yes --set changeps1 no
+   - cmd: conda update -q conda
+
+   # Useful for debugging any issues with conda
+   - cmd: conda info -a
+
+   # Install not using env because build needs to be in root env
+   - cmd: conda config --add channels conda-forge
+   - cmd: conda config --add channels jlaura
+   - cmd: conda install -c conda-forge gdal h5py
+   - cmd: conda install pandas sqlalchemy pyyaml
+   - cmd: conda install -c jlaura pvl protobuf
+
+   # Development installation
+   - cmd: conda install nose coverage sh anaconda-client
+   - cmd: pip install coveralls
+
+   - appveyor DownloadFile "https://raw.githubusercontent.com/menpo/condaci/v0.4.8/condaci.py -O condaci.pyi"
+   - cmd: python condaci.py setup
+
+build: off
+
+test_script:
+   - nosetests --with-coverage --cover-package=plio
+
+after_test:
+   # After test success, package and upload to Anaconda
+   - ~/miniconda/bin/python condaci.py build ./conda
