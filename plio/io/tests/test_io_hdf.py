@@ -17,10 +17,6 @@ class TestHDF(unittest.TestCase):
         cls.df = pd.DataFrame(cls.x[['bar', 'baz']], index=cls.x['index'],
                               columns=['bar', 'baz'])
 
-    @classmethod
-    def tearDownClass(cls):
-        os.remove('test_io_hdf.hdf')
-
     def test_df_sarray(self):
         converted = self.hdf.df_to_sarray(self.df.reset_index())
         np.testing.assert_array_equal(converted, self.x)
@@ -29,4 +25,8 @@ class TestHDF(unittest.TestCase):
         converted = self.hdf.sarray_to_df(self.x)
         self.assertTrue((self.df == converted).all().all())
 
-
+    @classmethod
+    def tearDownClass(cls):
+        try:
+            os.remove('test_io_hdf.hdf')
+        except: pass

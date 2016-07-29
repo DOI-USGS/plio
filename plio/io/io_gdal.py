@@ -468,30 +468,39 @@ class GeoDataset(object):
 
 def array_to_raster(array, file_name, projection=None,
                     geotransform=None, outformat='GTiff',
-                    ndv=None):
+                    ndv=None, bittype='GDT_Float64'):
     """
     Converts the given NumPy array to a raster format using the GeoDataset class.
 
     Parameters
     ----------
     array : ndarray
-            
+            The data to be written via GDAL
 
-    file_name : str 
+    file_name : str
+                The output file PATH (relative or absolute)
 
-    projection : 
-                 Default projection=None.
+    projection : object
+                 A GDAL readable projection object, WKT string, PROJ4 string, etc.
+                 Default: None
 
-    geotransform : object 
-                   Default geotransform=None.
+    geotransform : object
+                   A six parameter geotransformation
+                   Default:None.
 
     outformat : str
-                Default outformat='GTiff'.
+                A GDAL supported output format
+                Default: 'GTiff'.
 
     ndv : float
-          The no data value for the given band. See no_data_value(). Default ndv=None.
+          The no data value for the given band.
+          Default: None.
 
+    bittype : str
+              A GDAL supported bittype, e.g. GDT_Int32
+              Default: GDT_Float64
     """
+
     driver = gdal.GetDriverByName(outformat)
     try:
         y, x, bands = array.shape
@@ -501,8 +510,7 @@ def array_to_raster(array, file_name, projection=None,
         y, x = array.shape
         single = True
 
-    #This is a crappy hard code to 32bit.
-    dataset = driver.Create(file_name, x, y, bands, gdal.GDT_Float64)
+    dataset = driver.Create(file_name, x, y, bands, getattr(gdal, bittype))
 
     if geotransform:
         dataset.SetGeoTransform(geotransform)

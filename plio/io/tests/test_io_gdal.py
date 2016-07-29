@@ -179,14 +179,14 @@ class TestWriter(unittest.TestCase):
         dataset = io_gdal.GeoDataset('test.tif')
         self.assertEqual(gt, dataset.geotransform)
 
-    def test_with_no_data_value(self):
+    def test_with_no_data_value_nd(self):
         no_data_value = 0.0
-        #nd array
         io_gdal.array_to_raster(self.ndarr, 'test.tif', ndv=no_data_value)
         dataset = io_gdal.GeoDataset('test.tif')
         self.assertEqual(dataset.no_data_value, no_data_value)
 
-        #array
+    def test_with_no_data_value(self):
+        no_data_value = 0.0
         io_gdal.array_to_raster(self.arr, 'test.tif', ndv=no_data_value)
         dataset = io_gdal.GeoDataset('test.tif')
         self.assertEqual(dataset.no_data_value, no_data_value) 
