@@ -52,13 +52,13 @@ install:
     # Now install the pacakge dependencies
     - cmd: conda config --add channels conda-forge
     - cmd: conda config --add channels jlaura
-    - cmd: conda install -c conda-forge gdal h5py
-    - cmd: conda install pandas sqlalchemy pyyaml
-    - cmd: conda install -c jlaura protobuf pvl
+    - cmd: conda install --yes -c conda-forge gdal h5py
+    - cmd: conda install --yes pandas sqlalchemy pyyaml
+    - cmd: conda install --yes -c jlaura protobuf pvl
 
     # Development installation
-    - cmd: conda install nose coverage
-    - cmd: pip install coveralls
+    - cmd: conda install --yes nose coverage
+    - cmd: pip install -y coveralls
 
 # Skip .NET project specific build phase.
 build: off
