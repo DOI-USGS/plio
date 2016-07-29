@@ -1,7 +1,6 @@
 environment:
    BINSTAR_USER: jlaura
-   PYTHON_VERSION: 3.4
-   
+
 platform:
    - x64
 
@@ -18,12 +17,14 @@ install:
    - cmd: conda config --add channels jlaura
    - cmd: conda install -c conda-forge gdal h5py
    - cmd: conda install pandas sqlalchemy pyyaml
-   - cmd: pip install pvl 
-   - cmd: pip install protobuf
+   - cmd: conda install -c jlaura pvl protobuf
 
    # Development installation
-   - cmd: conda install nose coverage anaconda-client
+   - cmd: conda install nose coverage sh anaconda-client
    - cmd: pip install coveralls
+
+   - appveyor DownloadFile "https://raw.githubusercontent.com/menpo/condaci/v0.4.8/condaci.py -O condaci.pyi"
+   - cmd: python condaci.py setup
 
 build: off
 
@@ -32,4 +33,4 @@ test_script:
 
 after_test:
    # After test success, package and upload to Anaconda
-   - cmd: python ci_support\upload_or_check_non_existence.py .\conda jlaura --channel=main
+   - cmd: ~/miniconda/bin/python condaci.py build ./conda
