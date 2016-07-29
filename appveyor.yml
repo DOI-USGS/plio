@@ -21,7 +21,7 @@ install:
    - cmd: pip install protobuf==3.0.0b2
 
    # Development installation
-   - cmd: conda install nose coverage sh anaconda-client
+   - cmd: conda install nose coverage anaconda-client
    - cmd: pip install coveralls
 
    - appveyor DownloadFile "https://raw.githubusercontent.com/menpo/condaci/v0.4.8/condaci.py -O condaci.pyi"
