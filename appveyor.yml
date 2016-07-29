@@ -35,4 +35,4 @@ test_script:
 
 after_test:
    # After test success, package and upload to Anaconda
-   - cmd: python ci_support\upload_or_check_non_existence.py .\recipe jlaura --channel=main
+   - cmd: python ci_support\upload_or_check_non_existence.py .\conda jlaura --channel=main
