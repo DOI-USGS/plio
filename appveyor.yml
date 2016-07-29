@@ -25,9 +25,6 @@ install:
    - cmd: conda install nose coverage anaconda-client
    - cmd: pip install coveralls
 
-   - cmd: curl -o condaci.py https://raw.githubusercontent.com/menpo/condaci/v0.4.8/condaci.py
-   - cmd: python condaci.py setup
-
 build: off
 
 test_script:
