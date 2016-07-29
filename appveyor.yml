@@ -1,5 +1,6 @@
 environment:
    BINSTAR_USER: jlaura
+   PYTHON_VERSION: 3.4
 
 platform:
    - x64
