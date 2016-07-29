@@ -6,7 +6,7 @@ platform:
 
 install:
    - cmd: set PATH=C:\Miniconda3;C:\Miniconda3\Scripts;%PATH%
-   - cmd: - conda config --set always_yes yes --set changeps1 no
+   - cmd: conda config --set always_yes yes --set changeps1 no
    - cmd: conda update -q conda
 
    # Useful for debugging any issues with conda
