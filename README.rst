@@ -33,6 +33,6 @@ Installation is unfortunately complicated due to the difficulty in installing GD
     `- jlaura`
 3. Create a new environment to ensure that the installed package is not going to collide with existing packages
 
-   `conda create --name <somename> python=3`
+   ``conda create --name <somename> python=3``
 
-3. Install `plio` with `conda install plio`.
+3. Install ``plio`` with ``conda install plio``.
