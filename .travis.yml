@@ -48,13 +48,9 @@ install:
   - conda install -c jlaura pvl protobuf
 
   # Development installation
-  - conda install nose coverage
+  - conda install nose coverage sh anaconda-client
   - pip install coveralls
 
-  # Install sh and binstar to support upload to Anaconda
-  - conda install -n root conda-build
-  - conda install sh anaconda-client
-  
   # Straight from the menpo team
   - if [["$TRAVIS_OS_NAME" == "osx"]]; then
       curl -o condaci.py https://raw.githubusercontent.com/menpo/condaci/v0.4.8/condaci.py;

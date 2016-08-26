@@ -1,7 +1,7 @@
 import os
 import plio
 
-__all__ = ['get_path']
+__all__ = ['available', 'get_path']
 
 #Used largely unmodififed from:
 # https://github.com/pysal/pysal/blob/master/pysal/examples/__init__.py
@@ -44,7 +44,7 @@ def get_path(example_name): # pragma: no cover
 
 def available(directory='', verbose=False): # pragma: no cover
     """
-    List available datasets in autocnet.examples
+    List available datasets in plio.examples
 
     Parameters
     ==========
