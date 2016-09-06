@@ -52,7 +52,7 @@ class GeoDataset(object):
                  The bounding box of the image in lat/lon space
 
     geotransform : object
-                   Geotransform reference OGR object as an array of size 6 containing the affine 
+                   Geotransform reference OGR object as an array of size 6 containing the affine
                    transformation coefficients for transforming from raw sample/line to projected x/y.
                    xproj = geotransform[0] + sample * geotransform[1] + line * geotransform[2]
                    yproj = geotransform[3] + sample * geotransform[4] + line * geotransform[5]
@@ -61,7 +61,7 @@ class GeoDataset(object):
                                    Geospatial coordinate system OSR object.
 
     latlon_extent : list
-                    of two tuples containing the latitide/longitude boundaries. 
+                    of two tuples containing the latitide/longitude boundaries.
                     This list is in the form [(lowerlat, lowerlon), (upperlat, upperlon)].
 
     pixel_width : float
@@ -87,9 +87,9 @@ class GeoDataset(object):
                 Note: This is the third value geotransform array.
 
     xy_extent : list
-                of two tuples containing the sample/line boundaries. 
-                The first value is the upper left corner of the upper left pixel and 
-                the second value is the lower right corner of the lower right pixel. 
+                of two tuples containing the sample/line boundaries.
+                The first value is the upper left corner of the upper left pixel and
+                the second value is the lower right corner of the lower right pixel.
                 This list is in the form [(minx, miny), (maxx, maxy)].
 
     xy_corners : list
@@ -101,26 +101,26 @@ class GeoDataset(object):
                  Note: This is the fifth value geotransform array.
 
     coordinate_transformation : object
-                                The coordinate transformation from the spatial reference system to 
+                                The coordinate transformation from the spatial reference system to
                                 the geospatial coordinate system.
-        
+
     inverse_coordinate_transformation : object
-                                        The coordinate transformation from the geospatial 
+                                        The coordinate transformation from the geospatial
                                         coordinate system to the spatial reference system.
-        
+
     scale : tuple
-            The name and value of the linear projection units of the spatial reference system. 
+            The name and value of the linear projection units of the spatial reference system.
             This tuple is of type string/float of the form (unit name, value).
             To transform a linear distance to meters, multiply by this value.
             If no units are available ("Meters", 1) will be returned.
-                 
+
     spheroid : tuple
-               The spheroid found in the metadata using the spatial reference system. 
+               The spheroid found in the metadata using the spatial reference system.
                This is of the form (semi-major, semi-minor, inverse flattening).
 
     raster_size : tuple
                   The dimensions of the raster, i.e. (number of samples, number of lines).
-        
+
     central_meridian : float
                        The central meridian of the map projection from the metadata.
 
@@ -382,7 +382,7 @@ class GeoDataset(object):
         -------
         lat, lon : tuple
                    (Latitude, Longitude) corresponding to the given (x,y).
-        
+
         """
         try:
             geotransform = self.geotransform
@@ -410,7 +410,7 @@ class GeoDataset(object):
         -------
         x, y : tuple
                (Sample, line) position corresponding to the given (latitude, longitude).
-        
+
         """
         geotransform = self.geotransform
         upperlat, upperlon, _ = self.inverse_coordinate_transformation.TransformPoint(lon, lat)
@@ -567,7 +567,8 @@ def match_rasters(match_to, match_from, destination,
     match_from__srs = match_from.dataset.GetProjection()
     match_from__gt = match_from.geotransform
 
-    dst = gdal.GetDriverByName('GTiff').Create(destination, width, height, 1, gdalconst.GDT_Float32)
+    dst = gdal.GetDriverByName('GTiff').Create(destination, width, height, match_from.RasterCount,
+                                               gdalconst.GDT_Float32)
     dst.SetGeoTransform(match_to_gt)
     dst.SetProjection(match_to_srs)
 
