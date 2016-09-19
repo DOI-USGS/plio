@@ -42,7 +42,7 @@ def setup_package():
             'pvl',
             'protobuf==3.0.0b2',
             'h5py',
-            'icu,',
+            'icu',
             'pandas',
             'sqlalchemy',
             'pyyaml',
