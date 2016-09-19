@@ -37,12 +37,12 @@ def setup_package():
                 ['sqlalchemy_json/*.py', 'sqlalchemy_json/LICENSE']},
         zip_safe=False,
         install_requires=[
-            'gdal>=2',
+            'gdal',
             'numpy',
             'pvl',
             'protobuf==3.0.0b2',
             'h5py',
-            'icu,'
+            'icu,',
             'pandas',
             'sqlalchemy',
             'pyyaml',
