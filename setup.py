@@ -20,7 +20,7 @@ def setup_package():
         else:
             glob_name = 'examples/' + i + '/*'
         examples.add(glob_name)
-    
+
     setup(
         name = "plio",
         version = VERSION,
@@ -38,12 +38,15 @@ def setup_package():
         zip_safe=False,
         install_requires=[
             'gdal>=2',
+            'numpy',
             'pvl',
             'protobuf==3.0.0b2',
             'h5py',
+            'icu,'
             'pandas',
             'sqlalchemy',
-            'pyyaml'],
+            'pyyaml',
+            'certifi'],
         classifiers=[
             "Development Status :: 3 - Alpha",
             "Topic :: Utilities",
