@@ -2,16 +2,22 @@ package:
   name: plio
   version: 0.1.0
 
-source: 
-  git_url: https://github.com/USGS-Astrogeology/plio.git
+source:
+  path: ../
+
+build:
+  number: 0
+  skip: true  #[win]
+  script: python setup.py install --single-version-externally-managed --record=record.txt
 
 requirements:
-  build: 
-    - python 
+  build:
+    - python
+    - setuptools
     - numpy
     - pvl
     - protobuf 3.0.0b2
-    - gdal >=2
+    - gdal
     - icu
     - h5py
     - pandas
@@ -19,14 +25,21 @@ requirements:
     - pyyaml
   run:
     - python
+    - setuptools
     - numpy
     - pvl
     - protobuf 3.0.0b2
-    - gdal >=2
+    - gdal
     - icu
     - h5py
     - pandas
     - sqlalchemy
     - pyyaml
 
+test:
+  imports:
+    - plio
 
+about:
+  home: http://github.com/USGS-Astrogeology/plio
+  license: Public Domain
