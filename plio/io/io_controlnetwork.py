@@ -222,10 +222,12 @@ class IsisStore(object):
                     measure_spec = point_spec.Measure()
                     # For all of the attributes, set if they are an dict accessible attr of the obj.
                     for attr, attrtype in self.measure_attrs:
+
                         if attr in g.columns:
                             setattr(measure_spec, attr, attrtype(m[attr]))
                     measure_spec.type = int(m.measure_type)
-
+                    measure_spec.line = m.y
+                    measure_spec.sample = m.x
                     measure_iterable.append(measure_spec)
                     self.nmeasures += 1
                 point_spec.measures.extend(measure_iterable)
@@ -364,5 +366,3 @@ class IsisStore(object):
         if self._handle is not None:
             self._handle.close()
         self._handle = None
-
-

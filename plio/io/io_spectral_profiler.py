@@ -1,9 +1,10 @@
+import os
 import pandas as pd
 import pvl
 import numpy as np
 
 from plio.utils.utils import find_in_dict
-
+from plio.io.io_gdal import GeoDataset
 
 class Spectral_Profiler(object):
 
@@ -52,6 +53,7 @@ class Spectral_Profiler(object):
 
         label = pvl.load(input_data)
         self.label = label
+        self.input_data = input_data
         with open(input_data, 'rb') as indata:
             # Extract and handle the ancillary data
             ancillary_data = find_in_dict(label, "ANCILLARY_AND_SUPPLEMENT_DATA")
@@ -128,3 +130,20 @@ class Spectral_Profiler(object):
                     self.spectra[i] = self.spectra[i][self.spectra[i]['QA'] < qa_threshold]
 
             self.spectra = pd.Panel(self.spectra)
+
+    def open_browse(self, extension='.jpg'):
+        """
+        Attempt to open the browse image corresponding to the spc file
+
+        Parameters
+        ----------
+        extension : str
+                    The file type extension to be added to the base name
+                    of the spc file.
+
+        Returns
+        -------
+
+        """
+        path, ext = os.path.splitext(self.input_data)
+        self.browse = GeoDataset(path + extension)
