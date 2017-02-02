@@ -53,7 +53,7 @@ install:
     - cmd: conda config --add channels conda-forge
     - cmd: conda config --add channels jlaura
     - cmd: conda install --yes -c conda-forge gdal h5py
-    - cmd: conda install --yes pandas sqlalchemy pyyaml
+    - cmd: conda install --yes pandas sqlalchemy pyyaml networkx
     - cmd: conda install --yes -c jlaura protobuf pvl
 
     # Development installation
