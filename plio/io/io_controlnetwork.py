@@ -145,7 +145,7 @@ class IsisStore(object):
 
         self._path = path
         if not mode:
-            mode = 'wb' # pragma: no cover
+            mode = 'a' # pragma: no cover
         self._mode = mode
         self._handle = None
 
@@ -170,13 +170,13 @@ class IsisStore(object):
         self._handle.seek(offset)
         self._handle.write(data)
 
-    def create_points(self, graphs, pointid_prefix, pointid_suffix):
+    def create_points(self, obj, pointid_prefix, pointid_suffix):
         """
         Step through a control network (C) and return protocol buffer point objects
 
         Parameters
         ----------
-        graphs : list
+        obj : list
               of iterable objects (dataframes) with the appropriate
               attributes: point_id, point_type, serial,  measure_type, x, y required.
               The entries in the list must support grouping by the point_id attribute.
@@ -197,21 +197,20 @@ class IsisStore(object):
         # TODO: Rewrite using apply syntax for performance
         point_sizes = []
         point_messages = []
-        for graph in graphs:
-            for i, control_point_id in enumerate(graph.point_nodes):
-                control_point = graph.node[control_point_id]
+        for df in obj:
+            for i, g in df.groupby('point_id'):
                 point_spec = cnf.ControlPointFileEntryV0002()
-                point_spec.id = _set_pid(control_point['pointid'])
+                point_spec.id = _set_pid(self.pointid)
+
                 for attr, attrtype in self.point_attrs:
-                    if attr in control_point.keys():
+                    if attr in g.columns:
                         # As per protobuf docs for assigning to a repeated field.
                         if attr == 'aprioriCovar':
-                            arr = control_point['aprioriCovar']
+                            arr = g.iloc[0]['aprioriCovar']
                             point_spec.aprioriCovar.extend(arr.ravel().tolist())
                         else:
-                            # The third argument casts the value to the correct type
-                            setattr(point_spec, attr, attrtype(control_point[attr]))
-                point_spec.type = int(control_point.get('point_type', 2))
+                            setattr(point_spec, attr, attrtype(g.iloc[0][attr]))
+                point_spec.type = int(g.point_type.iat[0])
 
                 # The reference index should always be the image with the lowest index
                 point_spec.referenceIndex = 0
@@ -219,19 +218,16 @@ class IsisStore(object):
                 # A single extend call is cheaper than many add calls to pack points
                 measure_iterable = []
 
-                for j, control_measure_id in graph.edges(control_point_id):
-                    control_measure = graph.node[control_measure_id]
-                    if control_measure['node_type'] != 'correspondence':
-                        continue
+                for node_id, m in g.iterrows():
                     measure_spec = point_spec.Measure()
                     # For all of the attributes, set if they are an dict accessible attr of the obj.
                     for attr, attrtype in self.measure_attrs:
-                        if attr in control_measure.keys():
-                            setattr(measure_spec, attr, attrtype(control_measure[attr]))
 
-                    measure_spec.type = int(control_measure['measure_type'])
-                    measure_spec.line = float(control_measure['y'])
-                    measure_spec.sample = float(control_measure['x'])
+                        if attr in g.columns:
+                            setattr(measure_spec, attr, attrtype(m[attr]))
+                    measure_spec.type = int(m.measure_type)
+                    measure_spec.line = m.y
+                    measure_spec.sample = m.x
                     measure_iterable.append(measure_spec)
                     self.nmeasures += 1
                 point_spec.measures.extend(measure_iterable)
