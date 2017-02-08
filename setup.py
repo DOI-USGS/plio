@@ -42,11 +42,10 @@ def setup_package():
             'pvl',
             'protobuf==3.0.0b2',
             'h5py',
-            'icu',
             'pandas',
             'sqlalchemy',
             'pyyaml',
-            'certifi'],
+            'networkx'],
         classifiers=[
             "Development Status :: 3 - Alpha",
             "Topic :: Utilities",
