@@ -364,9 +364,9 @@ class ReadBin52(object):
                                                                       self.nseasons)
             caseidx = np.repeat(np.arange(self.ncases), self.nseasons)
             seasonidx = np.repeat(np.arange(self.nseasons), self.ncases)
-            flt_seasitems = seasitems.reshape(len(self.vlabels),
+            flt_seasitems = seasitems.reshape(len(columns),
                                               self.ncases * self.nseasons)
-            self.seasons = pd.DataFrame(flt_seasitems,
+            self.seasons = pd.DataFrame(flt_seasitems.T,
                                           index=[caseidx,seasonidx],
                                           columns=columns)
             self.seasons.index.names = ['Case', 'Season']
@@ -431,6 +431,9 @@ class ReadBin52(object):
 
         #Extract the hourly temperature data
         hourly2dataframe()
+
+        # Extract the seasons
+        season2dataframe()
 
         # Extract by layer data from the data cube
         layeritems = self.bin52data[: , self.ndx: , : , 5: 7, : ]

@@ -199,6 +199,12 @@ class GeoDataset(object):
         return self._srs
 
     @property
+    def nbands(self):
+        if not getattr(self, '_nbands', None):
+            self._nbands = self.dataset.RasterCount
+        return self._nbands
+
+    @property
     def geospatial_coordinate_system(self):
         if not getattr(self, '_gcs', None):
             self._gcs = self.spatial_reference.CloneGeogCS()
@@ -321,10 +327,8 @@ class GeoDataset(object):
     @property
     def coordinate_transformation(self):
         if not getattr(self, '_ct', None):
-            print('Getting CT')
             self._ct = osr.CoordinateTransformation(self.spatial_reference,
                                                     self.geospatial_coordinate_system)
-            print('CT', self._ct)
         return self._ct
 
     @property
@@ -332,7 +336,6 @@ class GeoDataset(object):
         if not getattr(self, '_ict', None):
             self._ict = osr.CoordinateTransformation(self.geospatial_coordinate_system,
                                                      self.spatial_reference)
-            print(self._ict)
         return self._ict
 
     @property
@@ -558,6 +561,7 @@ def match_rasters(match_to, match_from, destination,
                         GRA_Cubic, GRA_CubicSpline, GRA_Lanczos, GRA_Average,
                         GRA_Mode}
     """
+
     import gdalconst  # import here so Sphinx can build the docos, mocking is not working
     # TODO: If a destination is not provided create an in-memory GeoDataSet object
     match_to_srs = match_to.dataset.GetProjection()
@@ -567,8 +571,8 @@ def match_rasters(match_to, match_from, destination,
     match_from__srs = match_from.dataset.GetProjection()
     match_from__gt = match_from.geotransform
 
-    dst = gdal.GetDriverByName('GTiff').Create(destination, width, height, match_from.RasterCount,
-                                               gdalconst.GDT_Float32)
+    dst = gdal.GetDriverByName('GTiff').Create(destination, width, height, 1,
+                                               gdalconst.GDT_Float64)
     dst.SetGeoTransform(match_to_gt)
     dst.SetProjection(match_to_srs)
 
