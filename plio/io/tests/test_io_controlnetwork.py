@@ -73,7 +73,7 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
             self.assertEqual('None', header_protocol.description)
             self.assertEqual(self.modified_date, header_protocol.lastModified)
             #Repeating
-            self.assertEqual([99] * self.npts, header_protocol.pointMessageSizes)
+            self.assertEqual([135] * self.npts, header_protocol.pointMessageSizes)
 
     def test_create_point(self):
 
@@ -99,7 +99,7 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
         self.assertEqual(10, mpoints)
 
         points_bytes = find_in_dict(pvl_header, 'PointsBytes')
-        self.assertEqual(495, points_bytes)
+        self.assertEqual(675, points_bytes)
 
         points_start_byte = find_in_dict(pvl_header, 'PointsStartByte')
         self.assertEqual(self.point_start_byte, points_start_byte)
