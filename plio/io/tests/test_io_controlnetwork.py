@@ -35,7 +35,7 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
         io_controlnetwork.to_isis('test.net', dfs, mode='wb', targetname='Moon')
 
         cls.header_message_size = 78
-        cls.point_start_byte = 65609 # 66949
+        cls.point_start_byte = 65614 # 66949
 
     def test_create_buffer_header(self):
         self.npts = 5
@@ -56,7 +56,7 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
         io_controlnetwork.to_isis('test.net', dfs, mode='wb', targetname='Moon')
 
         self.header_message_size = 78
-        self.point_start_byte = 66104 # 66949
+        self.point_start_byte = 65614 # 66949
 
         with open('test.net', 'rb') as f:
             f.seek(io_controlnetwork.HEADERSTARTBYTE)
@@ -73,13 +73,13 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
             self.assertEqual('None', header_protocol.description)
             self.assertEqual(self.modified_date, header_protocol.lastModified)
             #Repeating
-            self.assertEqual([99] * self.npts, header_protocol.pointMessageSizes)
+            self.assertEqual([135] * self.npts, header_protocol.pointMessageSizes)
 
     def test_create_point(self):
 
         with open('test.net', 'rb') as f:
             f.seek(self.point_start_byte)
-            for i, length in enumerate([99] * self.npts):
+            for i, length in enumerate([135] * self.npts):
                 point_protocol = cnf.ControlPointFileEntryV0002()
                 raw_point = f.read(length)
                 point_protocol.ParseFromString(raw_point)
@@ -99,7 +99,7 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
         self.assertEqual(10, mpoints)
 
         points_bytes = find_in_dict(pvl_header, 'PointsBytes')
-        self.assertEqual(495, points_bytes)
+        self.assertEqual(675, points_bytes)
 
         points_start_byte = find_in_dict(pvl_header, 'PointsStartByte')
         self.assertEqual(self.point_start_byte, points_start_byte)
