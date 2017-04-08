@@ -11,10 +11,10 @@ from plio.io import io_spectral_profiler
 from plio.io.io_gdal import GeoDataset
 
 class Test_Spectral_Profiler_IO(unittest.TestCase):
-    
+
     def setUp(self):
         self.examplefile = get_path('SP_2C_02_02358_S138_E3586.spc')
-    
+
     def test_openspc(self):
         ds = io_spectral_profiler.Spectral_Profiler(self.examplefile)
         self.assertEqual(ds.nspectra, 38)
