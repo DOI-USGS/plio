@@ -15,7 +15,7 @@ class Test_Tes_IO(unittest.TestCase):
     def setUp(self):
         self.examplefile = get_path('pos10001.tab')
 
-    def test_openspc(self):
+    def test_opentab(self):
         ds = io_tes.Tes(self.examplefile)
         self.assertEqual(ds.data.size, 119106)
         self.assertIsInstance(ds.data, pd.DataFrame)
