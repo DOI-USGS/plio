@@ -11,6 +11,7 @@ from plio.io.io_json import read_json
 from plio.io import tes_dtype_map
 from plio.io import tes_columns
 from plio.io import tes_scaling_factors
+from plio.io import tes2numpy
 
 class Tes(object):
     """
@@ -28,6 +29,7 @@ class Tes(object):
 
     """
 
+
     def __init__(self, input_data, var_file = None):
         """
         Read the .spc file, parse the label, and extract the spectra
@@ -39,13 +41,13 @@ class Tes(object):
                      The PATH to the input .tab file
 
         """
-        def expand_column(df, expand_column, columns):
+        def expand_column(df, expand_column, columns): # pragma: no cover
             array = np.asarray([np.asarray(list(tup[0])) for tup in df[expand_column].as_matrix()], dtype=np.uint8)
             new_df = pd.concat([df, pd.DataFrame(array, columns=columns)], axis=1)
             del new_df[expand_column]
             return new_df
 
-        def bolquality2arr(arr):
+        def bolquality2arr(arr): # pragma: no cover
             bitarr = np.unpackbits(np.asarray(arr, dtype=np.uint8))
             lis = [(bitarr2int(bitarr[0:3]), bit2bool(bitarr[3:4]))]
 
@@ -53,7 +55,7 @@ class Tes(object):
             arr = np.array(lis, dtype=types)
             return arr
 
-        def obsquality2arr(arr):
+        def obsquality2arr(arr): # pragma: no cover
             bitarr = np.unpackbits(np.asarray(arr, dtype=np.uint8))
             lis = [(bitarr2int(bitarr[0:2]), bitarr2int(bitarr[2:5]),
                     bitarr2int(bitarr[5:6]), bitarr2int(bitarr[6:7]),
@@ -64,7 +66,7 @@ class Tes(object):
             arr = np.array(lis, dtype=types)
             return arr
 
-        def obsclass2arr(arr):
+        def obsclass2arr(arr): # pragma: no cover
             bitarr = np.unpackbits(np.asarray(arr, dtype=np.uint8))
             lis = [(bitarr2int(bitarr[0:3]), bitarr2int(bitarr[3:7]),
                     bitarr2int(bitarr[7:11]), bitarr2int(bitarr[11:13]),
@@ -76,7 +78,7 @@ class Tes(object):
             arr = np.array(lis, dtype=types)
             return arr
 
-        def radquality2arr(arr):
+        def radquality2arr(arr): # pragma: no cover
             bitarr = np.unpackbits(np.asarray(arr, dtype=np.uint8))
             lis = [(bitarr2int(bitarr[0:1]), bitarr2int(bitarr[1:2]),
                     bitarr2int(bitarr[2:3]), bitarr2int(bitarr[3:5]),
@@ -89,7 +91,7 @@ class Tes(object):
             arr = np.array(lis, dtype=types)
             return arr
 
-        def atmquality2arr(arr):
+        def atmquality2arr(arr): # pragma: no cover
             bitarr = np.unpackbits(np.asarray(arr, dtype=np.uint8))
             lis = [(bitarr2int(bitarr[0:2]), bitarr2int(bitarr[2:4]))]
 
@@ -97,13 +99,13 @@ class Tes(object):
             arr = np.array(lis, dtype=types)
             return arr
 
-        def expand_column(df, expand_column, columns):
+        def expand_column(df, expand_column, columns): # pragma: no cover
             array = np.asarray([np.asarray(list(tup[0])) for tup in df[expand_column].as_matrix()], dtype=np.uint8)
             new_df = pd.concat([df, pd.DataFrame(array, columns=columns)], axis=1)
             del new_df[expand_column]
             return new_df
 
-        def bolquality2arr(arr):
+        def bolquality2arr(arr): # pragma: no cover
             bitarr = np.unpackbits(np.asarray(arr, dtype=np.uint8))
             lis = [(bitarr2int(bitarr[0:3]), bit2bool(bitarr[3:4]))]
 
@@ -111,7 +113,7 @@ class Tes(object):
             arr = np.array(lis, dtype=types)
             return arr
 
-        def obsquality2arr(arr):
+        def obsquality2arr(arr): # pragma: no cover
             bitarr = np.unpackbits(np.asarray(arr, dtype=np.uint8))
             lis = [(bitarr2int(bitarr[0:2]), bitarr2int(bitarr[2:5]),
                     bitarr2int(bitarr[5:6]), bitarr2int(bitarr[6:7]),
@@ -122,7 +124,7 @@ class Tes(object):
             arr = np.array(lis, dtype=types)
             return arr
 
-        def obsclass2arr(arr):
+        def obsclass2arr(arr): # pragma: no cover
             bitarr = np.unpackbits(np.asarray(arr, dtype=np.uint8))
             lis = [(bitarr2int(bitarr[0:3]), bitarr2int(bitarr[3:7]),
                     bitarr2int(bitarr[7:11]), bitarr2int(bitarr[11:13]),
@@ -134,7 +136,7 @@ class Tes(object):
             arr = np.array(lis, dtype=types)
             return arr
 
-        def radquality2arr(arr):
+        def radquality2arr(arr): # pragma: no cover
             bitarr = np.unpackbits(np.asarray(arr, dtype=np.uint8))
             lis = [(bitarr2int(bitarr[0:1]), bitarr2int(bitarr[1:2]),
                     bitarr2int(bitarr[2:3]), bitarr2int(bitarr[3:5]),
@@ -147,7 +149,7 @@ class Tes(object):
             arr = np.array(lis, dtype=types)
             return arr
 
-        def atmquality2arr(arr):
+        def atmquality2arr(arr): # pragma: no cover
             bitarr = np.unpackbits(np.asarray(arr, dtype=np.uint8))
             lis = [(bitarr2int(bitarr[0:2]), bitarr2int(bitarr[2:4]))]
 
@@ -155,47 +157,14 @@ class Tes(object):
             arr = np.array(lis, dtype=types)
             return arr
 
-        def tes2numpy(msb_type, num_bytes, nelems=1):
-            """
-            Converts a MSB data type to a numpy datatype
-
-            """
-            valid_bytes = {
-                'MSB_UNSIGNED_INTEGER': [1,2,4,8,16,32,64],
-                'MSB_INTEGER': [1,2,4,8,16,32,64],
-                'IEEE_REAL': [1,2,4,8,16,32,64],
-                'CHARACTER': range(1,128),
-                'MSB_BIT_STRING': range(1,128)
-            }
-
-            msb_bit_string_type = [('byte{}'.format(i), '>u1') for i in range(num_bytes)]
-
-            dtype_map = {
-                'MSB_UNSIGNED_INTEGER': '>u{}'.format(num_bytes),
-                'MSB_INTEGER': '>i{}'.format(num_bytes),
-                'IEEE_REAL': '>f{}'.format(num_bytes),
-                'CHARACTER': 'a{}'.format(num_bytes),
-                'MSB_BIT_STRING': msb_bit_string_type
-            }
-
-            if num_bytes not in valid_bytes[msb_type] and not nelems:
-                raise Exception('invalid byte ({}) count for type ({})'.format(num_bytes, msb_type))
-
-            if nelems > 1:
-                # Must be an array
-                return [('elem{}'.format(i), dtype_map[msb_type]) for i in range(nelems)]
-
-
-            return dtype_map[msb_type]
-
-        def bitarr2int(arr):
+        def bitarr2int(arr): # pragma: no cover
             arr = "".join(str(i) for i in arr)
             return np.uint8(int(arr,2))
 
-        def bit2bool(bit):
+        def bit2bool(bit): # pragma: no cover
             return np.bool_(bit)
 
-        def expand_bitstrings(df, dataset):
+        def expand_bitstrings(df, dataset): # pragma: no cover
             if dataset == 'BOL':
                 quality_columns = ['ti_bol_rating', 'bol_ref_lamp']
                 df['quality'] = df['quality'].apply(bolquality2arr)
@@ -249,7 +218,7 @@ class Tes(object):
         df = pd.DataFrame(data=array, columns=columns[dataset.upper()])
 
         # Read Radiance array if applicable
-        if dataset.upper() == 'RAD':
+        if dataset.upper() == 'RAD': # pragma: no cover
             with open('{}.var'.format(path.splitext(f)[0]) , 'rb') as file:
                 buffer = file.read()
                 def process_rad(index):
@@ -268,7 +237,7 @@ class Tes(object):
                 df["cal_rad"] = df["cal_rad"].apply(process_rad)
 
         # Apply scaling factors
-        for column in scaling_factors[dataset]:
+        for column in scaling_factors[dataset]: # pragma: no cover
             def scale(x):
                  return np.multiply(x, scaling_factors[dataset][column])
             df[column] = df[column].apply(scale)

@@ -1,3 +1,37 @@
+def tes2numpy(msb_type, num_bytes, nelems=1):
+    """
+    Converts a MSB data type to a numpy datatype
+
+    """
+    valid_bytes = {
+        'MSB_UNSIGNED_INTEGER': [1,2,4,8,16,32,64],
+        'MSB_INTEGER': [1,2,4,8,16,32,64],
+        'IEEE_REAL': [1,2,4,8,16,32,64],
+        'CHARACTER': range(1,128),
+        'MSB_BIT_STRING': range(1,128)
+    }
+
+    msb_bit_string_type = [('byte{}'.format(i), '>u1') for i in range(num_bytes)]
+
+    dtype_map = {
+        'MSB_UNSIGNED_INTEGER': '>u{}'.format(num_bytes),
+        'MSB_INTEGER': '>i{}'.format(num_bytes),
+        'IEEE_REAL': '>f{}'.format(num_bytes),
+        'CHARACTER': 'a{}'.format(num_bytes),
+        'MSB_BIT_STRING': msb_bit_string_type
+    }
+
+    if num_bytes not in valid_bytes[msb_type] and nelems == 1:
+        raise Exception('invalid byte ({}) count for type ({})'.format(num_bytes, msb_type))
+
+    if nelems > 1:
+        # Must be an array
+        return [('elem{}'.format(i), dtype_map[msb_type]) for i in range(nelems)]
+
+
+    return dtype_map[msb_type]
+
+
 tes_dtype_map = {'ATM': [('sclk_time', '>u4'),
   ('srf_pressure', '>u2'),
   ('nadir_pt',
