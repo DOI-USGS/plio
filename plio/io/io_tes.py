@@ -2,16 +2,10 @@ import numpy as np
 import pandas as pd
 import pvl
 
-import pvl
 import sys
 import functools
 import json
-from shapely.geometry import Polygon
-import sqlalchemy
 
-from glob import glob
-from os.path import dirname
-from shutil import copyfile
 from plio.io.io_json import read_json
 
 from plio.io import tes_dtype_map
