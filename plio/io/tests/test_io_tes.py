@@ -9,7 +9,8 @@ sys.path.insert(0, os.path.abspath('..'))
 from plio.examples import get_path
 from plio.io import io_tes
 from plio.io.io_gdal import GeoDataset
-from plio.io import tes2numpy
+from plio.utils._tes2numpy import tes2numpy
+
 
 class Test_Tes_IO(unittest.TestCase):
 

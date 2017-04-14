@@ -8,10 +8,9 @@ import json
 
 from plio.io.io_json import read_json
 
-from plio.io import tes_dtype_map
-from plio.io import tes_columns
-from plio.io import tes_scaling_factors
-from plio.io import tes2numpy
+from plio.utils._tes2numpy import tes_dtype_map
+from plio.utils._tes2numpy import tes_columns
+from plio.utils._tes2numpy import tes_scaling_factors
 
 class Tes(object):
     """
