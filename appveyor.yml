@@ -40,6 +40,7 @@ install:
     - cmd: set PYTHONUNBUFFERED=1
 
     - cmd: conda config --set show_channel_urls true
+    - cmd: conda install --yes python=3.5 
     - cmd: conda install -c pelson/channel/development --yes --quiet obvious-ci
     - cmd: conda config --add channels conda-forge
     - cmd: conda info

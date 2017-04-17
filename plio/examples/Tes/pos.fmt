@@ -1,0 +1,87 @@
+NAME                    = POS
+COLUMNS                 = 6
+ROW_BYTES               = 54
+INTERCHANGE_FORMAT      = BINARY
+PRIMARY_KEY             = ( "SPACECRAFT_CLOCK_START_COUNT" )
+DESCRIPTION             = "
+
+    The POS table stores the positions of the spacecraft and sun 
+    relative to the planet, the spacecraft's orientation quaternion, 
+    and the Mars body quaternion, all relative to the J2000 system.
+
+    These data are initially derived from the project's SPICE kernels,
+    but may be corrected from various other sources.  This table
+    may also include interpolated values where SPICE data were unavailable."
+
+OBJECT                  = COLUMN
+    NAME                = SPACECRAFT_CLOCK_START_COUNT
+    DATA_TYPE           = MSB_UNSIGNED_INTEGER
+    START_BYTE          = 1
+    BYTES               = 4
+    ALIAS_NAME          = sclk_time
+    DESCRIPTION         = "The value of the spacecraft clock at the
+                          beginning of the observation"
+END_OBJECT              = COLUMN
+
+
+OBJECT                  = COLUMN
+    NAME                = EPHEMERIS_TIME
+    DATA_TYPE           = IEEE_REAL
+    START_BYTE          = 5
+    BYTES               = 8
+    ALIAS_NAME          = et
+    DESCRIPTION         = "Ephemeris time, seconds since 1/1/2000"
+    UNIT                = "Seconds"
+END_OBJECT              = COLUMN
+
+OBJECT                  = COLUMN
+    NAME                = SPACECRAFT_POSITION
+    DATA_TYPE           = IEEE_REAL
+    START_BYTE          = 13
+    BYTES               = 12
+    ITEMS               = 3
+    ITEM_BYTES          = 4
+    ALIAS_NAME          = pos
+    DESCRIPTION         = "Spacecraft position vector relative to Mars
+                           in the J2000 reference frame"
+    UNIT                = "KM"
+END_OBJECT              = COLUMN
+
+OBJECT                  = COLUMN
+    NAME                = SUN_POSITION
+    DATA_TYPE           = IEEE_REAL
+    START_BYTE          = 25
+    BYTES               = 12
+    ITEMS               = 3
+    ITEM_BYTES          = 4
+    ALIAS_NAME          = sun
+    DESCRIPTION         = "Sun position vector relative to Mars in the J2000
+                           reference frame"
+    UNIT                = "KM"
+END_OBJECT              = COLUMN
+
+OBJECT                  = COLUMN
+    NAME                = SPACECRAFT_QUATERNION
+    DATA_TYPE           = IEEE_REAL
+    START_BYTE          = 37
+    BYTES               = 16
+    ITEMS               = 4
+    ITEM_BYTES          = 4
+    ALIAS_NAME          = quat
+    DESCRIPTION         = "Spacecraft pointing quaternion in the J2000
+                           reference frame"
+END_OBJECT              = COLUMN
+
+OBJECT                  = COLUMN
+    NAME                = POSITION_SOURCE_ID
+    DATA_TYPE           = CHARACTER
+    START_BYTE          = 53
+    BYTES               = 2
+    ITEMS               = 2
+    ITEM_BYTES          = 1
+    ALIAS_NAME          = id
+    DESCRIPTION         = "2-character source ID.
+                           First character is source of positions.
+                           Second character is source of pointing.
+                           See ancillary table for details."
+END_OBJECT              = COLUMN
