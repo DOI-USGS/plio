@@ -1,19 +1,17 @@
-#################
-Library Reference
-#################
+.. _reference:
+
+##############
+Plio Reference
+##############
 
 :Release: |version|
 :Date: |today|
 
-AutoCNet
-========
-
-Sub-packages
-------------
+.. module: plio
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   date/index
-   io/index
-   utils/index
+   date
+   io
+   utils

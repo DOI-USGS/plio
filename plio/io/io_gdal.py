@@ -27,6 +27,9 @@ NP2GDAL_CONVERSION = {
 
 GDAL2NP_CONVERSION = {}
 
+DEFAULT_PROJECTIONS = {'mars':'GEOGCS["Mars 2000",DATUM["D_Mars_2000",SPHEROID["Mars_2000_IAU_IAG",3396190.0,169.89444722361179]],PRIMEM["Greenwich",0],UNIT["Decimal_Degree",0.0174532925199433]]'}
+DEFAULT_RADII = {'mars': 3396190.0}
+
 for k, v in iter(NP2GDAL_CONVERSION.items()):
     GDAL2NP_CONVERSION[v] = k
 
@@ -169,7 +172,21 @@ class GeoDataset(object):
         top left y, y-rotation, n-s pixel resolution]
         """
         if not getattr(self, '_geotransform', None):
-            self._geotransform = self.dataset.GetGeoTransform()
+            if self.footprint:
+                # This is an ISIS3 cube that does not report a valid geotransform
+                ul, ll, lr, ur = self.latlon_extent
+                xs, ys = self.raster_size
+                xres = abs(ul[0] - ur[0]) / xs
+                yres = abs(ul[1] - ll[1]) / ys
+                self._geotransform = [ul[0], xres, 0, ul[1], 0, -yres]
+
+                if ul[1] > ll[1]:
+                    # Image is South-North instead of North-South
+                    self._geotransform[-1] *= -1  # Lat increases with image length
+                    self._geotransform[3] = ll[1] # Origin is at the LL
+
+            else:
+                self._geotransform = self.dataset.GetGeoTransform()
         return self._geotransform
 
     @property
@@ -188,7 +205,12 @@ class GeoDataset(object):
     def spatial_reference(self):
         if not getattr(self, '_srs', None):
             self._srs = osr.SpatialReference()
-            self._srs.ImportFromWkt(self.dataset.GetProjection())
+            proj = self.dataset.GetProjection()
+            if proj:
+                self._srs.ImportFromWkt(self.dataset.GetProjection())
+            else:
+                target = find_in_dict(self.metadata, 'TargetName')
+                self._srs.ImportFromWkt(DEFAULT_PROJECTIONS[target.lower()])
             try:
                 self._srs.MorphToESRI()
                 self._srs.MorphFromESRI()
@@ -239,19 +261,6 @@ class GeoDataset(object):
         return self._footprint
 
     @property
-    def latlon_corners(self):
-        if not getattr(self, '_latlon_corners', None):
-            pixel_corners = self.xy_corners
-            gt = self.geotransform
-
-            self._latlon_corners = []
-
-            for x, y in pixel_corners:
-                x, y = self.pixel_to_latlon(x, y)
-                self._latlon_corners.append((x, y))
-        return self._latlon_corners
-
-    @property
     def xy_corners(self):
         return [(0, 0),
                 (0, self.dataset.RasterYSize),
@@ -269,11 +278,11 @@ class GeoDataset(object):
             if self.footprint:
                 fp = self.footprint
                 # If we have a footprint, do not worry about computing a lat/lon transform
-                lowerlat, upperlat, lowerlon, upperlon = fp.GetEnvelope()
-                self._footprint = [(upperlat, lowerlon),
-                                   (lowerlat, lowerlon),
-                                   (lowerlat, upperlon),
-                                   (upperlat, upperlon)]
+                minx, maxx, miny, maxy = fp.GetEnvelope()
+                self._latlon_extent = [(minx, maxy),
+                                   (minx, miny),
+                                   (maxx, miny),
+                                   (maxx, maxy)]
             else:
                 self._latlon_extent = []
                 for x, y in self.xy_extent:
@@ -419,7 +428,7 @@ class GeoDataset(object):
         upperlat, upperlon, _ = self.inverse_coordinate_transformation.TransformPoint(lon, lat)
         x = (upperlat - geotransform[0]) / geotransform[1]
         y = (upperlon - geotransform[3]) / geotransform[5]
-        return x, y
+        return int(x), int(y)
 
     def read_array(self, band=1, pixels=None, dtype='float32'):
         """
@@ -560,6 +569,14 @@ def match_rasters(match_to, match_from, destination,
                         {GRA_NearestNeighbor, GRA_Bilinear (Default),
                         GRA_Cubic, GRA_CubicSpline, GRA_Lanczos, GRA_Average,
                         GRA_Mode}
+
+    Examples
+    ========
+    Open an example Apollo 15 Geotiff
+
+    >>> from plio import get_path
+    >>> from plio.io.io_gdal import GeoDataSet
+    >>> ds = GeoDataSet(get_path('AS15-M-0296_SML_geo.tif'))
     """
 
     import gdalconst  # import here so Sphinx can build the docos, mocking is not working
