@@ -74,7 +74,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Planetary I/O (plio)'
-copyright = u'2016 - , Plio Developers'
+copyright = u'2017 - , Plio Developers'
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -104,7 +104,7 @@ exclude_patterns = ['build']
 # default_role = None
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
-add_function_parentheses = False
+add_function_parentheses = True
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
@@ -129,20 +129,17 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'alabaster'
+html_theme = 'scipy'
 
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    'github_user': 'USGS-Astrogeology',
-    'github_repo': 'plio',
-    'fixed_sidebar': True,
-    'page_width': '80%'
-}
+    "edit_link": "true",
+    "rootlinks":[]}
 
 # Add any paths that contain custom themes here, relative to this directory.
-# html_theme_path = []
+html_theme_path = ['_theme']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -176,12 +173,7 @@ html_last_updated_fmt = '%b %d, %Y'
 # html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-html_sidebars = {
-    '**':['about.html',
-          'navigation.html',
-          'relations.html',
-          'searchbox.html']
-}
+#html_sidebars = {}
 
 # Additional templates that should be rendered to pages, maps page names
 # to template names.
@@ -300,4 +292,3 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 # texinfo_no_detailmenu = False
-

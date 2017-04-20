@@ -91,6 +91,19 @@ def json_numpy_obj_hook(dct):
     return dct
 
 def load(projectname):
+    """
+    Read an AutoCNET project into memory.
+
+    Parameters
+    ----------
+    projectname : str
+                  PATH to the project
+
+    Returns
+    -------
+    cg : object
+         AutoCNET CandidateGraph object
+    """
     if autocnet_avail is False:
         warning.warn('AutoCNet Library is not available.  Unable to load an AutoCNet CandidateGraph')
         return

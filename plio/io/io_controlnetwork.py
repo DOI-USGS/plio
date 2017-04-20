@@ -41,6 +41,10 @@ def to_isis(path, obj, mode='w', version=VERSION,
             creation_date=None, modified_date=None,
             pointid_prefix=None, pointid_suffix=None):
     """
+
+    Write an AutoCNET Candidate graph object to an ISIS3 compatible control
+    network.
+
     Parameters
     ----------
     path : str
