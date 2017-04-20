@@ -6,3 +6,4 @@ Getting Started with AutoCNet
 
    Introduction to the Tutorials <intro>
    Opening a Spatial Data Set with GDAL <GeoDataset.ipynb>
+   Opening a TES dataset <tes.ipynb>
