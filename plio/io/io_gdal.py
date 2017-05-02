@@ -8,6 +8,7 @@ import pvl
 from osgeo import ogr
 
 from plio.io import extract_metadata
+from plio.geofuncs import geofuncs
 from plio.utils.utils import find_in_dict
 
 gdal.UseExceptions()
@@ -477,6 +478,9 @@ class GeoDataset(object):
             array = band.ReadAsArray(xstart, ystart, xextent, yextent).astype(dtype)
         return array
 
+    def estimate_mbr(self, geodata):
+        return geofuncs.estimate_mbr(self, geodata)
+
 
 def array_to_raster(array, file_name, projection=None,
                     geotransform=None, outformat='GTiff',
@@ -549,7 +553,7 @@ def array_to_raster(array, file_name, projection=None,
 
 
 def match_rasters(match_to, match_from, destination,
-                  resampling_method='GRA_Bilinear'):
+                  resampling_method='GRA_Bilinear', ndv=0):
     """
     Match a source raster to a match raster, including resolution and extent.
 
@@ -590,7 +594,9 @@ def match_rasters(match_to, match_from, destination,
 
     dst = gdal.GetDriverByName('GTiff').Create(destination, width, height, 1,
                                                gdalconst.GDT_Float64)
+
     dst.SetGeoTransform(match_to_gt)
     dst.SetProjection(match_to_srs)
+    dst.GetRasterBand(1).SetNoDataValue(ndv)
 
     gdal.ReprojectImage(match_from.dataset, dst, None, None, getattr(gdalconst, resampling_method))

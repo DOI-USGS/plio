@@ -18,6 +18,16 @@ def create_dir(basedir=''):
     """
     return tempfile.mkdtemp(dir=basedir)
 
+def check_file_exists(fpath):
+    #Ensure that the file exists at the PATH specified
+    if os.path.isfile(fpath) == False:
+        error_msg = "Unable to find file: {}\n".format(fpath)
+        try:
+            logging.error(error_msg)
+        except:
+            print(error_msg)
+        return
+    return True
 
 def delete_dir(dir):
     """
