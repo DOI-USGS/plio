@@ -6,8 +6,8 @@ import sys
 import functools
 import json
 
+from os import path
 from plio.io.io_json import read_json
-
 from plio.utils._tes2numpy import tes_dtype_map
 from plio.utils._tes2numpy import tes_columns
 from plio.utils._tes2numpy import tes_scaling_factors
@@ -199,11 +199,22 @@ class Tes(object):
             else:
                 return df
 
+        if isinstance(input_data, pd.DataFrame):
+            self.dataset = None
+            for key in tes_columns.keys():
+                if len(set(tes_columns[key]).intersection(set(input_data.columns))) > 2 :
+                    self.dataset = key
+
+            self.label = None
+            self.data = input_data
+            return
+
         self.label = pvl.load(input_data)
         nrecords = self.label['TABLE']['ROWS']
         nbytes_per_rec = self.label['RECORD_BYTES']
         data_start = self.label['LABEL_RECORDS'] * self.label['RECORD_BYTES']
         dataset = self.label['TABLE']['^STRUCTURE'].split('.')[0]
+        self.dataset = dataset
 
         numpy_dtypes = tes_dtype_map
         columns = tes_columns
@@ -218,16 +229,20 @@ class Tes(object):
 
         # Read Radiance array if applicable
         if dataset.upper() == 'RAD': # pragma: no cover
-            with open('{}.var'.format(path.splitext(f)[0]) , 'rb') as file:
-                buffer = file.read()
+            if not var_file:
+                filename, file_extension = path.splitext(input_data)
+                var_file = filename + ".var"
+
+            with open(var_file, "rb") as var:
+                buffer = var.read()
                 def process_rad(index):
                     if index is -1:
                         return None
 
                     length = np.frombuffer(buffer[index:index+2], dtype='>u2')[0]
                     exp = np.frombuffer(buffer[index+2:index+4], dtype='>i2')[0]
-
-                    radarr = np.frombuffer(buffer[index+4:index+4+length-2], dtype='>i2') * (2**(exp-15))
+                    scale = 2**(int(exp)-15)
+                    radarr = np.frombuffer(buffer[index+4:index+4+length-2], dtype='>i2') * scale
                     if np.frombuffer(buffer[index+4+length-2:index+4+length], dtype='>u2')[0] != length:
                         warnings.warn("Last element did not match the length for file index {} in file {}".format(index, f))
                     return radarr
