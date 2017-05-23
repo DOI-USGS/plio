@@ -1,6 +1,7 @@
 import sys
 import os
 
+import argparse
 import plio
 from plio.io.io_tes import Tes
 
@@ -85,14 +86,13 @@ def clamp_longitude(angle):
     """
     return ((angle + 180) % 360) - 180
 
-def to_mongodb(chunk_size=60):
-    data_dir = '/scratch/jlaura/tes/tes_data/'
+def to_mongodb(data_dir, out_dir,sl):
     folders = [folder for folder in os.listdir(data_dir) if folder[:4] == "mgst"]
 
     search_len = len(data_dir) + 9
     print("search len: {}".format(search_len))
 
-    folders = sorted(folders, key=lambda x:int(x[5:]))[4:]
+    folders = sorted(folders, key=lambda x:int(x[5:]))[sl]
     print("first 20 Folders:")
     print("\n".join(folders[:20]))
 
@@ -135,9 +135,24 @@ def to_mongodb(chunk_size=60):
         processed = processed + length
         print()
 
-    
-
-
+    single_key_sets = {'ATM', 'POS', 'TLM', 'OBS'}
+    compound_key_sets = {'BOL', 'CMP', 'GEO', 'IFG', 'PCT', 'RAD'}
+    dfs = dict.fromkeys(single_key_sets | compound_key_sets,0)
+    for tes in outliers:
+        dfs[tes.dataset] = dfs[tes.dataset] + 1
+        tes.data.to_hdf5(out_dir+"/"+tes.dataset+str(dfs[tes.dataset]))
 
 if __name__ == "__main__":
-    to_mongodb()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('data_dir', action='store', help='The location of the MGST folders for TES',
+                        default='/scratch/jlaura/tes/tes_data/')
+    parser.add_argument('to', action='store', help='Python style slice of the folders to process. \
+                        Folders are ordered (e.g. [mgst1100, mgst1101 ...])', default=None)
+    parser.add_argument('from', action='store', help='Python style slice of the folders to process. \
+                            Folders are ordered (e.g. [mgst1100, mgst1101 ...])', default=None)
+    parser.add_argument('out_dir', action='store', help='The location of where to place outliers.')
+
+    args = parser.parse_args()
+    args = args.__dict__()
+
+    to_mongodb(args["data_dir"], args["out_dir"], slice(args["from"], args["to"]))
