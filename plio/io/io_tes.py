@@ -326,4 +326,4 @@ class Tes(object):
 
         outlier_idx = keyspace-set(merged["sclk_time"])
         outliers = [Tes(tds.data[tds.data['sclk_time'].isin(outlier_idx)], data_set=tds.dataset) for tds in tes_data]
-        return merged, [tds for tds in outliers if not tds.data.empty]`
+        return merged, [tds for tds in outliers if not tds.data.empty]
