@@ -6,8 +6,8 @@ import sys
 import functools
 import json
 
+from os import path
 from plio.io.io_json import read_json
-
 from plio.utils._tes2numpy import tes_dtype_map
 from plio.utils._tes2numpy import tes_columns
 from plio.utils._tes2numpy import tes_scaling_factors
@@ -29,7 +29,7 @@ class Tes(object):
     """
 
 
-    def __init__(self, input_data, var_file = None):
+    def __init__(self, input_data, var_file = None, data_set=None):
         """
         Read the .spc file, parse the label, and extract the spectra
 
@@ -199,11 +199,25 @@ class Tes(object):
             else:
                 return df
 
+        if isinstance(input_data, pd.DataFrame):
+            self.dataset = None
+            if not data_set:
+                for key in tes_columns.keys():
+                    if len(set(tes_columns[key]).intersection(set(input_data.columns))) > 3 :
+                        self.dataset = key
+            else:
+                self.dataset=data_set
+
+            self.label = None
+            self.data = input_data
+            return
+
         self.label = pvl.load(input_data)
         nrecords = self.label['TABLE']['ROWS']
         nbytes_per_rec = self.label['RECORD_BYTES']
         data_start = self.label['LABEL_RECORDS'] * self.label['RECORD_BYTES']
         dataset = self.label['TABLE']['^STRUCTURE'].split('.')[0]
+        self.dataset = dataset
 
         numpy_dtypes = tes_dtype_map
         columns = tes_columns
@@ -218,16 +232,20 @@ class Tes(object):
 
         # Read Radiance array if applicable
         if dataset.upper() == 'RAD': # pragma: no cover
-            with open('{}.var'.format(path.splitext(f)[0]) , 'rb') as file:
-                buffer = file.read()
+            if not var_file:
+                filename, file_extension = path.splitext(input_data)
+                var_file = filename + ".var"
+
+            with open(var_file, "rb") as var:
+                buffer = var.read()
                 def process_rad(index):
                     if index is -1:
                         return None
 
                     length = np.frombuffer(buffer[index:index+2], dtype='>u2')[0]
                     exp = np.frombuffer(buffer[index+2:index+4], dtype='>i2')[0]
-
-                    radarr = np.frombuffer(buffer[index+4:index+4+length-2], dtype='>i2') * (2**(exp-15))
+                    scale = 2**(int(exp)-15)
+                    radarr = np.frombuffer(buffer[index+4:index+4+length-2], dtype='>i2') * scale
                     if np.frombuffer(buffer[index+4+length-2:index+4+length], dtype='>u2')[0] != length:
                         warnings.warn("Last element did not match the length for file index {} in file {}".format(index, f))
                     return radarr
@@ -244,3 +262,68 @@ class Tes(object):
         df =  expand_bitstrings(df, dataset.upper())
 
         self.data =  df
+
+    def join(tes_data):
+        """
+        Given a list of Tes objects, merges them into a single dataframe using
+        SPACECRAFT_CLOCK_START_COUNT (sclk_time) as the index.
+
+        Parameters
+        ----------
+
+        tes_data : iterable
+                   A Python iterable of Tes objects
+
+        Returns
+        -------
+
+        : dataframe
+          A pandas dataframe containing the merged data
+
+        : outliers
+          A list of Tes() objects containing the tables containing no matches
+        """
+        if not hasattr(tes_data, '__iter__') and not isinstance(tes_data, Tes):
+            raise TypeError("Input data must be a Tes datasets or an iterable of Tes datasets, got {}".format(type(tes_data)))
+        elif not hasattr(tes_data, '__iter__'):
+            tes_data = [tes_data]
+
+        if len(tes_data) == 0:
+            warn("Input iterable is empty")
+
+        if not all([isinstance(obj, Tes) for obj in tes_data]):
+            # Get the list of types and the indices of elements that caused the error
+            types = [type(obj) for obj in tes_data]
+            error_idx = [i for i, x in enumerate([isinstance(obj, Tes) for obj in tes_data]) if x == False]
+
+            raise TypeError("Input data must must be a Tes dataset, input array has non Tes objects at indices: {}\
+                             for inputs of type: {}".format(error_idx, types))
+
+        single_key_sets = {'ATM', 'POS', 'TLM', 'OBS'}
+        compound_key_sets = {'BOL', 'CMP', 'GEO', 'IFG', 'PCT', 'RAD'}
+        dfs = dict.fromkeys(single_key_sets | compound_key_sets, DataFrame())
+
+        # Organize the data based on datasets
+        for ds in tes_data:
+            # Find a way to do this in place?
+            dfs[ds.dataset] = dfs[ds.dataset].append(ds.data)
+
+        # remove and dataframes that are empty
+        empty_dfs = [key for key in dfs.keys() if dfs[key].empty]
+        for key in empty_dfs:
+            dfs.pop(key, None)
+
+
+        single_key_dfs = [dfs[key] for key in dfs.keys() if key in single_key_sets]
+        compound_key_dfs = [dfs[key] for key in dfs.keys() if key in compound_key_sets]
+        all_dfs = single_key_dfs+compound_key_dfs
+
+        keyspace = functools.reduce(lambda left,right: left|right, [set(df['sclk_time']) for df in all_dfs])
+
+        single_key_merged = functools.reduce(lambda left,right: pd.merge(left, right, on=["sclk_time"]), single_key_dfs)
+        compound_key_merged = functools.reduce(lambda left,right: pd.merge(left, right, on=["sclk_time", "detector"]), compound_key_dfs)
+        merged = single_key_merged.merge(compound_key_merged, on="sclk_time")
+
+        outlier_idx = keyspace-set(merged["sclk_time"])
+        outliers = [Tes(tds.data[tds.data['sclk_time'].isin(outlier_idx)], data_set=tds.dataset) for tds in tes_data]
+        return merged, [tds for tds in outliers if not tds.data.empty]
