@@ -40,6 +40,11 @@ def intersection_to_pixels(inverse_affine, ul, ur, lr, ll):
         if py > maxy:
             maxy = py
 
+    if minx < 0:
+        minx = 0
+    if miny < 0:
+        miny = 0
+
     return minx, maxx, miny, maxy
 
 def compute_overlap(geodata_a, geodata_b):
