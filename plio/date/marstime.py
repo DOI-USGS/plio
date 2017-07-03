@@ -16,7 +16,6 @@ import datetime
 from numpy import pi, floor,array,shape, cos, sin,ceil,arcsin,arccos,arange,abs
 from collections import namedtuple
 
-
 d2R = pi/180.
 
 def getJD(iTime):
@@ -75,34 +74,6 @@ def getJ2000(iTime):
 	return jdTT - 2451545.0
 
 
-def testJ2000():
-	iTime = [2001,11,13,2,45,2]
-	testJD = getJ2000(iTime)
-	callibration = 58891502.000000 #test should be this value.
-	diff = testJD - callibration
-	print(testJD)
-	print('difference = {0}s'.format(diff))
-
-def testUTC():
-	jd = 2452226.614606
-	date = getUTC(jd)
-
-	callibration = datetime.datetime(2001,11,13,2,45,2)
-	diff = callibration - date
-	print(date)
-	print('difference = {}'.format(diff))
-
-
-def testLS():
-
-	iTime = [2000,1,6,0,0,0]
-	lsdata = getMTfromTime(iTime)
-	ls = lsdata.ls
-	year = lsdata.year
-	callibration = 277.18677
-	diff = ls - callibration
-	print(ls)
-	print('Difference = {:f} degrees'.format(diff))
 
 def getMarsParams(j2000):
 	'''Mars time parameters'''
@@ -288,17 +259,6 @@ def SZAGetTime(sza,date, lon, lat):
 	return thisDate, thisSza
 
 
-def testSZA():
-	'''test getSZAfromTime'''
-	itime = [2000,1,6,0,0,0]
-	lon = 0.0
-	lat = 0.0
-	expected = 154.26182
-	sza = getSZAfromTime(itime,lon,lat)
-	print(sza)
-	print('Difference = {:f} degrees'.format(sza-expected))
-
-
 def getLTfromTime(iTime,lon):
 	'''The mars local solar time from an earth time and mars longitude.
 
@@ -311,47 +271,3 @@ def getLTfromTime(iTime,lon):
 	LTST = LMST + timedata.EOT*(24/360.)
 
 	return LTST
-
-def testLTfromTime():
-	'''test getLTfromTime function'''
-	iTime = [2000,1,6,0,0,0]
-	lon = 0.0
-	LTST = getLTfromTime(iTime,lon)
-	expected = 23.64847
-	print(LTST)
-	print('Difference = {:f} degrees'.format(LTST-expected))
-
-def mapSZA(iTime):
-	'''Create an SZA map given an Earth time
-
-	:param iTime: 6 element list: [y,m,d,h,m,s]
-	:returns: null
-	'''
-	import numpy as np
-	from matplotlib import pyplot
-
-	nlons = 72
-	nlats = 72
-	latitude = arange(nlats-1)*2.5-87.5
-	longitude = arange(nlons-1)*5-175.
-
-	SZA = np.zeros((nlats-1,nlons-1))
-	for ilat in arange(nlats-1):
-		for ilon in arange(nlons-1):
-			SZA[ilat,ilon] = getSZAfromTime(iTime,longitude[ilon],latitude[ilat])
-
-
-	pyplot.figure()
-	pyplot.xlabel('Longitude')
-	pyplot.ylabel('Latitude')
-	levels = [0,90,180]
-	cont = pyplot.contourf(longitude,latitude,SZA,30,
-		cmap=pyplot.cm.gist_rainbow)
-	cont2 = pyplot.contour(longitude,latitude,SZA,levels,
-		linewidths=(2,),colors='black',
-		linestyles=('--'))
-	pyplot.clabel(cont2, fmt = '%2.1f', colors = 'black', fontsize=11)
-	cb = pyplot.colorbar(cont)
-	cb.set_label('Solar Zenith Angle')
-
-	pyplot.savefig('plot.ps')
