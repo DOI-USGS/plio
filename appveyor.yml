@@ -65,7 +65,7 @@ install:
 build: off
 
 test_script:
-    - cmd: nosetests --with-coverage --cover-package=plio
+    - cmd: pytest --cov=cycsm
     - "%CMD_IN_ENV% conda build conda --quiet"
 
 deploy_script:
