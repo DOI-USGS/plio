@@ -40,7 +40,7 @@ install:
     - cmd: set PYTHONUNBUFFERED=1
 
     - cmd: conda config --set show_channel_urls true
-    - cmd: conda install --yes python=3.5 
+    - cmd: conda install --yes python=3.5
     - cmd: conda install -c pelson/channel/development --yes --quiet obvious-ci
     - cmd: conda config --add channels conda-forge
     - cmd: conda info
@@ -56,7 +56,6 @@ install:
     - cmd: conda install --yes -c conda-forge gdal h5py
     - cmd: conda install --yes pandas sqlalchemy pyyaml networkx affine
     - cmd: conda install --yes -c jlaura protobuf pvl
-    - cmd: pip install libpysal
 
     # Development installation
     - cmd: conda install --yes nose coverage

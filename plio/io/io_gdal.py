@@ -14,8 +14,6 @@ from plio.io import extract_metadata
 from plio.geofuncs import geofuncs
 from plio.utils.utils import find_in_dict
 
-from libpysal.cg import is_clockwise
-
 gdal.UseExceptions()
 
 NP2GDAL_CONVERSION = {
@@ -220,7 +218,7 @@ class GeoDataset(object):
     @property
     def north_up(self):
         if self.footprint:
-            return is_clockwise(json.loads(self.footprint.ExportToJson())['coordinates'][0][0])
+            return geofuncs.is_clockwise(json.loads(self.footprint.ExportToJson())['coordinates'][0][0])
         else:
             return True
 
