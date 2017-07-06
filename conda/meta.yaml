@@ -24,6 +24,7 @@ requirements:
     - sqlalchemy
     - pyyaml
     - affine
+    - networkx
   run:
     - python
     - setuptools
@@ -37,6 +38,7 @@ requirements:
     - sqlalchemy
     - pyyaml
     - affine
+    - networkx
 
 test:
   imports:
