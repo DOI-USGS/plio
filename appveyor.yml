@@ -65,8 +65,7 @@ install:
 build: off
 
 test_script:
-    - cmd: python setup.py install
-    - cmd: pytest --cov=plio
+    - cmd: pytest --cov=plio --ignore=plio/examples
     - "%CMD_IN_ENV% conda build conda --quiet"
 
 deploy_script:
