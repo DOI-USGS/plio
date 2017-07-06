@@ -50,7 +50,7 @@ install:
 
   # Development installation
   - conda install nose coverage sh anaconda-client
-  - pip install coveralls affine
+  - pip install coveralls affine libpysal
 
   # Straight from the menpo team
   - if [["$TRAVIS_OS_NAME" == "osx"]]; then

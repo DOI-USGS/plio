@@ -440,7 +440,7 @@ class GeoDataset(object):
 
         """
         lon, lat, _ = self.inverse_coordinate_transformation.TransformPoint(lon, lat)
-        px, py = map(int, self.inverse_affine * (lat, lon))
+        px, py = map(int, self.inverse_affine * (lon, lat))
         return px, py
 
     def read_array(self, band=1, pixels=None, dtype='float32'):
