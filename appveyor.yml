@@ -58,14 +58,15 @@ install:
     - cmd: conda install --yes -c jlaura protobuf pvl
 
     # Development installation
-    - cmd: conda install --yes nose coverage pytest
+    - cmd: conda install --yes pytest pytest-cov
     - cmd: pip install coveralls
 
 # Skip .NET project specific build phase.
 build: off
 
 test_script:
-    - cmd: pytest --cov=cycsm
+    - cmd: python setup.py install
+    - cmd: pytest --cov=plio
     - "%CMD_IN_ENV% conda build conda --quiet"
 
 deploy_script:
