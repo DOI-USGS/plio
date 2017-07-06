@@ -23,6 +23,9 @@ requirements:
     - pandas
     - sqlalchemy
     - pyyaml
+    - affine
+    - pip:
+        - libpysal
   run:
     - python
     - setuptools
@@ -35,6 +38,9 @@ requirements:
     - pandas
     - sqlalchemy
     - pyyaml
+    - affine
+    - pip:
+        - libpysal
 
 test:
   imports:
