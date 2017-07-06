@@ -5,5 +5,5 @@ from . import io
 from . import date
 from . import data
 from . import examples
+from . import geofuncs
 from . import utils
-

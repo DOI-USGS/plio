@@ -40,7 +40,7 @@ install:
     - cmd: set PYTHONUNBUFFERED=1
 
     - cmd: conda config --set show_channel_urls true
-    - cmd: conda install --yes python=3.5 
+    - cmd: conda install --yes python=3.5
     - cmd: conda install -c pelson/channel/development --yes --quiet obvious-ci
     - cmd: conda config --add channels conda-forge
     - cmd: conda info
@@ -54,18 +54,18 @@ install:
     - cmd: conda config --add channels conda-forge
     - cmd: conda config --add channels jlaura
     - cmd: conda install --yes -c conda-forge gdal h5py
-    - cmd: conda install --yes pandas sqlalchemy pyyaml networkx
+    - cmd: conda install --yes pandas sqlalchemy pyyaml networkx affine
     - cmd: conda install --yes -c jlaura protobuf pvl
 
     # Development installation
-    - cmd: conda install --yes nose coverage
+    - cmd: conda install --yes pytest pytest-cov
     - cmd: pip install coveralls
 
 # Skip .NET project specific build phase.
 build: off
 
 test_script:
-    - cmd: nosetests --with-coverage --cover-package=plio
+    - cmd: pytest --cov=plio --ignore=plio/examples
     - "%CMD_IN_ENV% conda build conda --quiet"
 
 deploy_script:

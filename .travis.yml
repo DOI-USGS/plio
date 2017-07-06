@@ -45,12 +45,11 @@ install:
   - conda config --add channels jlaura
   - conda install python=$PYTHON_VERSION
   - conda install -c conda-forge gdal h5py
-  - conda install pandas sqlalchemy pyyaml networkx
+  - conda install pandas sqlalchemy pyyaml networkx affine
   - conda install -c jlaura pvl protobuf
 
   # Development installation
-  - conda install nose coverage sh anaconda-client
-  - pip install coveralls
+  - conda install pytest  pytest-cov sh anaconda-client
 
   # Straight from the menpo team
   - if [["$TRAVIS_OS_NAME" == "osx"]]; then
@@ -62,7 +61,7 @@ install:
 
 
 script:
-  - nosetests --with-coverage --cover-package=plio
+  - pytest --cov=plio 
   # After test success, package and upload to Anaconda
   - ~/miniconda/bin/python condaci.py build ./conda
 

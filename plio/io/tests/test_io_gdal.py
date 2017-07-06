@@ -189,7 +189,7 @@ class TestWriter(unittest.TestCase):
         no_data_value = 0.0
         io_gdal.array_to_raster(self.arr, 'test.tif', ndv=no_data_value)
         dataset = io_gdal.GeoDataset('test.tif')
-        self.assertEqual(dataset.no_data_value, no_data_value) 
+        self.assertEqual(dataset.no_data_value, no_data_value)
 
     def test_with_projection(self):
         wktsrs = """PROJCS["Moon2000_Mercator180",
@@ -226,6 +226,3 @@ class TestWriter(unittest.TestCase):
             os.remove('test.tif')
         except:
             pass
-
-
-

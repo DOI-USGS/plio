@@ -23,6 +23,8 @@ requirements:
     - pandas
     - sqlalchemy
     - pyyaml
+    - affine
+    - networkx
   run:
     - python
     - setuptools
@@ -35,6 +37,8 @@ requirements:
     - pandas
     - sqlalchemy
     - pyyaml
+    - affine
+    - networkx
 
 test:
   imports:

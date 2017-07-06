@@ -1,6 +1,9 @@
+import json
+import math
 import os
 import warnings
 
+import affine
 import gdal
 import numpy as np
 import osr
@@ -8,6 +11,7 @@ import pvl
 from osgeo import ogr
 
 from plio.io import extract_metadata
+from plio.geofuncs import geofuncs
 from plio.utils.utils import find_in_dict
 
 gdal.UseExceptions()
@@ -27,7 +31,8 @@ NP2GDAL_CONVERSION = {
 
 GDAL2NP_CONVERSION = {}
 
-DEFAULT_PROJECTIONS = {'mars':'GEOGCS["Mars 2000",DATUM["D_Mars_2000",SPHEROID["Mars_2000_IAU_IAG",3396190.0,169.89444722361179]],PRIMEM["Greenwich",0],UNIT["Decimal_Degree",0.0174532925199433]]'}
+DEFAULT_PROJECTIONS = {'mars':'GEOGCS["Mars 2000",DATUM["D_Mars_2000",SPHEROID["Mars_2000_IAU_IAG",3396190.0,169.89444722361179]],PRIMEM["Greenwich",0],UNIT["Decimal_Degree",0.0174532925199433]]',
+                       'moon':'GEOGCS["Moon 2000",DATUM["D_Moon_2000",SPHEROID["Moon_2000_IAU_IAG",1737400.0,0.0]],PRIMEM["Greenwich",0],UNIT["Decimal_Degree",0.0174532925199433]]'}
 DEFAULT_RADII = {'mars': 3396190.0}
 
 for k, v in iter(NP2GDAL_CONVERSION.items()):
@@ -173,21 +178,30 @@ class GeoDataset(object):
         """
         if not getattr(self, '_geotransform', None):
             if self.footprint:
-                # This is an ISIS3 cube that does not report a valid geotransform
-                ul, ll, lr, ur = self.latlon_extent
-                xs, ys = self.raster_size
-                xres = abs(ul[0] - ur[0]) / xs
-                yres = abs(ul[1] - ll[1]) / ys
-                self._geotransform = [ul[0], xres, 0, ul[1], 0, -yres]
+                coords = json.loads(self.footprint.ExportToJson())['coordinates'][0][0]
+                ul, ur, lr, ll = geofuncs.find_four_corners(coords)
 
-                if ul[1] > ll[1]:
-                    # Image is South-North instead of North-South
-                    self._geotransform[-1] *= -1  # Lat increases with image length
-                    self._geotransform[3] = ll[1] # Origin is at the LL
-
+                xsize, ysize = self.raster_size
+                xstart = ul[0]
+                xscale = (ur[0] - xstart) / xsize
+                xskew = (ll[0] - xstart) / ysize
+                ystart = ul[1]
+                yskew = (ur[1] - ystart) / xsize
+                yscale = (ll[1] - ystart) / ysize
+                self._geotransform = [xstart, xscale, xskew, ystart, yskew, yscale]
             else:
                 self._geotransform = self.dataset.GetGeoTransform()
         return self._geotransform
+
+    @property
+    def forward_affine(self):
+        self._fa = affine.Affine.from_gdal(*self.geotransform)
+        return self._fa
+
+    @property
+    def inverse_affine(self):
+        self._ia = ~self.forward_affine
+        return self._ia
 
     @property
     def standard_parallels(self):
@@ -200,6 +214,13 @@ class GeoDataset(object):
         if not getattr(self, '_unit_type', None):
             self._unit_type = self.dataset.GetRasterBand(1).GetUnitType()
         return self._unit_type
+
+    @property
+    def north_up(self):
+        if self.footprint:
+            return geofuncs.is_clockwise(json.loads(self.footprint.ExportToJson())['coordinates'][0][0])
+        else:
+            return True
 
     @property
     def spatial_reference(self):
@@ -396,16 +417,8 @@ class GeoDataset(object):
                    (Latitude, Longitude) corresponding to the given (x,y).
 
         """
-        try:
-            geotransform = self.geotransform
-            x = geotransform[0] + (x * geotransform[1]) + (y * geotransform[2])
-            y = geotransform[3] + (x * geotransform[4]) + (y * geotransform[5])
-            lon, lat, _ = self.coordinate_transformation.TransformPoint(x, y)
-        except:
-            lat = lon = None
-            warnings.warn('Unable to compute pixel to geographic conversion without '
-                          'projection information for {}'.format(self.base_name))
-
+        lon, lat = self.forward_affine * (x,y)
+        lon, lat, _ = self.coordinate_transformation.TransformPoint(lon, lat)
         return lat, lon
 
     def latlon_to_pixel(self, lat, lon):
@@ -424,11 +437,9 @@ class GeoDataset(object):
                (Sample, line) position corresponding to the given (latitude, longitude).
 
         """
-        geotransform = self.geotransform
-        upperlat, upperlon, _ = self.inverse_coordinate_transformation.TransformPoint(lon, lat)
-        x = (upperlat - geotransform[0]) / geotransform[1]
-        y = (upperlon - geotransform[3]) / geotransform[5]
-        return int(x), int(y)
+        lon, lat, _ = self.inverse_coordinate_transformation.TransformPoint(lon, lat)
+        px, py = map(int, self.inverse_affine * (lon, lat))
+        return px, py
 
     def read_array(self, band=1, pixels=None, dtype='float32'):
         """
@@ -458,24 +469,33 @@ class GeoDataset(object):
 
         if not pixels:
             array = band.ReadAsArray().astype(dtype)
+            if self.north_up == False:
+                array = np.flipud(array)
         else:
             # Check that the read start is not outside of the image
-            xstart, ystart, xextent, yextent = pixels
+            xstart, ystart, xcount, ycount = pixels
+            xmax, ymax = map(int, self.xy_extent[1])
+
+            # If the image is south up, flip the roi
+            if self.north_up == False:
+                ystart = ymax - ystart - ycount
             if xstart < 0:
                 xstart = 0
 
             if ystart < 0:
                 ystart = 0
 
-            xmax, ymax = map(int, self.xy_extent[1])
-            if xstart + pixels[2] > xmax:
-                xextent = xmax - xstart
+            if xstart + xcount > xmax:
+                xcount = xmax - xstart
 
-            if ystart + pixels[3] > ymax:
-                yextent = ymax - ystart
+            if ystart +  ycount > ymax:
+                ycount = ymax - ystart
 
-            array = band.ReadAsArray(xstart, ystart, xextent, yextent).astype(dtype)
+            array = band.ReadAsArray(xstart, ystart, xcount, ycount).astype(dtype)
         return array
+
+    def compute_overlap(self, geodata, **kwargs):
+        return geofuncs.compute_overlap(self, geodata, **kwargs)
 
 
 def array_to_raster(array, file_name, projection=None,
@@ -549,7 +569,7 @@ def array_to_raster(array, file_name, projection=None,
 
 
 def match_rasters(match_to, match_from, destination,
-                  resampling_method='GRA_Bilinear'):
+                  resampling_method='GRA_Bilinear', ndv=0):
     """
     Match a source raster to a match raster, including resolution and extent.
 
@@ -590,7 +610,9 @@ def match_rasters(match_to, match_from, destination,
 
     dst = gdal.GetDriverByName('GTiff').Create(destination, width, height, 1,
                                                gdalconst.GDT_Float64)
+
     dst.SetGeoTransform(match_to_gt)
     dst.SetProjection(match_to_srs)
+    dst.GetRasterBand(1).SetNoDataValue(ndv)
 
     gdal.ReprojectImage(match_from.dataset, dst, None, None, getattr(gdalconst, resampling_method))
