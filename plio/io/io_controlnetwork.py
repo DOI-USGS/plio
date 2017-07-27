@@ -222,7 +222,8 @@ class IsisStore(object):
                 for attr, attrtype in self.measure_attrs:
                     if attr in g.columns:
                         setattr(measure_spec, attr, attrtype(m[attr]))
-
+                measure_spec.sample = m.x
+                measure_spec.line = m.y
                 measure_spec.type = 2
                 measure_iterable.append(measure_spec)
                 self.nmeasures += 1
