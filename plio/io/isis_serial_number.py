@@ -28,7 +28,6 @@ def get_isis_translation(label):
     """
     # Instantiate a DB session if not already instantiated
     if not hasattr(plio, 'data_session'):
-        print(get_data('data.db'))
         plio.data_session = setup_db_session(get_data('data.db'))
 
     # Grab the label is not already read

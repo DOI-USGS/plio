@@ -5,12 +5,6 @@ import pvl
 from plio.io import ControlNetFileV0002_pb2 as cnf
 from plio.utils.utils import xstr
 
-try:
-    import spiceypy
-    spicey_available = True
-except:
-    spicey_available = False
-
 VERSION = 2
 HEADERSTARTBYTE = 65536
 DEFAULTUSERNAME = 'None'
@@ -34,7 +28,7 @@ def write_filelist(lst, path="fromlist.lis"):
     return
 
 
-def to_isis(path, obj, mode='w', version=VERSION,
+def to_isis(path, obj, serials, mode='wb', version=VERSION,
             headerstartbyte=HEADERSTARTBYTE,
             networkid='None', targetname='None',
             description='None', username=DEFAULTUSERNAME,
@@ -98,7 +92,7 @@ def to_isis(path, obj, mode='w', version=VERSION,
             creation_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
         if not modified_date:
             modified_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-        point_messages, point_sizes = store.create_points(obj, pointid_prefix, pointid_suffix)
+        point_messages, point_sizes = store.create_points(obj, serials, pointid_prefix, pointid_suffix)
         points_bytes = sum(point_sizes)
         buffer_header, buffer_header_size = store.create_buffer_header(networkid,
                                                                        targetname,
@@ -174,15 +168,15 @@ class IsisStore(object):
         self._handle.seek(offset)
         self._handle.write(data)
 
-    def create_points(self, obj, pointid_prefix, pointid_suffix):
+    def create_points(self, df, serials, pointid_prefix, pointid_suffix):
         """
         Step through a control network (C) and return protocol buffer point objects
 
         Parameters
         ----------
-        obj : list
-              of iterable objects (dataframes) with the appropriate
-              attributes: point_id, point_type, serial,  measure_type, x, y required.
+        df : DataFrame
+              with the appropriate attributes: point_id, point_type, serial,
+              measure_type, x, y required.
               The entries in the list must support grouping by the point_id attribute.
 
         Returns
@@ -201,46 +195,44 @@ class IsisStore(object):
         # TODO: Rewrite using apply syntax for performance
         point_sizes = []
         point_messages = []
-        for df in obj:
-            for i, g in df.groupby('point_id'):
-                point_spec = cnf.ControlPointFileEntryV0002()
-                point_spec.id = _set_pid(self.pointid)
+        for i, g in df.groupby('point_id'):
+            point_spec = cnf.ControlPointFileEntryV0002()
+            point_spec.id = _set_pid(i)
 
-                for attr, attrtype in self.point_attrs:
+            for attr, attrtype in self.point_attrs:
+                if attr in g.columns:
+                    # As per protobuf docs for assigning to a repeated field.
+                    if attr == 'aprioriCovar':
+                        arr = g.iloc[0]['aprioriCovar']
+                        point_spec.aprioriCovar.extend(arr.ravel().tolist())
+                    else:
+                        setattr(point_spec, attr, attrtype(g.iloc[0][attr]))
+            point_spec.type = 2  # Hardcoded to free
+
+            # The reference index should always be the image with the lowest index
+            point_spec.referenceIndex = 0
+
+            # A single extend call is cheaper than many add calls to pack points
+            measure_iterable = []
+
+            for node_id, m in g.iterrows():
+                measure_spec = point_spec.Measure()
+                measure_spec.serialnumber = serials[m.image_index]
+                # For all of the attributes, set if they are an dict accessible attr of the obj.
+                for attr, attrtype in self.measure_attrs:
                     if attr in g.columns:
-                        # As per protobuf docs for assigning to a repeated field.
-                        if attr == 'aprioriCovar':
-                            arr = g.iloc[0]['aprioriCovar']
-                            point_spec.aprioriCovar.extend(arr.ravel().tolist())
-                        else:
-                            setattr(point_spec, attr, attrtype(g.iloc[0][attr]))
-                point_spec.type = int(g.point_type.iat[0])
+                        setattr(measure_spec, attr, attrtype(m[attr]))
 
-                # The reference index should always be the image with the lowest index
-                point_spec.referenceIndex = 0
+                measure_spec.type = 2
+                measure_iterable.append(measure_spec)
+                self.nmeasures += 1
+            point_spec.measures.extend(measure_iterable)
 
-                # A single extend call is cheaper than many add calls to pack points
-                measure_iterable = []
+            point_message = point_spec.SerializeToString()
+            point_sizes.append(point_spec.ByteSize())
+            point_messages.append(point_message)
 
-                for node_id, m in g.iterrows():
-                    measure_spec = point_spec.Measure()
-                    # For all of the attributes, set if they are an dict accessible attr of the obj.
-                    for attr, attrtype in self.measure_attrs:
-
-                        if attr in g.columns:
-                            setattr(measure_spec, attr, attrtype(m[attr]))
-                    measure_spec.type = int(m.measure_type)
-                    measure_spec.line = m.y
-                    measure_spec.sample = m.x
-                    measure_iterable.append(measure_spec)
-                    self.nmeasures += 1
-                point_spec.measures.extend(measure_iterable)
-
-                point_message = point_spec.SerializeToString()
-                point_sizes.append(point_spec.ByteSize())
-                point_messages.append(point_message)
-
-                self.pointid += 1
+            self.pointid += 1
         return point_messages, point_sizes
 
     def create_buffer_header(self, networkid, targetname,
