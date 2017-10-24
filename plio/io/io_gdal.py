@@ -200,6 +200,9 @@ class GeoDataset(object):
 
     @property
     def inverse_affine(self):
+        # If det(A) == 0, the transformation is degenerate
+        if self.forward_affine.is_degenerate:
+            return None
         self._ia = ~self.forward_affine
         return self._ia
 
@@ -475,10 +478,9 @@ class GeoDataset(object):
             # Check that the read start is not outside of the image
             xstart, ystart, xcount, ycount = pixels
             xmax, ymax = map(int, self.xy_extent[1])
-
             # If the image is south up, flip the roi
             if self.north_up == False:
-                ystart = ymax - ystart - ycount
+                ystart = ymax - (ystart + ycount)
             if xstart < 0:
                 xstart = 0
 
@@ -488,10 +490,11 @@ class GeoDataset(object):
             if xstart + xcount > xmax:
                 xcount = xmax - xstart
 
-            if ystart +  ycount > ymax:
+            if ystart + ycount > ymax:
                 ycount = ymax - ystart
-
             array = band.ReadAsArray(xstart, ystart, xcount, ycount).astype(dtype)
+            #if self.north_up == False:
+            #    array = np.flipud(array)
         return array
 
     def compute_overlap(self, geodata, **kwargs):
