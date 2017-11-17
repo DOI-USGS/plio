@@ -7,8 +7,6 @@ only:
 env:
   global:
     - BINSTAR_USER: jlaura
-  matrix:
-    - PYTHON_VERSION: 3.5
 
 os:
   - linux
@@ -61,7 +59,7 @@ install:
 
 
 script:
-  - pytest --cov=plio 
+  - pytest --cov=plio
   # After test success, package and upload to Anaconda
   - ~/miniconda/bin/python condaci.py build ./conda
 
