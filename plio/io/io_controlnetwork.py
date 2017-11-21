@@ -9,7 +9,6 @@ VERSION = 2
 HEADERSTARTBYTE = 65536
 DEFAULTUSERNAME = 'None'
 
-
 def write_filelist(lst, path="fromlist.lis"):
     """
     Writes a filelist to a file so it can be used in ISIS3.
@@ -86,7 +85,6 @@ def to_isis(path, obj, serials, mode='wb', version=VERSION,
                      Suffix to tbe added to the point id.  If the suffix is '_bar', pointids
                      will be in the form '1_bar, 2_bar, ..., n_bar'.
     """
-
     with IsisStore(path, mode) as store:
         if not creation_date:
             creation_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
@@ -128,8 +126,8 @@ class IsisStore(object):
     """
 
     def __init__(self, path, mode=None, **kwargs):
-        self.pointid = 0
         self.nmeasures = 0
+        self.npoints = 0
 
         # Conversion from buffer types to Python types
         bt = {1: float,
@@ -196,9 +194,15 @@ class IsisStore(object):
         point_sizes = []
         point_messages = []
         for i, g in df.groupby('point_id'):
-            point_spec = cnf.ControlPointFileEntryV0002()
-            point_spec.id = _set_pid(i)
 
+            # Get the point specification from the protobuf
+            point_spec = cnf.ControlPointFileEntryV0002()
+
+            # Set the ID and then loop over all of the attributes that the
+            # point has and check for corresponding columns in the group and
+            # set with the correct type
+            #point_spec.id = _set_pid(i)
+            point_spec.id = _set_pid(i)
             for attr, attrtype in self.point_attrs:
                 if attr in g.columns:
                     # As per protobuf docs for assigning to a repeated field.
@@ -217,23 +221,25 @@ class IsisStore(object):
 
             for node_id, m in g.iterrows():
                 measure_spec = point_spec.Measure()
-                measure_spec.serialnumber = serials[m.image_index]
                 # For all of the attributes, set if they are an dict accessible attr of the obj.
                 for attr, attrtype in self.measure_attrs:
                     if attr in g.columns:
                         setattr(measure_spec, attr, attrtype(m[attr]))
+
+                measure_spec.serialnumber = serials[m.image_index]
                 measure_spec.sample = m.x
                 measure_spec.line = m.y
                 measure_spec.type = 2
                 measure_iterable.append(measure_spec)
                 self.nmeasures += 1
-            point_spec.measures.extend(measure_iterable)
 
+            self.npoints += 1
+
+            point_spec.measures.extend(measure_iterable)
             point_message = point_spec.SerializeToString()
             point_sizes.append(point_spec.ByteSize())
             point_messages.append(point_message)
 
-            self.pointid += 1
         return point_messages, point_sizes
 
     def create_buffer_header(self, networkid, targetname,
@@ -342,7 +348,7 @@ class IsisStore(object):
                         ('Created', creation_date),
                         ('LastModified', modified_date),
                         ('Description', description),
-                        ('NumberOfPoints', self.pointid),
+                        ('NumberOfPoints', self.npoints),
                         ('NumberOfMeasures', self.nmeasures),
                         ('Version', version)
                         ])

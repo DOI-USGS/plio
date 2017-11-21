@@ -1,4 +1,5 @@
 import json
+import warnings
 import numpy as np
 
 def intersection_to_pixels(inverse_affine, ul, ur, lr, ll):
@@ -27,6 +28,10 @@ def intersection_to_pixels(inverse_affine, ul, ur, lr, ll):
     miny = np.inf
     maxy = -np.inf
 
+    if inverse_affine == None:
+        warnings.warn('Inverse affine transformation not available.')
+        return None
+
     for c in [ul, ur, lr, ll]:
         px, py = map(int, inverse_affine * (c[0], c[1]))
 
@@ -51,7 +56,6 @@ def compute_overlap(geodata_a, geodata_b):
     p1 = geodata_a.footprint
     p2 = geodata_b.footprint
     intersection = json.loads(p1.Intersection(p2).ExportToJson())['coordinates'][0]
-
     ul, ur, lr, ll = find_four_corners(intersection)
 
     a_intersection = intersection_to_pixels(geodata_a.inverse_affine, ul, ur, lr, ll)
@@ -120,7 +124,6 @@ def find_four_corners(coords, threshold=120):
     plio.geofuncs.geofuncs.find_corners
     """
     corners = find_corners(coords, threshold)
-
     corners.sort(key = lambda x:x[1])
     upper = corners[2:]
     lower = corners[:2]

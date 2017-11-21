@@ -4,12 +4,6 @@ branches:
 only:
   - master
 
-env:
-  global:
-    - BINSTAR_USER: jlaura
-  matrix:
-    - PYTHON_VERSION: 3.5
-
 os:
   - linux
   - osx
@@ -43,7 +37,6 @@ install:
   # Install not using env because build needs to be in root env
   - conda config --add channels conda-forge
   - conda config --add channels jlaura
-  - conda install python=$PYTHON_VERSION
   - conda install -c conda-forge gdal h5py
   - conda install pandas sqlalchemy pyyaml networkx affine
   - conda install -c jlaura pvl protobuf
@@ -51,22 +44,13 @@ install:
   # Development installation
   - conda install pytest  pytest-cov sh anaconda-client
 
-  # Straight from the menpo team
-  - if [["$TRAVIS_OS_NAME" == "osx"]]; then
-      curl -o condaci.py https://raw.githubusercontent.com/menpo/condaci/v0.4.8/condaci.py;
-    else
-      wget https://raw.githubusercontent.com/menpo/condaci/v0.4.8/condaci.py -O condaci.py;
-    fi
-  - python condaci.py setup
-
 
 script:
-  - pytest --cov=plio 
-  # After test success, package and upload to Anaconda
-  - ~/miniconda/bin/python condaci.py build ./conda
+  - pytest --cov=plio
 
 after_success:
   - coveralls
+  - conda install conda-build && conda install anaconda-client && conda config --set anaconda_upload yes && conda build --token $CONDA_UPLOAD_TOKEN recipe
 
 notifications:
   webhooks:

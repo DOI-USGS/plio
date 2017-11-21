@@ -38,7 +38,6 @@ def get_isis_translation(label):
     spacecraft_name = find_in_dict(label, 'SpacecraftName')
     for row in plio.data_session.query(StringToMission).filter(StringToMission.key==spacecraft_name):
         spacecraft_name = row.value.lower()
-
     # Try and pull an instrument identifier
     try:
         instrumentid = find_in_dict(label, 'InstrumentId').capitalize()
@@ -51,7 +50,6 @@ def get_isis_translation(label):
                                                             Translations.instrument==instrumentid):
         # Convert the JSON back to a PVL object
         translation = PVLModule(row.translation)
-
     return translation
 
 
@@ -75,6 +73,7 @@ def generate_serial_number(label):
         label = pvl.load(label, cls=SerialNumberDecoder)
     # Get the translation information
     translation = get_isis_translation(label)
+
     if not translation:
         warnings.warn('Unable to load an appropriate image translation.')
         return
@@ -91,11 +90,11 @@ def generate_serial_number(label):
             search_translation = {group['Translation'][1]:group['Translation'][0]}
             sub_group = find_nested_in_dict(label, search_position)
             serial_entry = sub_group[search_key]
+
             if serial_entry in search_translation.keys():
                 serial_entry = search_translation[serial_entry]
             elif '*' in search_translation.keys() and search_translation['*'] != '*':
                 serial_entry = search_translation['*']
-
             serial_number.append(serial_entry)
         except:
             pass
