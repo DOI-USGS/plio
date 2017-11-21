@@ -3,7 +3,7 @@ package:
   version: 0.1.0
 
 source:
-  path: ../
+  git_url: https://github.com/USGS-Astrogeology/plio
 
 build:
   number: 0
