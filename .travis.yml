@@ -4,10 +4,11 @@ branches:
 only:
   - master
 
-env:
-  - PYTHON_VERSION = "3.4"
-  - PYTHON_VERSION = "3.5"
-  - PYTHON_VERSION = "3.6"
+matrix:
+  include:
+    - PYTHON_VERSION = "3.4"
+    - PYTHON_VERSION = "3.5"
+    - PYTHON_VERSION = "3.6"
 os:
   - linux
   - osx
