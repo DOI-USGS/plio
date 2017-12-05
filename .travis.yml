@@ -1,4 +1,4 @@
-langage: python
+language: generic
 sudo: false
 
 branches:
@@ -8,10 +8,11 @@ os:
   - linux
   - osx
   
-python:
-  - "3.4"
-  - "3.5"
-  - "3.6"
+env:
+  - PYTHON_VERSION = "3.4"
+  - PYTHON_VERSION = "3.5"
+  - PYTHON_VERSION = "3.6"
+
 before_install:
   # We do this conditionally because it saves us some downloading if the
   # version is the same.
@@ -28,7 +29,7 @@ before_install:
   # Useful for debugging any issues with conda
   - conda info -a
   # Create the env
-  - conda create -q -n test python=$TRAVIS_PYTHON_VERSION
+  - conda create -q -n test python=$PYTHON_VERSION
   - source activate test
   
 install:
@@ -48,7 +49,7 @@ after_success:
   - coveralls
   - conda install conda-build anaconda-client
   - conda config --set anaconda_upload yes
-  - conda build --token $CONDA_UPLOAD_TOKEN --python $TRAVIS_PYTHON_VERSION recipe
+  - conda build --token $CONDA_UPLOAD_TOKEN --python $PYTHON_VERSION recipe
 
 notifications:
   webhooks:
