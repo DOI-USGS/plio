@@ -31,7 +31,7 @@ before_install:
 
 install:
   # Create the env
-  - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
+  - conda create --yes -n test python=$PYTHON_VERSION
   - source activate test
 
   - conda config --add channels conda-forge
