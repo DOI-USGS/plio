@@ -1,19 +1,17 @@
-sudo: false
 langage: python
+sudo: false
 
 branches:
   only:
     - master
-
-python:
- - "3.4"
- - "3.5"
- - "3.6"
-
 os:
   - linux
   - osx
-
+  
+python:
+  - "3.4"
+  - "3.5"
+  - "3.6"
 before_install:
   # We do this conditionally because it saves us some downloading if the
   # version is the same.
@@ -30,7 +28,7 @@ before_install:
   # Useful for debugging any issues with conda
   - conda info -a
   # Create the env
-  - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
+  - conda create -q -n test python=$TRAVIS_PYTHON_VERSION
   - source activate test
   
 install:
