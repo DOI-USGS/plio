@@ -31,6 +31,7 @@ before_install:
 
 install:
   # Create the env
+  - echo $PYTHON_VERSION
   - conda create --yes -n test python=$PYTHON_VERSION
   - source activate test
 
@@ -38,7 +39,7 @@ install:
   - conda config --add channels jlaura
   - conda install -c conda-forge gdal h5py 
   - conda install pandas sqlalchemy pyyaml networkx affine protobuf
-  - conda install -c jlaura pvlf
+  - conda install -c jlaura pvl
 
   # Development installation
   - conda install pytest  pytest-cov sh anaconda-client
