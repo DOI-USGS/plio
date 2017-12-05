@@ -1,14 +1,15 @@
 sudo: false
+langage: python
 
 branches:
 only:
   - master
 
-matrix:
-  include:
-    - PYTHON_VERSION = "3.4"
-    - PYTHON_VERSION = "3.5"
-    - PYTHON_VERSION = "3.6"
+python:
+ - "3.4"
+ - "3.5"
+ - "3.6"
+
 os:
   - linux
   - osx
@@ -32,7 +33,7 @@ before_install:
 install:
   # Create the env
   - echo $PYTHON_VERSION
-  - conda create --yes -n test python=$PYTHON_VERSION
+  - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
   - source activate test
 
   - conda config --add channels conda-forge
@@ -52,7 +53,7 @@ after_success:
   - coveralls
   - conda install conda-build anaconda-client
   - conda config --set anaconda_upload yes
-  - conda build --token $CONDA_UPLOAD_TOKEN --python PYTHON_VERSION recipe
+  - conda build --token $CONDA_UPLOAD_TOKEN --python $TRAVIS_PYTHON_VERSION recipe
 
 notifications:
   webhooks:
