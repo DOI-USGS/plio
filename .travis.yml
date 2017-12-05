@@ -32,7 +32,7 @@ before_install:
 
 install:
   # Create the env
-  - echo $PYTHON_VERSION
+  - echo $TRAVIS_PYTHON_VERSION
   - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
   - source activate test
 
