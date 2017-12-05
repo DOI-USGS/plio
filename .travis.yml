@@ -2,8 +2,8 @@ sudo: false
 langage: python
 
 branches:
-only:
-  - master
+  only:
+    - master
 
 python:
  - "3.4"
@@ -29,13 +29,11 @@ before_install:
   - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
-
-install:
   # Create the env
-  - echo $TRAVIS_PYTHON_VERSION
   - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
   - source activate test
-
+  
+install:
   - conda config --add channels conda-forge
   - conda config --add channels jlaura
   - conda install -c conda-forge gdal h5py 
@@ -44,8 +42,7 @@ install:
 
   # Development installation
   - conda install pytest  pytest-cov sh anaconda-client
-
-
+  
 script:
   - pytest --cov=plio
 
