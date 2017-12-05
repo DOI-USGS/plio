@@ -29,7 +29,7 @@ before_install:
   # Useful for debugging any issues with conda
   - conda info -a
   # Create the env
-  - conda create -q -n test python $PYTHON_VERSION
+  - conda create -q -n test python=$PYTHON_VERSION
   - source activate test
   
 install:
