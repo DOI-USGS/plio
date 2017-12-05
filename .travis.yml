@@ -4,27 +4,22 @@ branches:
 only:
   - master
 
+env:
+  matrix:
+    - PYTHON_VERSION = "3.4"
+    - PYTHON_VERSION = "3.5"
+    - PYTHON_VERSION = "3.6"
 os:
   - linux
   - osx
 
 before_install:
-
-install:
   # We do this conditionally because it saves us some downloading if the
   # version is the same.
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      if [ "$PYTHON_VERSION" == 2.7 ]; then
-        wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
-      else
-        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-      fi
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
     else
-      if ["$PYTHON_VERSION" == 2.7]; then
-        curl -o miniconda.sh  https://repo.continuum.io/miniconda/Miniconda-latest-MacOSX-x86_64.sh;
-      else
-        curl -o miniconda.sh  https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh;
-      fi
+      curl -o miniconda.sh  https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh;
     fi
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
@@ -34,12 +29,16 @@ install:
   # Useful for debugging any issues with conda
   - conda info -a
 
-  # Install not using env because build needs to be in root env
+install:
+  # Create the env
+  - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
+  - source activate test
+
   - conda config --add channels conda-forge
   - conda config --add channels jlaura
-  - conda install -c conda-forge gdal h5py
-  - conda install pandas sqlalchemy pyyaml networkx affine
-  - conda install -c jlaura pvl protobuf
+  - conda install -c conda-forge gdal h5py 
+  - conda install pandas sqlalchemy pyyaml networkx affine protobuf
+  - conda install -c jlaura pvlf
 
   # Development installation
   - conda install pytest  pytest-cov sh anaconda-client
@@ -50,7 +49,9 @@ script:
 
 after_success:
   - coveralls
-  - conda install conda-build && conda install anaconda-client && conda config --set anaconda_upload yes && conda build --token $CONDA_UPLOAD_TOKEN recipe
+  - conda install conda-build anaconda-client
+  - conda config --set anaconda_upload yes
+  - conda build --token $CONDA_UPLOAD_TOKEN --python PYTHON_VERSION recipe
 
 notifications:
   webhooks:
