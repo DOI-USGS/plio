@@ -1,7 +1,7 @@
 import unittest
 
-from .. import io_json
-from .. import io_yaml
+from plio.io import io_json
+from plio.io import io_yaml
 
 try:
     import yaml
