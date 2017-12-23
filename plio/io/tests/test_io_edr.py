@@ -1,7 +1,5 @@
 import unittest
 
-sys.path.insert(0, os.path.abspath('..'))
-
 from plio.examples import get_path
 from plio.io import io_edr
 
