@@ -6,8 +6,8 @@ from time import strftime, gmtime
 import pandas as pd
 import pvl
 
-from .. import io_controlnetwork
-from .. import ControlNetFileV0002_pb2 as cnf
+from plio.io import io_controlnetwork
+from plio.io import ControlNetFileV0002_pb2 as cnf
 from plio.utils.utils import find_in_dict
 
 sys.path.insert(0, os.path.abspath('..'))
