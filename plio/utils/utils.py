@@ -51,30 +51,6 @@ def file_to_list(file):
     return list(file_list)
 
 
-def create_dir(basedir=''):
-    """
-    Create a unique, temporary directory in /tmp where processing will occur
-
-    Parameters
-    ----------
-    basedir : str
-              The PATH to create the temporary directory in.
-    """
-    return tempfile.mkdtemp(dir=basedir)
-
-
-def delete_dir(dir):
-    """
-    Delete a directory
-
-    Parameters
-    ----------
-    dir : str
-          Remove a directory
-    """
-    shutil.rmtree(dir)
-
-
 def file_search(searchdir,searchstring):
     """
     Recursively search for files in the specified directory
@@ -166,7 +142,7 @@ def xstr(s):
         return ''
     return str(s)
 
-def lookup(df,lookupfile=None,lookupdf=None,sep=',',skiprows=1,left_on='sclock',right_on='Spacecraft Clock'):
+def lookup(df, lookupfile=None, lookupdf=None, sep=',', skiprows=1, left_on='sclock', right_on='Spacecraft Clock'):
 #TODO: automatically determine the number of rows to skip to handle ccam internal master list and PDS "official" master list formats
     if lookupfile is not None:
         # this loop concatenates together multiple lookup files if provided
