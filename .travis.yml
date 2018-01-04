@@ -30,6 +30,8 @@ before_install:
   # Create the env
   - conda create -q -n test python=$PYTHON_VERSION
   - source activate test
+  # https://github.com/travis-ci/travis-ci/issues/8982
+  - python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
 
 install:
   - conda config --add channels conda-forge
