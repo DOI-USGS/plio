@@ -5,8 +5,8 @@ branches:
 version: '0.1.0.{build}'
 
 matrix:
-  - PYTHON: "C:\\Miniconda35-x64\Scripts\activate.bat"
-  - PYTHON: "C:\\Miniconda36-x64\Scripts\activate.bat"
+  - PYTHON: "C:\\Miniconda35-x64\\Scripts\\activate.bat"
+  - PYTHON: "C:\\Miniconda36-x64\\Scripts\\activate.bat"
 
 platform:
   - x64
