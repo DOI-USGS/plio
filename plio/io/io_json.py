@@ -15,7 +15,7 @@ def read_json(inputfile):
     jobs : dict
            returns a dictionary 
 
-    >>> inputs = readinputfile('testfiles/sampleinput.json')
+    >>> inputs = read_json('testfiles/sampleinput.json')
     >>> k = inputs.keys()
     >>> k.sort()
     >>> print k
