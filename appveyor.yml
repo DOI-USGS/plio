@@ -20,7 +20,7 @@ install:
   - cmd: conda config --set always_yes yes --set changeps1 no
   - cmd: conda update -q conda
   - cmd: conda config --add channels conda-forge
-  - cmd: conda install -c conda-forge pvl protobuf gdal numpy pandas sqlalchemy pyyaml networkx
+  - cmd: conda install -c conda-forge pvl protobuf gdal numpy pandas sqlalchemy pyyaml networkx affine
   - cmd: conda install conda-build anaconda-client pytest-cov
 
 build_script:
