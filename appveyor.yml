@@ -30,7 +30,7 @@ build_script:
   - cmd: python setup.py install
   
 test_script:
-  - cmd: pytest --cov=plio
+  - cmd: pytest plio/
 
 on_success:
   - cmd: conda config --set anaconda_upload yes
