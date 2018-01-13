@@ -21,6 +21,7 @@ install:
   - cmd: conda update -q conda
   - cmd: conda config --add channels conda-forge
   - cmd: conda install -c conda-forge pvl protobuf gdal numpy pandas sqlalchemy pyyaml networkx
+  - cmd: conda install conda-build anaconda-client pytest-cov
 
 build_script:
   - cmd: conda build .
