@@ -24,9 +24,8 @@ install:
   - cmd: conda install conda-build anaconda-client pytest-cov
 
 build_script:
-  - cmd: conda build .
-  - cmd: conda install --use-local plio
-
+  - cmd: python setup.py install
+  
 test_script:
   - cmd: pytest --cov=plio
 
