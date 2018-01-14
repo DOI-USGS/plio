@@ -45,7 +45,9 @@ def setup_package():
             'pandas',
             'sqlalchemy',
             'pyyaml',
-            'networkx'],
+            'networkx', 
+            'affine',
+            'scipy'],
         classifiers=[
             "Development Status :: 3 - Alpha",
             "Topic :: Utilities",
