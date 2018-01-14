@@ -25,7 +25,7 @@ install:
   - cmd: activate test_env
   - cmd: conda config --add channels conda-forge
   - cmd: conda install -c conda-forge pvl protobuf gdal numpy pandas sqlalchemy pyyaml networkx affine h5py scipy
-  - cmd: conda install conda-build anaconda-client pytest-cov
+  - cmd: conda install pytest-cov
   # https://pythonhosted.org/CodeChat/appveyor.yml.html
   - cmd: python -m pip install -U pip
   - cmd: python -m easy_install -U setuptools
@@ -38,5 +38,6 @@ test_script:
 
 on_success:
   - cmd: deactivate
+  - cmd: conda install conda-build anaconda-client 
   - cmd: conda config --set anaconda_upload yes
   - cmd: conda build --token %CONDA_UPLOAD_TOKEN% .
