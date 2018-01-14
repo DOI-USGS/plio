@@ -23,7 +23,7 @@ requirements:
     - pyyaml
     - affine
     - networkx
-    - setuptools  #[win]
+    - scipy
   run:
     - python
     - setuptools
@@ -38,6 +38,7 @@ requirements:
     - pyyaml
     - affine
     - networkx
+    - scipy
 
 test:
   imports:
