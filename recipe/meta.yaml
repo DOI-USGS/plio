@@ -23,6 +23,7 @@ requirements:
     - pyyaml
     - affine
     - networkx
+    - setuptools  #[win]
   run:
     - python
     - setuptools
