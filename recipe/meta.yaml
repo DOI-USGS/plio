@@ -24,6 +24,7 @@ requirements:
     - affine
     - networkx
     - scipy
+    - certifi
   run:
     - python
     - setuptools
@@ -39,6 +40,7 @@ requirements:
     - affine
     - networkx
     - scipy
+    - certifi
 
 test:
   imports:
