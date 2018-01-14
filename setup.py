@@ -40,7 +40,7 @@ def setup_package():
             'gdal',
             'numpy',
             'pvl',
-            'protobuf==3.0.0b2',
+            'protobuf',
             'h5py',
             'pandas',
             'sqlalchemy',
