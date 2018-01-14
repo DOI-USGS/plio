@@ -21,6 +21,7 @@ install:
   - cmd: call %PYTHON%
   - cmd: conda config --set always_yes yes --set changeps1 no
   - cmd: conda update -q conda
+  - cmd: conda install conda-build anaconda-client 
   - cmd: conda create -q -n test_env python=%PYTHON_VERSION%
   - cmd: activate test_env
   - cmd: conda config --add channels conda-forge
@@ -38,7 +39,5 @@ test_script:
 
 on_success:
   - cmd: deactivate
-  - cmd: call %PYTHON%
-  - cmd: conda install conda-build anaconda-client 
   - cmd: conda config --set anaconda_upload yes
   - cmd: conda build --token %CONDA_UPLOAD_TOKEN% .
