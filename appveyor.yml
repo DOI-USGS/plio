@@ -21,7 +21,7 @@ install:
   - cmd: call %PYTHON%
   - cmd: conda config --set always_yes yes --set changeps1 no
   - cmd: conda update -q conda
-  - cmd: conda create -q -n test python=$PYTHON_VERSION
+  - cmd: conda create -q -n test python=%PYTHON_VERSION%
   - cmd: source activate test
   - cmd: conda config --add channels conda-forge
   - cmd: conda install -c conda-forge pvl protobuf gdal numpy pandas sqlalchemy pyyaml networkx affine h5py scipy
