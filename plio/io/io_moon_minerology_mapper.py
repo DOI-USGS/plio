@@ -15,7 +15,7 @@ def openm3(input_data):
 
 def metadatatoband(metadata):
     wv2band = []
-    for k, v in metadata.iteritems():
+    for k, v in metadata.items():
         try:
             wv2band.append(float(value))
         except:
