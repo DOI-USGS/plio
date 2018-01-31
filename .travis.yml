@@ -7,7 +7,7 @@ branches:
 os:
   - linux
   - osx
-  
+
 env:
   - PYTHON_VERSION=3.5
   - PYTHON_VERSION=3.6
@@ -30,27 +30,26 @@ before_install:
   # Create the env
   - conda create -q -n test python=$PYTHON_VERSION
   - source activate test
-  
+  # https://github.com/travis-ci/travis-ci/issues/8982
+  - python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
+
 install:
   - conda config --add channels conda-forge
-  - conda config --add channels jlaura
-  - conda install -c conda-forge gdal h5py 
-  - conda install pandas sqlalchemy pyyaml networkx affine protobuf
-  - pip install pvl
+  - conda install -q gdal h5py pandas sqlalchemy pyyaml networkx affine protobuf scipy pvl
 
   # Development installation
-  - conda install pytest  pytest-cov sh anaconda-client
-  
+  - conda install -q pytest pytest-cov sh
+
 script:
   - pytest --cov=plio
 
 after_success:
   - coveralls
   # Need to do the build in the root
-  - source deactivate 
-  - conda install conda-build anaconda-client
+  - source deactivate
+  - conda install -q conda-build anaconda-client
   - conda config --set anaconda_upload yes
-  - conda build --token $CONDA_UPLOAD_TOKEN --python $PYTHON_VERSION recipe
+  - conda build --token $CONDA_UPLOAD_TOKEN --python $PYTHON_VERSION recipe -q
 
 notifications:
   webhooks:
