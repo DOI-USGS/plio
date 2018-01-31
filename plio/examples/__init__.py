@@ -3,7 +3,7 @@ import plio
 
 __all__ = ['available', 'get_path']
 
-#Used largely unmodififed from:
+# Used largely unmodififed from:
 # https://github.com/pysal/pysal/blob/master/pysal/examples/__init__.py
 
 base = os.path.split(plio.__file__)[0]

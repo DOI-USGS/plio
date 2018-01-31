@@ -5,6 +5,7 @@ import os
 import fnmatch
 import shutil
 import tempfile
+import pandas as pd
 
 
 def create_dir(basedir=''):
@@ -48,30 +49,6 @@ def file_to_list(file):
         file_list = filter(None, file_list)
 
     return list(file_list)
-
-
-def create_dir(basedir=''):
-    """
-    Create a unique, temporary directory in /tmp where processing will occur
-
-    Parameters
-    ----------
-    basedir : str
-              The PATH to create the temporary directory in.
-    """
-    return tempfile.mkdtemp(dir=basedir)
-
-
-def delete_dir(dir):
-    """
-    Delete a directory
-
-    Parameters
-    ----------
-    dir : str
-          Remove a directory
-    """
-    shutil.rmtree(dir)
 
 
 def file_search(searchdir,searchstring):
@@ -164,3 +141,31 @@ def xstr(s):
     if s is None:
         return ''
     return str(s)
+
+def lookup(df, lookupfile=None, lookupdf=None, sep=',', skiprows=1, left_on='sclock', right_on='Spacecraft Clock'):
+#TODO: automatically determine the number of rows to skip to handle ccam internal master list and PDS "official" master list formats
+    if lookupfile is not None:
+        # this loop concatenates together multiple lookup files if provided
+        # (mostly to handle the three different master lists for chemcam)
+        for x in lookupfile:
+            try:
+                tmp = pd.read_csv(x, sep=sep, skiprows=skiprows, error_bad_lines=False)
+                lookupdf = pd.concat([lookupdf, tmp])
+            except:
+                lookupdf = pd.read_csv(x, sep=sep, skiprows=skiprows, error_bad_lines=False)
+    metadata = df['meta']
+
+    metadata = metadata.merge(lookupdf, left_on=left_on, right_on=right_on, how='left')
+
+    # remove metadata columns that already exist in the data frame to avoid non-unique columns
+    meta_cols = set(metadata.columns.values)
+    meta_cols_keep = list(meta_cols - set(df['meta'].columns.values))
+    metadata = metadata[meta_cols_keep]
+
+    # make metadata into a multiindex
+    metadata.columns = [['meta'] * len(metadata.columns), metadata.columns.values]
+    # give it the same indices as the df
+    metadata.index = df.index
+    # combine the df and the new metadata
+    df = pd.concat([metadata, df], axis=1)
+    return df

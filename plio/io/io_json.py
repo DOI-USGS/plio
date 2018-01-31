@@ -14,13 +14,6 @@ def read_json(inputfile):
     =======
     jobs : dict
            returns a dictionary 
-
-    >>> inputs = readinputfile('testfiles/sampleinput.json')
-    >>> k = inputs.keys()
-    >>> k.sort()
-    >>> print k
-    [u'ancillarydata', u'bands', u'force', u'images', u'latlon', u'name', u'outputformat', u'processing_pipeline', u'projection', u'resolution', u'rtilt', u'tesatm', u'uddw']
-
     """
     with open(inputfile, 'r') as f:
         try:
