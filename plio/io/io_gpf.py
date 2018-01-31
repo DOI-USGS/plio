@@ -2,13 +2,6 @@ import math
 import numpy as np
 import pandas as pd
 
-
-GPF_DATA_DTYPE = np.dtype([('point_id', np.int), ('stat', np.int), ('known', np.int),
-                  ('lat_Y_North', np.float), ('long_X_East', np.float), ('ht', np.float),
-                  ('sigma0', np.float), ('sigma1', np.float), ('sigma2', np.float),
-                  ('res0', np.float), ('res1', np.float), ('res2', np.float)])
-
-
 def read_gpf(input_data):
     """
     Read a socet gpf file into a pandas data frame
@@ -33,8 +26,6 @@ def read_gpf(input_data):
                 col = l
                 break
 
-
-
     # Mixed types requires read as unicode - let pandas soft convert
     d = np.genfromtxt(input_data, skip_header=3, dtype='unicode')
     d = d.reshape(-1, 12)
@@ -45,7 +36,8 @@ def read_gpf(input_data):
                               'lat_y_North', 'long_X_East','ht',
                               'sigma0', 'sigma1', 'sigma2',
                               'res0', 'res1', 'res2'])
-    # Soft conversion of numeric types to numerics
+
+    # Soft conversion of numeric types to numerics, allows str in first col for point_id
     df = df.apply(pd.to_numeric, errors='ignore')
 
     # Validate the read data with the header point count
