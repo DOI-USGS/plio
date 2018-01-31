@@ -1,7 +1,4 @@
-try:
-    import yaml
-except:
-    print('YAML package not installed, disabling yaml_io module')
+import yaml
 
 
 def read_yaml(inputfile):
@@ -21,6 +18,6 @@ def read_yaml(inputfile):
     try:
         with open(inputfile, 'r') as f:
             ydict = yaml.load(f)
-    except: # pragma: no cover
+    except:  # pragma: no cover
         raise IOError('Unable to load YAML file.')
     return ydict
