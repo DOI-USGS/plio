@@ -55,7 +55,7 @@ def save_gpf(df, output_file):
 
     output_file : str
                   path to the output data file
-    
+
     Returns
     -------
     int         : success value
@@ -68,10 +68,10 @@ def save_gpf(df, output_file):
     except:
         print ('Unable to open output gpf file: {0}'.format(output_file))
         return 1
-        
+
     #grab number of rows in pandas dataframe
     numpts = len(df)
-    
+
     #Output gpf header
     outGPF.write('GROUND POINT FILE\n')
     outGPF.write('{0}\n'.format(numpts))
@@ -83,6 +83,6 @@ def save_gpf(df, output_file):
         outGPF.write('{0}         {1}         {2}\n'.format(row['lat_y_North'], row['long_X_East'], row['ht']))
         outGPF.write('{0} {1} {2}\n'.format(row['sigma0'], row['sigma1'], row['sigma2']))
         outGPF.write('{0} {1} {2}\n\n'.format(row['res0'], row['res1'], row['res2']))
-        
+
     outGPF.close()
-    return 0
+    return
