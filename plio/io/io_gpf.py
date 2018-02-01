@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 import math
+=======
+>>>>>>> upstream/master
 import numpy as np
 import pandas as pd
 
@@ -44,3 +47,49 @@ def read_gpf(input_data):
     assert int(cnt) == len(df)
 
     return df
+<<<<<<< HEAD
+=======
+
+def save_gpf(df, output_file):
+    """
+    Write a socet gpf file from a gpf-defined pandas dataframe
+
+    Parameters
+    ----------
+    df          : pd.DataFrame
+                  Pandas DataFrame
+
+    output_file : str
+                  path to the output data file
+    
+    Returns
+    -------
+    int         : success value
+                  0 = success, 1 = errors
+    """
+
+    # Check that file can be opened
+    try:
+        outGPF = open(output_file, 'w', newline='\r\n')
+    except:
+        print ('Unable to open output gpf file: {0}'.format(output_file))
+        return 1
+        
+    #grab number of rows in pandas dataframe
+    numpts = len(df)
+    
+    #Output gpf header
+    outGPF.write('GROUND POINT FILE\n')
+    outGPF.write('{0}\n'.format(numpts))
+    outGPF.write('point_id,stat,known,lat_Y_North,long_X_East,ht,sig(3),res(3)\n')
+
+    for index,row in df.iterrows():
+        #Output coordinates to gpf file
+        outGPF.write('{0} {1} {2}\n'.format(row['point_id'], row['stat'], row['known']))
+        outGPF.write('{0}         {1}         {2}\n'.format(row['lat_y_North'], row['long_X_East'], row['ht']))
+        outGPF.write('{0} {1} {2}\n'.format(row['sigma0'], row['sigma1'], row['sigma2']))
+        outGPF.write('{0} {1} {2}\n\n'.format(row['res0'], row['res1'], row['res2']))
+        
+    outGPF.close()
+    return 0
+>>>>>>> upstream/master
