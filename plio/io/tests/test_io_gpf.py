@@ -27,7 +27,7 @@ def test_read_gfp(gpf, expected):
     assert_frame_equal(df, expected)
 
 @pytest.mark.parametrize('gpf, out_gpf', [(insight_gpf(),out_insight_gpf())])
-def test_write_gfp(gpf, out_gpf):
+def test_write_gpf(gpf, out_gpf):
     df = read_gpf(gpf)
     val = save_gpf(df, out_gpf)
-    assertTrue(filecmp.cmp(gpf, out_gpf, shallow=True), "save_gpf does not create an equal file.")
+    assert filecmp.cmp(gpf, out_gpf, shallow=True)
