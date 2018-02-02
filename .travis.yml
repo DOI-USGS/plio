@@ -36,7 +36,8 @@ before_install:
 install:
   - conda config --add channels conda-forge
   - conda install -q gdal h5py pandas sqlalchemy pyyaml networkx affine protobuf scipy pvl
-
+  # For travis/conda uploads
+  - conda install pip setuptools
   # Development installation
   - conda install -q pytest pytest-cov sh
 
