@@ -6,18 +6,11 @@ Planetary Input / Output
    :alt: Join the chat at https://gitter.im/USGS-Astrogeology/plio
    :target: https://gitter.im/USGS-Astrogeology/plio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
-.. image:: https://img.shields.io/pypi/v/autocnet.svg
-        :target: https://pypi.python.org/pypi/plio
-
 .. image:: https://travis-ci.org/USGS-Astrogeology/plio.svg?branch=master
    :target: https://travis-ci.org/USGS-Astrogeology/plio
 
 .. image:: https://coveralls.io/repos/github/USGS-Astrogeology/plio/badge.svg?branch=master 
    :target: https://coveralls.io/github/USGS-Astrogeology/plio?branch=master
-
-.. image:: https://readthedocs.org/projects/plio/badge/?version=latest
-   :target: http://plio.readthedocs.io/en/latest/?badge=latest
-   :alt: Documentation Status
 
 
 A planetary file I/O API
