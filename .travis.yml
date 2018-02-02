@@ -36,8 +36,6 @@ before_install:
 install:
   - conda config --add channels conda-forge
   - conda install -q gdal h5py pandas sqlalchemy pyyaml networkx affine protobuf scipy pvl
-  # For travis/conda uploads
-  - conda install pip setuptools
   # Development installation
   - conda install -q pytest pytest-cov sh
 
@@ -51,6 +49,11 @@ after_success:
   - conda install -q conda-build anaconda-client
   - conda config --set anaconda_upload yes
   - conda build --token $CONDA_UPLOAD_TOKEN --python $PYTHON_VERSION recipe -q
+
+  # Docs to gh-pages
+  - source activate test_env  # Reactivate the env to have all deps installed.
+  - travis-sphinx build --source=docs --nowarn # The sphinx build script
+  - travis-sphinx deploy --branches=dev
 
 notifications:
   webhooks:
