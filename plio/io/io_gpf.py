@@ -13,7 +13,7 @@ def read_gpf(input_data):
     Returns
     -------
     df : pd.DataFrame
-         containing the gfp data with appropriate column names and indices
+         containing the gpf data with appropriate column names and indices
     """
 
     # Check that the number of rows is matching the expected number
@@ -32,7 +32,7 @@ def read_gpf(input_data):
     #TODO: cols should be used to dynamically generate the column names
 
     df = pd.DataFrame(d, columns=['point_id', 'stat', 'known',
-                              'lat_y_North', 'long_X_East','ht',
+                              'lat_Y_North', 'long_X_East','ht',
                               'sigma0', 'sigma1', 'sigma2',
                               'res0', 'res1', 'res2'])
 
