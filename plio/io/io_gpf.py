@@ -13,7 +13,7 @@ def read_gpf(input_data):
     Returns
     -------
     df : pd.DataFrame
-         containing the gfp data with appropriate column names and indices
+         containing the gpf data with appropriate column names and indices
     """
 
     # Check that the number of rows is matching the expected number
@@ -32,7 +32,7 @@ def read_gpf(input_data):
     #TODO: cols should be used to dynamically generate the column names
 
     df = pd.DataFrame(d, columns=['point_id', 'stat', 'known',
-                              'lat_y_North', 'long_X_East','ht',
+                              'lat_Y_North', 'long_X_East','ht',
                               'sigma0', 'sigma1', 'sigma2',
                               'res0', 'res1', 'res2'])
 
@@ -80,7 +80,7 @@ def save_gpf(df, output_file):
     for index,row in df.iterrows():
         #Output coordinates to gpf file
         outGPF.write('{0} {1} {2}\n'.format(row['point_id'], row['stat'], row['known']))
-        outGPF.write('{0}         {1}         {2}\n'.format(row['lat_y_North'], row['long_X_East'], row['ht']))
+        outGPF.write('{0}         {1}         {2}\n'.format(row['lat_Y_North'], row['long_X_East'], row['ht']))
         outGPF.write('{0} {1} {2}\n'.format(row['sigma0'], row['sigma1'], row['sigma2']))
         outGPF.write('{0} {1} {2}\n\n'.format(row['res0'], row['res1'], row['res2']))
 
