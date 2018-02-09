@@ -80,7 +80,7 @@ def save_gpf(df, output_file):
     for index,row in df.iterrows():
         #Output coordinates to gpf file
         outGPF.write('{0} {1} {2}\n'.format(row['point_id'], row['stat'], row['known']))
-        outGPF.write('{0}         {1}         {2}\n'.format(row['lat_y_North'], row['long_X_East'], row['ht']))
+        outGPF.write('{0}         {1}         {2}\n'.format(row['lat_Y_North'], row['long_X_East'], row['ht']))
         outGPF.write('{0} {1} {2}\n'.format(row['sigma0'], row['sigma1'], row['sigma2']))
         outGPF.write('{0} {1} {2}\n\n'.format(row['res0'], row['res1'], row['res2']))
 
