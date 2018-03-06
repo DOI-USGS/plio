@@ -17,7 +17,7 @@ def metadatatoband(metadata):
     wv2band = []
     for k, v in metadata.items():
         try:
-            wv2band.append(float(value))
+            wv2band.append(float(v))
         except:
             v = v.split(" ")[-1].split("(")[1].split(")")[0]
             wv2band.append(float(v))
