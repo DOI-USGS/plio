@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
 
-from plio.io.io_gpf import read_gpf
-from plio.io.io_gpf import save_gpf
+from plio.io.io_bae import read_gpf
+from plio.io.io_bae import save_gpf
 from plio.examples import get_path
 
 import pytest
