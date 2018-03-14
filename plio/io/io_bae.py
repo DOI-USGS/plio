@@ -4,7 +4,7 @@ import re
 import numpy as np
 import pandas as pd
 
-def socet_keywords_to_json(keywords, ell=None):
+def socetset_keywords_to_json(keywords, ell=None):
     """
     Convert a SocetCet keywords.list file to JSON
 
