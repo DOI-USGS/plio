@@ -1,19 +1,9 @@
 import numpy as np
-from osgeo import gdal
+from .io_gdal import GeoDataset
 
-
-def openmi(input_data):
-    ds = gdal.Open(input_data)
-    band_pointers = []
-    nbands = ds.RasterCount
-
-    for b in xrange(1, nbands + 1):
-        band_pointers.append(ds.GetRasterBand(b))
-
-    ref_array = ds.GetRasterBand(1).ReadAsArray()
-    wv_array = None
-    return wv_array, ref_array[::3, ::3], ds
-
+def open(input_data):
+    ds = GeoDataset(input_data)
+    return ds
 
 def getspectra(x, y, ds):
     nbands = ds.RasterCount

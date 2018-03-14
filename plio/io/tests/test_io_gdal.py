@@ -10,6 +10,11 @@ sys.path.insert(0, os.path.abspath('..'))
 
 from plio.io import io_gdal
 
+class TestWithoutGdal(unittest.TestCase):
+    def test_without_gdal:
+        io_gdal.has_gdal = False
+        with self.assertRaises(ImportError):
+            io_gdal.GeoDataset('foo')
 
 class TestMercator(unittest.TestCase):
     def setUp(self):
