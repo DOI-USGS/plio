@@ -10,11 +10,6 @@ sys.path.insert(0, os.path.abspath('..'))
 
 from plio.io import io_gdal
 
-class TestWithoutGdal(unittest.TestCase):
-    def test_without_gdal(self):
-        io_gdal.has_gdal = False
-        with self.assertRaises(ImportError):
-            io_gdal.GeoDataset('foo')
 
 class TestMercator(unittest.TestCase):
     def setUp(self):
@@ -231,3 +226,12 @@ class TestWriter(unittest.TestCase):
             os.remove('test.tif')
         except:
             pass
+
+class TestWithoutGdal(unittest.TestCase):
+    def test_without_gdal(self):
+        io_gdal.has_gdal = False
+        with self.assertRaises(ImportError):
+            io_gdal.GeoDataset('foo')
+
+    def tearDown(self):
+        io_gdal.has_gdal = True
