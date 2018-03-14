@@ -4,7 +4,7 @@ import re
 import numpy as np
 import pandas as pd
 
-def socet_keywords_to_json(keywords):
+def socet_keywords_to_json(keywords, ell=None):
     """
     Convert a SocetCet keywords.list file to JSON
 
@@ -21,29 +21,35 @@ def socet_keywords_to_json(keywords):
     matcher = re.compile(r'\b(?!\d)\w+\b')
     numeric_matcher = re.compile(r'\W-?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?')
     stream = {}
-    with open(keywords, 'r') as f:
-        for l in f:
-            l = l.rstrip()
-            if not l:
-                continue
-            matches = matcher.findall(l)
-            if matches:
-                key = matches[0]
-                stream[key] = []
-                # Case where the kw are strings after the key
-                if len(matches) > 1:
-                    stream[key] = matches[1:]
-                # Case where the kw are numeric types after the key
-                else:
-                    nums = numeric_matcher.findall(l)
-                    if len(nums) == 1:
-                        stream[key] = float(nums[0])
+
+    def parse(fi):
+        with open(fi, 'r') as f:
+            for l in f:
+                l = l.rstrip()
+                if not l:
+                    continue
+                matches = matcher.findall(l)
+                if matches:
+                    key = matches[0]
+                    stream[key] = []
+                    # Case where the kw are strings after the key
+                    if len(matches) > 1:
+                        stream[key] = matches[1:]
+                    # Case where the kw are numeric types after the key
                     else:
-                        stream[key] += map(float, nums)
-            else:
-                # Case where the values are on a newline after the key
-                nums = numeric_matcher.findall(l)
-                stream[key] += map(float, nums)
+                        nums = numeric_matcher.findall(l)
+                        if len(nums) == 1:
+                            stream[key] = float(nums[0])
+                        else:
+                            stream[key] += map(float, nums)
+                else:
+                    # Case where the values are on a newline after the key
+                    nums = numeric_matcher.findall(l)
+                    stream[key] += map(float, nums)
+    
+    parse(keywords)
+    if ell:
+        parse(ell)
     return json.dumps(stream)
     
 def read_gpf(input_data):
