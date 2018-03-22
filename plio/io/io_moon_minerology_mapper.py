@@ -1,17 +1,16 @@
 import numpy as np
-from osgeo import gdal
+from .io_gdal import GeoDataset
 
 
-def openm3(input_data):
+def open(input_data):
     if input_data.split('.')[-1] == 'hdr':
         # GDAL wants the img, but many users aim at the .hdr
         input_data = input_data.split('.')[0] + '.img'
-    ds = gdal.Open(input_data)
-    ref_array = ds.GetRasterBand(1).ReadAsArray()
-    metadata = ds.GetMetadata()
+    ds = GeoDataSet(input_data)
+    ref_array = ds.read_array()
+    metadata = ds.metadata
     wv_array = metadatatoband(metadata)
     return wv_array, ref_array, ds
-
 
 def metadatatoband(metadata):
     wv2band = []
