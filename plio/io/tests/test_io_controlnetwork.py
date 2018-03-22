@@ -10,8 +10,22 @@ from plio.io import io_controlnetwork
 from plio.io import ControlNetFileV0002_pb2 as cnf
 from plio.utils.utils import find_in_dict
 
+from plio.examples import get_path
+
+import pytest
+
+@pytest.fixture
+def apollo_cnet():
+    return get_path('apollo_out.net')
+
 sys.path.insert(0, os.path.abspath('..'))
 
+
+def test_cnet_read(apollo_cnet):
+    df = io_controlnetwork.from_isis(apollo_cnet)
+    assert len(df) == find_in_dict(df.header, 'NumberOfMeasures')
+    assert isinstance(df, io_controlnetwork.IsisControlNetwork)
+    assert len(df.groupby('id')) == find_in_dict(df.header, 'NumberOfPoints')
 
 class TestWriteIsisControlNetwork(unittest.TestCase):
 

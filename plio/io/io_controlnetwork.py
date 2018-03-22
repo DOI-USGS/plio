@@ -1,11 +1,11 @@
 from time import gmtime, strftime
 
+import pandas as pd
 import pvl
 
 from plio.io import ControlNetFileV0002_pb2 as cnf
-from plio.utils.utils import xstr
+from plio.utils.utils import xstr, find_in_dict
 
-VERSION = 2
 HEADERSTARTBYTE = 65536
 DEFAULTUSERNAME = 'None'
 
@@ -26,8 +26,24 @@ def write_filelist(lst, path="fromlist.lis"):
         handle.write('\n')
     return
 
+class IsisControlNetwork(pd.DataFrame):
 
-def to_isis(path, obj, serials, mode='wb', version=VERSION,
+    # normal properties
+    _metadata = ['header']
+
+    @property
+    def _constructor(self):
+        return IsisControlNetwork
+
+def from_isis(path, remove_empty=True):
+
+    # Now get ready to work with the binary
+    with IsisStore(path, mode='rb') as store:
+        df = store.read()
+
+    return df
+
+def to_isis(path, obj, serials, mode='wb', version=2,
             headerstartbyte=HEADERSTARTBYTE,
             networkid='None', targetname='None',
             description='None', username=DEFAULTUSERNAME,
@@ -111,9 +127,7 @@ def to_isis(path, obj, serials, mode='wb', version=VERSION,
                                          buffer_header_size, points_bytes,
                                          creation_date, modified_date)
 
-
         store.write(header)
-
 
 class IsisStore(object):
     """
@@ -136,6 +150,7 @@ class IsisStore(object):
               9: str,
               11: None,
               14: None}
+        self.header_attrs = [(i.name, bt[i.type]) for i in cnf._CONTROLNETFILEHEADERV0002.fields]
         self.point_attrs = [(i.name, bt[i.type]) for i in cnf._CONTROLPOINTFILEENTRYV0002.fields]
         self.measure_attrs = [(i.name, bt[i.type]) for i in cnf._CONTROLPOINTFILEENTRYV0002_MEASURE.fields]
 
@@ -147,11 +162,55 @@ class IsisStore(object):
 
         self._open()
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, traceback):
+        self.close()
+
+    def close(self):
+        if self._handle is not None:
+            self._handle.close()
+        self._handle = None
+
     def _open(self):
-        if self._mode in ['wb', 'a']:
-            self._handle = open(self._path, self._mode)
-        else:
-            raise NotImplementedError
+        self._handle = open(self._path, self._mode)
+
+    def read(self):
+        """
+        Given an ISIS store, read the underlying ISIS3 compatible control network and
+        return an IsisControlNetwork dataframe.
+        """
+        pvl_header = pvl.load(self._path)
+        header_start_byte = find_in_dict(pvl_header, 'HeaderStartByte')
+        header_bytes = find_in_dict(pvl_header, 'HeaderBytes')
+        point_start_byte = find_in_dict(pvl_header, 'PointsStartByte')
+        version = find_in_dict(pvl_header, 'Version')
+        if version == 2:
+            point_attrs = [i for i in cnf._CONTROLPOINTFILEENTRYV0002.fields_by_name if i != 'measures']
+            measure_attrs = [i for i in cnf._CONTROLPOINTFILEENTRYV0002_MEASURE.fields_by_name]
+        
+        cols = point_attrs + measure_attrs
+
+        cp = cnf.ControlPointFileEntryV0002()
+        self._handle.seek(header_start_byte)
+        pbuf_header = cnf.ControlNetFileHeaderV0002()
+        pbuf_header.ParseFromString(self._handle.read(header_bytes))
+        
+        self._handle.seek(point_start_byte)
+        cp = cnf.ControlPointFileEntryV0002()
+        pts = []
+        for s in pbuf_header.pointMessageSizes:
+            cp.ParseFromString(self._handle.read(s))            
+            pt = [getattr(cp, i) for i in point_attrs if i != 'measures']
+
+            for measure in cp.measures:
+                meas = pt + [getattr(measure, j) for j in measure_attrs]
+                pts.append(meas)
+        df = IsisControlNetwork(pts, columns=cols)
+        df.header = pvl_header
+        return df
+
 
     def write(self, data, offset=0):
         """
@@ -358,14 +417,3 @@ class IsisStore(object):
         ])
 
         return pvl.dumps(header, cls=encoder)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, traceback):
-        self.close()
-
-    def close(self):
-        if self._handle is not None:
-            self._handle.close()
-        self._handle = None

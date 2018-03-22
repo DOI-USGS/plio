@@ -1,9 +1,9 @@
+import json
 import numpy as np
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
 
-from plio.io.io_gpf import read_gpf
-from plio.io.io_gpf import save_gpf
+from plio.io.io_bae import socetset_keywords_to_json, read_gpf, save_gpf
 from plio.examples import get_path
 
 import pytest
@@ -43,3 +43,14 @@ def test_write_gpf(gpf):
     truth_arr = np.genfromtxt(gpf, skip_header=3)
     test_arr = np.genfromtxt('out.gpf', skip_header=3)
     np.testing.assert_array_almost_equal(truth_arr, test_arr)
+
+def test_create_from_socet_lis():
+    socetlis = get_path('socet_isd.lis')
+    socetell = get_path('ellipsoid.ell')
+    js = json.loads(socetset_keywords_to_json(socetlis))
+    assert isinstance(js, dict)  # This is essentially a JSON linter
+    # Manually validated 
+    assert 'RECTIFICATION_TERMS' in js.keys()
+    assert 'SEMI_MAJOR_AXIS' in js.keys()  # From ellipsoid file
+    assert 'NUMBER_OF_EPHEM' in js.keys()
+    assert len(js['EPHEM_PTS']) / 3 == js['NUMBER_OF_EPHEM'] 
