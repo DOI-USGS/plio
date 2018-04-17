@@ -1,0 +1,210 @@
+HATS_File_Version_7
+PROJ_FLAG 1
+PROJECT D:\data\CTX_Athabasca_Middle.prj
+ATF_FILE CTX_Athabasca_Middle_step0.atf
+GP_FILE CTX_Athabasca_Middle.gpf
+STRAT_FILE apm.apm_strat
+SOLVE_STRAT_FILE default.solve
+DTM_FILE null
+GPS_INFO_FILE null
+INPUT_COV_FILE null
+TRI_CONSTRAINT_FILE null
+ADJ absolute
+NUM_IMGS 6
+STRIP_SEQ 0
+NUM_STRIPS 3
+STRIP_FLAG 1
+STRIP_FLAG 1
+STRIP_ID 1
+IMAGE_SEQ 0
+NUM_IMGS_STRIP 2
+STRIP_BEGIN         0         0         0       0.0       0.0
+STRIP_END         0         0         0       0.0       0.0
+STRIP_SCAN 1
+IMAGE_FLAG 1
+IMAGE_FLAG 1
+IMAGE_ID 0
+IMAGE_SUP P19_008344_1894_XN_09N203W.sup
+IMAGE_IPF P19_008344_1894_XN_09N203W.ipf
+SENSOR GENERIC_PUSHBROOM
+INCLUDE_IN_SOLUTION 1
+IMG_DATA_1       60.0        0.0
+IMG_DATA_2     1000.0        0.0
+IMG_DATA_3        0.0      228.6
+DEFAULT_FLAG 1
+NUM_ADJ_PARMS 16
+ADJUST_&_SIGMA  0                  100
+ADJUST_&_SIGMA  0                  100
+ADJUST_&_SIGMA  0                   10
+ADJUST_&_SIGMA  0                   13
+ADJUST_&_SIGMA  0                   13
+ADJUST_&_SIGMA  0                  1.3
+ADJUST_&_SIGMA  0               0.0173
+ADJUST_&_SIGMA  0               0.0173
+ADJUST_&_SIGMA  0                  0.1
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0353
+IMAGE_FLAG 1
+IMAGE_ID 1
+IMAGE_SUP P20_008845_1894_XN_09N203W.sup
+IMAGE_IPF P20_008845_1894_XN_09N203W.ipf
+SENSOR GENERIC_PUSHBROOM
+INCLUDE_IN_SOLUTION 1
+IMG_DATA_1       60.0        0.0
+IMG_DATA_2     1000.0        0.0
+IMG_DATA_3        0.0      228.6
+DEFAULT_FLAG 1
+NUM_ADJ_PARMS 16
+ADJUST_&_SIGMA  1                  100
+ADJUST_&_SIGMA  1                  100
+ADJUST_&_SIGMA  1                   10
+ADJUST_&_SIGMA  1                   13
+ADJUST_&_SIGMA  1                   13
+ADJUST_&_SIGMA  1                  1.3
+ADJUST_&_SIGMA  0               0.0173
+ADJUST_&_SIGMA  0               0.0173
+ADJUST_&_SIGMA  1                  0.1
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0353
+STRIP_FLAG 1
+STRIP_ID 2
+IMAGE_SEQ 0
+NUM_IMGS_STRIP 2
+STRIP_BEGIN         0         0         0       0.0       0.0
+STRIP_END         0         0         0       0.0       0.0
+STRIP_SCAN 1
+IMAGE_FLAG 1
+IMAGE_FLAG 1
+IMAGE_ID 0
+IMAGE_SUP P03_002371_1888_XI_08N204W.sup
+IMAGE_IPF P03_002371_1888_XI_08N204W.ipf
+SENSOR GENERIC_PUSHBROOM
+INCLUDE_IN_SOLUTION 0
+IMG_DATA_1       60.0        0.0
+IMG_DATA_2     1000.0        0.0
+IMG_DATA_3        0.0      228.6
+DEFAULT_FLAG 1
+NUM_ADJ_PARMS 16
+ADJUST_&_SIGMA  0                  100
+ADJUST_&_SIGMA  0                  100
+ADJUST_&_SIGMA  0                   10
+ADJUST_&_SIGMA  0                   13
+ADJUST_&_SIGMA  0                   13
+ADJUST_&_SIGMA  0                  1.3
+ADJUST_&_SIGMA  0               0.0173
+ADJUST_&_SIGMA  0               0.0173
+ADJUST_&_SIGMA  0                  0.1
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0353
+IMAGE_FLAG 1
+IMAGE_ID 1
+IMAGE_SUP P01_001540_1889_XI_08N204W.sup
+IMAGE_IPF P01_001540_1889_XI_08N204W.ipf
+SENSOR GENERIC_PUSHBROOM
+INCLUDE_IN_SOLUTION 0
+IMG_DATA_1       60.0        0.0
+IMG_DATA_2     1000.0        0.0
+IMG_DATA_3        0.0      228.6
+DEFAULT_FLAG 1
+NUM_ADJ_PARMS 16
+ADJUST_&_SIGMA  1                  100
+ADJUST_&_SIGMA  1                  100
+ADJUST_&_SIGMA  1                   10
+ADJUST_&_SIGMA  1                   13
+ADJUST_&_SIGMA  1                   13
+ADJUST_&_SIGMA  1                  1.3
+ADJUST_&_SIGMA  0               0.0173
+ADJUST_&_SIGMA  0               0.0173
+ADJUST_&_SIGMA  1                  0.1
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0353
+STRIP_FLAG 1
+STRIP_ID 3
+IMAGE_SEQ 0
+NUM_IMGS_STRIP 2
+STRIP_BEGIN         0         0         0       0.0       0.0
+STRIP_END         0         0         0       0.0       0.0
+STRIP_SCAN 1
+IMAGE_FLAG 1
+IMAGE_FLAG 1
+IMAGE_ID 0
+IMAGE_SUP P01_001606_1897_XI_09N203W.sup
+IMAGE_IPF P01_001606_1897_XI_09N203W.ipf
+SENSOR GENERIC_PUSHBROOM
+INCLUDE_IN_SOLUTION 0
+IMG_DATA_1       60.0        0.0
+IMG_DATA_2     1000.0        0.0
+IMG_DATA_3        0.0      228.6
+DEFAULT_FLAG 1
+NUM_ADJ_PARMS 16
+ADJUST_&_SIGMA  0                  100
+ADJUST_&_SIGMA  0                  100
+ADJUST_&_SIGMA  0                   10
+ADJUST_&_SIGMA  0                   13
+ADJUST_&_SIGMA  0                   13
+ADJUST_&_SIGMA  0                  1.3
+ADJUST_&_SIGMA  0               0.0173
+ADJUST_&_SIGMA  0               0.0173
+ADJUST_&_SIGMA  0                  0.1
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0353
+IMAGE_FLAG 1
+IMAGE_ID 1
+IMAGE_SUP P03_002226_1895_XI_09N203W.sup
+IMAGE_IPF P03_002226_1895_XI_09N203W.ipf
+SENSOR GENERIC_PUSHBROOM
+INCLUDE_IN_SOLUTION 0
+IMG_DATA_1       60.0        0.0
+IMG_DATA_2     1000.0        0.0
+IMG_DATA_3        0.0      228.6
+DEFAULT_FLAG 1
+NUM_ADJ_PARMS 16
+ADJUST_&_SIGMA  1                  100
+ADJUST_&_SIGMA  1                  100
+ADJUST_&_SIGMA  1                   10
+ADJUST_&_SIGMA  1                   13
+ADJUST_&_SIGMA  1                   13
+ADJUST_&_SIGMA  1                  1.3
+ADJUST_&_SIGMA  0               0.0173
+ADJUST_&_SIGMA  0               0.0173
+ADJUST_&_SIGMA  1                  0.1
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0017
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0002
+ADJUST_&_SIGMA  0               0.0353
+TPP_FILE 3x3.tpp
+TRANS_TF_CTL_IMG 0
+UPDATE_ZERO_SIGMAS 0
+USE_DTM_FILE 0
+USE_GPS_FILE 0
+USE_INPUT_COV_FILE 0
+USE_TRI_CONSTRAINT_FILE 0
+PERCENT_REMOVED_POINTS 50
