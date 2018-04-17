@@ -23,5 +23,5 @@ Installation is unfortunately complicated due to the difficulty in installing GD
 2. Create a new environment to ensure that the installed package is not going to collide with existing packages
 
    ``conda create --name <somename> python=3``
-
-3. Install ``plio`` with ``conda install -c usgs-astrogeology plio``.
+3. Ensure that the `conda-forge` channel is added to your conda config.  For instructions, see: https://conda.io/docs/user-guide/tasks/manage-channels.html
+4. Install ``plio`` with ``conda install -c usgs-astrogeology plio``.
