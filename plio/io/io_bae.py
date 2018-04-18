@@ -46,12 +46,124 @@ def socetset_keywords_to_json(keywords, ell=None):
                     # Case where the values are on a newline after the key
                     nums = numeric_matcher.findall(l)
                     stream[key] += map(float, nums)
-    
+
     parse(keywords)
     if ell:
         parse(ell)
     return json.dumps(stream)
-    
+
+def read_ipfs(input_data_list):
+    """
+    Read a socet ipf file into a pandas data frame
+
+    Parameters
+    ----------
+    input_data_list : list
+                 list of paths to the a set of input data files
+
+    Returns
+    -------
+    df : pd.DataFrame
+         containing the ipf data with appropriate column names and indices
+    """
+
+    default_columns = np.genfromtxt(input_data_list[0], skip_header=2, dtype='unicode',
+                                    max_rows = 1, delimiter = ',')
+
+    columns = []
+
+    for column in default_columns:
+
+        if '(' in column and ')' in column:
+            column_name ,suffix = column.split('(')
+            num = int(suffix.split(')')[0])
+
+            for column_num in range(int(num)):
+                new_column = '{}{}'.format(column_name, column_num)
+                columns.append(new_column);
+
+        else:
+            columns.append(column)
+
+    d_total = []
+
+    for input_file in input_data_list:
+        d = read_ipf(input_file)
+        for point in d:
+            d_total.append(point)
+
+    df = pd.DataFrame(d_total, columns=columns)
+
+    # Soft conversion of numeric types to numerics, allows str in first col for point_id
+    df = df.apply(pd.to_numeric, errors='ignore')
+
+    # Validate the read data with the header point count
+    # assert int(cnt) == len(df), 'Dataframe length {} does not match point length {}.'.format(int(cnt), len(df))
+
+    return df
+
+def read_ipf(input_data):
+    """
+    Read a socet ipf file into a pandas data frame
+
+    Parameters
+    ----------
+    input_data : str
+                 path to the an input data file
+
+    Returns
+    -------
+    df : pd.DataFrame
+         containing the ipf data with appropriate column names and indices
+    """
+
+    # Check that the number of rows is matching the expected number
+    with open(input_data, 'r') as f:
+        for i, l in enumerate(f):
+            if i == 1:
+                cnt = int(l)
+            elif i == 2:
+                col = l
+                break
+
+    # default_columns = np.genfromtxt(input_data, skip_header=2, dtype='unicode',
+    #                                 max_rows = 1, delimiter = ',')
+    #
+    # columns = []
+    #
+    # for column in default_columns:
+    #
+    #     if '(' in column and ')' in column:
+    #         column_name ,suffix = column.split('(')
+    #         num = int(suffix.split(')')[0])
+    #
+    #         for column_num in range(int(num)):
+    #             new_column = '{}{}'.format(column_name, column_num)
+    #             columns.append(new_column);
+    #
+    #     else:
+    #         columns.append(column)
+
+    # TODO: Add unicode conversion
+
+    d = [line.split() for line in open(input_data, 'r')]
+    d = np.hstack(np.array(d[3:]))
+    d = d.reshape(-1, 12)
+
+    assert int(cnt) == len(d), 'Dataframe length {} does not match point length {}.'.format(int(cnt), len(df))
+
+    return d
+
+    # df = pd.DataFrame(d, columns=columns)
+    #
+    # # Soft conversion of numeric types to numerics, allows str in first col for point_id
+    # df = df.apply(pd.to_numeric, errors='ignore')
+    #
+    # # Validate the read data with the header point count
+    # assert int(cnt) == len(df), 'Dataframe length {} does not match point length {}.'.format(int(cnt), len(df))
+    #
+    # return df
+
 def read_gpf(input_data):
     """
     Read a socet gpf file into a pandas data frame
@@ -76,22 +188,35 @@ def read_gpf(input_data):
                 col = l
                 break
 
+    default_columns = np.genfromtxt(input_data, skip_header=2, dtype='unicode',
+                                    max_rows = 1, delimiter = ',')
+
+    columns = []
+
+    for column in default_columns:
+
+        if '(' in column and ')' in column:
+            column_name ,suffix = column.split('(')
+            num = int(suffix.split(')')[0])
+
+            for column_num in range(int(num)):
+                new_column = '{}{}'.format(column_name, column_num)
+                columns.append(new_column);
+
+        else:
+            columns.append(column)
+
     # Mixed types requires read as unicode - let pandas soft convert
     d = np.genfromtxt(input_data, skip_header=3, dtype='unicode')
     d = d.reshape(-1, 12)
 
-    #TODO: cols should be used to dynamically generate the column names
-
-    df = pd.DataFrame(d, columns=['point_id', 'stat', 'known',
-                              'lat_Y_North', 'long_X_East','ht',
-                              'sigma0', 'sigma1', 'sigma2',
-                              'res0', 'res1', 'res2'])
+    df = pd.DataFrame(d, columns=columns)
 
     # Soft conversion of numeric types to numerics, allows str in first col for point_id
     df = df.apply(pd.to_numeric, errors='ignore')
 
     # Validate the read data with the header point count
-    assert int(cnt) == len(df)
+    assert int(cnt) == len(df), 'Dataframe length {} does not match point length {}.'.format(int(cnt), len(df))
 
     return df
 
