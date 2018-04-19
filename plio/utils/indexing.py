@@ -35,7 +35,7 @@ def expanded_indexer(key, ndim):
 class _LocIndexer(object):
     def __init__(self, data_array):
         self.data_array = data_array
-        
+    
     def __getitem__(self, key):
         # expand the indexer so we can handle Ellipsis
         key = expanded_indexer(key, 3)
@@ -43,8 +43,11 @@ class _LocIndexer(object):
         ifnone = lambda a, b: b if a is None else a
         if isinstance(sl, slice):
             sl = list(range(ifnone(sl.start, 0), self.data_array.nbands, ifnone(sl.step, 1)))
-        
-        idx = [self._get_idx(s) for s in sl]
+
+        if isinstance(sl, (int, float)):
+            idx = self._get_idx(sl)
+        else:    
+            idx = [self._get_idx(s) for s in sl]
         key = (idx, key[1], key[2])
         return self.data_array._read(key)   
     
@@ -52,7 +55,7 @@ class _LocIndexer(object):
         vals = np.abs(self.data_array.wavelengths-value)
         minidx = np.argmin(vals)
         if vals[minidx] >= tolerance:
-            warning.warn("Absolute difference between requested value and found values is {}".format(vals[minidx]))
+            warnings.warn("Absolute difference between requested value and found values is {}".format(vals[minidx]))
         return minidx
     
 class _iLocIndexer(object):
