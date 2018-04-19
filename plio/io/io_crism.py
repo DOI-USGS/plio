@@ -5,7 +5,7 @@ from .hcube import HCube
 import gdal
 
 
-class M3(GeoDataset, HCube):
+class Crism(GeoDataset, HCube):
     """
     An M3 specific reader with the spectral mixin.
     """
@@ -14,15 +14,9 @@ class M3(GeoDataset, HCube):
         if not hasattr(self, '_wavelengths'):
             try:
                 info = gdal.Info(self.file_name, format='json')
-                if 'Resize' in info['metadata']['']['Band_1']:
-                    wavelengths = [float(j.split(' ')[-1].replace('(','').replace(')', '')) for\
-                                  i,j in sorted(info['metadata'][''].items(),
-                                  key=lambda x: float(x[0].split('_')[-1]))]
-                    # This is a geotiff translated from the PDS IMG
-                else:
-                    # This is a PDS IMG
-                    wavelengths = [float(j) for i, j in sorted(info['metadata'][''].items(),
-                                    key=lambda x: float(x[0].split('_')[-1]))]
+                wv = dict((k,v) for (k,v) in info['metadata'][''].items() if 'Band' in k) # Only get the 'Band_###' keys
+                wavelengths = [float(j.split(" ")[0]) for i, j in sorted(wv.items(),
+                                key=lambda x: int(x[0].split('_')[-1]))]
                 self._original_wavelengths = wavelengths
                 self._wavelengths = np.round(wavelengths, self.tolerance)
             except:
@@ -33,6 +27,6 @@ def open(input_data):
     if os.path.splitext(input_data)[-1] == 'hdr':
         # GDAL wants the img, but many users aim at the .hdr
         input_data = os.path.splitext(input_data)[:-1] + '.img'
-    ds = M3(input_data)
+    ds = Crism(input_data)
 
     return ds
