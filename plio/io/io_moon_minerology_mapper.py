@@ -14,8 +14,15 @@ class M3(GeoDataset, HCube):
         if not hasattr(self, '_wavelengths'):
             try:
                 info = gdal.Info(self.file_name, format='json')
-                wavelengths = [float(j) for i, j in sorted(info['metadata'][''].items(),
-                                 key=lambda x: float(x[0].split('_')[-1]))]
+                if 'Resize' in info['metadata']['']['Band_1']:
+                    wavelengths = [float(j.split(' ')[-1].replace('(','').replace(')', '')) for\
+                                  i,j in sorted(info['metadata'][''].items(),
+                                  key=lambda x: float(x[0].split('_')[-1]))]
+                    # This is a geotiff translated from the PDS IMG
+                else:
+                    # This is a PDS IMG
+                    wavelengths = [float(j) for i, j in sorted(info['metadata'][''].items(),
+                                    key=lambda x: float(x[0].split('_')[-1]))]
                 self._original_wavelengths = wavelengths
                 self._wavelengths = np.round(wavelengths, self.tolerance)
             except:
