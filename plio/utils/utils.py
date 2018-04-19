@@ -7,6 +7,18 @@ import shutil
 import tempfile
 import pandas as pd
 
+import numpy as np
+
+def metadatatoband(metadata):
+    wv2band = []
+    for k, v in metadata.items():
+        try:
+            wv2band.append(float(v))
+        except:
+            v = v.split(" ")[-1].split("(")[1].split(")")[0]
+            wv2band.append(float(v))
+    wv2band.sort(key=int)
+    return np.asarray(wv2band)
 
 def create_dir(basedir=''):
     """
