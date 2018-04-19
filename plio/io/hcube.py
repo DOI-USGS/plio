@@ -1,6 +1,7 @@
 import numpy as np
 import gdal
 
+from ..utils.indexing import _LocIndexer, _iLocIndexer
 class HCube(object):
     """
     A Mixin class for use with the io_gdal.GeoDataset class
@@ -27,7 +28,6 @@ class HCube(object):
     
     @tolerance.setter
     def tolerance(self, val):
-        wv = self.wavelengths
         if isinstance(val, int):
             self._tolerance = val
             self._reindex()
@@ -39,7 +39,8 @@ class HCube(object):
             self._wavelengths = np.round(self._original_wavelengths, decimals=self.tolerance)
 
     def __getitem__(self, key):
-        return _iLocIndexer(self)
+        i = _iLocIndexer(self)
+        return i[key]
     
     @property
     def loc(self):
@@ -54,7 +55,6 @@ class HCube(object):
 
         y = key[1]
         x = key[2]
-        
         if isinstance(x, slice):
             xstart = ifnone(x.start,0)
             xstop = ifnone(x.stop,self.raster_size[0])
@@ -68,8 +68,11 @@ class HCube(object):
         else:
             raise TypeError("Loc style access elements must be slices, e.g., [:] or [10:100]")
             
-        pixels = (xstart, ystart, xstop, ystop)
-        arrs = []
-        for b in key[0]:
-            arrs.append(self.read_array(band=int(b+1), pixels=pixels))
+        pixels = (xstart, ystart, xstep, ystep)
+        if isinstance(key[0], (int, np.integer)):
+            return self.read_array(band=int(key[0]+1), pixels=pixels)
+        else:
+            arrs = []
+            for b in key[0]:
+                arrs.append(self.read_array(band=int(b+1), pixels=pixels))
         return np.stack(arrs)
