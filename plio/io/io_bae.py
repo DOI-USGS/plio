@@ -72,7 +72,6 @@ def read_ipf_str(input_data):
     df : pd.DataFrame
          containing the ipf data with appropriate column names and indices
     """
-
     # Check that the number of rows is matching the expected number
     with open(input_data, 'r') as f:
         for i, l in enumerate(f):
@@ -92,6 +91,8 @@ def read_ipf_str(input_data):
     d = d.reshape(-1, 12)
 
     df = pd.DataFrame(d, columns=columns)
+    file = os.path.split(os.path.splitext(input_data)[0])[1]
+    df['ipf_file'] = pd.Series(np.full((len(df['pt_id'])), file), index = df.index)
 
     assert int(cnt) == len(df), 'Dataframe length {} does not match point length {}.'.format(int(cnt), len(df))
 
