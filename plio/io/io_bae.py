@@ -1,5 +1,6 @@
 import json
 import re
+from functools import singledispatch
 
 import numpy as np
 import pandas as pd
@@ -52,57 +53,12 @@ def socetset_keywords_to_json(keywords, ell=None):
         parse(ell)
     return json.dumps(stream)
 
-def read_ipfs(input_data_list):
-    """
-    Read a socet ipf file into a pandas data frame
+@singledispatch
+def read_ipf(arg): # pragma: no cover
+    return str(arg)
 
-    Parameters
-    ----------
-    input_data_list : list
-                 list of paths to the a set of input data files
-
-    Returns
-    -------
-    df : pd.DataFrame
-         containing the ipf data with appropriate column names and indices
-    """
-
-    default_columns = np.genfromtxt(input_data_list[0], skip_header=2, dtype='unicode',
-                                    max_rows = 1, delimiter = ',')
-
-    columns = []
-
-    for column in default_columns:
-
-        if '(' in column and ')' in column:
-            column_name ,suffix = column.split('(')
-            num = int(suffix.split(')')[0])
-
-            for column_num in range(int(num)):
-                new_column = '{}{}'.format(column_name, column_num)
-                columns.append(new_column);
-
-        else:
-            columns.append(column)
-
-    d_total = []
-
-    for input_file in input_data_list:
-        d = read_ipf(input_file)
-        for point in d:
-            d_total.append(point)
-
-    df = pd.DataFrame(d_total, columns=columns)
-
-    # Soft conversion of numeric types to numerics, allows str in first col for point_id
-    df = df.apply(pd.to_numeric, errors='ignore')
-
-    # Validate the read data with the header point count
-    # assert int(cnt) == len(df), 'Dataframe length {} does not match point length {}.'.format(int(cnt), len(df))
-
-    return df
-
-def read_ipf(input_data):
+@read_ipf.register(str)
+def read_ipf_str(input_data):
     """
     Read a socet ipf file into a pandas data frame
 
@@ -126,43 +82,47 @@ def read_ipf(input_data):
                 col = l
                 break
 
-    # default_columns = np.genfromtxt(input_data, skip_header=2, dtype='unicode',
-    #                                 max_rows = 1, delimiter = ',')
-    #
-    # columns = []
-    #
-    # for column in default_columns:
-    #
-    #     if '(' in column and ')' in column:
-    #         column_name ,suffix = column.split('(')
-    #         num = int(suffix.split(')')[0])
-    #
-    #         for column_num in range(int(num)):
-    #             new_column = '{}{}'.format(column_name, column_num)
-    #             columns.append(new_column);
-    #
-    #     else:
-    #         columns.append(column)
+    columns = np.genfromtxt(input_data, skip_header=2, dtype='unicode',
+                            max_rows = 1, delimiter = ',')
 
     # TODO: Add unicode conversion
-
     d = [line.split() for line in open(input_data, 'r')]
     d = np.hstack(np.array(d[3:]))
+
     d = d.reshape(-1, 12)
 
-    assert int(cnt) == len(d), 'Dataframe length {} does not match point length {}.'.format(int(cnt), len(df))
+    df = pd.DataFrame(d, columns=columns)
 
-    return d
+    assert int(cnt) == len(df), 'Dataframe length {} does not match point length {}.'.format(int(cnt), len(df))
 
-    # df = pd.DataFrame(d, columns=columns)
-    #
-    # # Soft conversion of numeric types to numerics, allows str in first col for point_id
-    # df = df.apply(pd.to_numeric, errors='ignore')
-    #
-    # # Validate the read data with the header point count
-    # assert int(cnt) == len(df), 'Dataframe length {} does not match point length {}.'.format(int(cnt), len(df))
-    #
-    # return df
+    # Soft conversion of numeric types to numerics, allows str in first col for point_id
+    df = df.apply(pd.to_numeric, errors='ignore')
+
+    return df
+
+@read_ipf.register(list)
+def read_ipf_list(input_data_list):
+    """
+    Read a socet ipf file into a pandas data frame
+
+    Parameters
+    ----------
+    input_data_list : list
+                 list of paths to the a set of input data files
+
+    Returns
+    -------
+    df : pd.DataFrame
+         containing the ipf data with appropriate column names and indices
+    """
+    frames = []
+
+    for input_file in input_data_list:
+        frames.append(read_ipf(input_file))
+
+    df = pd.concat(frames)
+
+    return df
 
 def read_gpf(input_data):
     """
@@ -242,7 +202,7 @@ def save_gpf(df, output_file):
     try:
         outGPF = open(output_file, 'w', newline='\r\n')
     except:
-        print ('Unable to open output gpf file: {0}'.format(output_file))
+        print('Unable to open output gpf file: {0}'.format(output_file))
         return 1
 
     #grab number of rows in pandas dataframe
