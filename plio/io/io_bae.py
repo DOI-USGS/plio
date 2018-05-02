@@ -85,11 +85,10 @@ def read_ipf_str(input_data):
     columns = np.genfromtxt(input_data, skip_header=2, dtype='unicode',
                             max_rows = 1, delimiter = ',')
 
-    # TODO: Add unicode conversion
     d = [line.split() for line in open(input_data, 'r')]
     d = np.hstack(np.array(d[3:]))
 
-    d = d.reshape(-1, 12)
+    d = d.reshape(-1, 12).astype('unicode')
 
     df = pd.DataFrame(d, columns=columns)
     file = os.path.split(os.path.splitext(input_data)[0])[1]
@@ -125,6 +124,54 @@ def read_ipf_list(input_data_list):
     df = pd.concat(frames)
 
     return df
+
+def save_ipf(df, output_path):
+    """
+    Write a socet gpf file from a gpf-defined pandas dataframe
+
+    Parameters
+    ----------
+    df          : pd.DataFrame
+                  Pandas DataFrame
+
+    output_file : str
+                  path to the output data file
+
+    Returns
+    -------
+    int         : success value
+                  0 = success, 1 = errors
+    """
+
+    for ipf_file, ipf_df in df.groupby('ipf_file'):
+
+        output_file = os.path.join(output_path, ipf_file + '.ipf')
+
+        # Check that file can be opened
+        try:
+            outIPF = open(output_file, 'w', newline='\r\n')
+        except:
+            print('Unable to open output ipf file: {0}'.format(output_file))
+            return 1
+
+        #grab number of rows in pandas dataframe ipf group
+        numpts = len(ipf_df)
+
+        #Output ipf header
+        outIPF.write('IMAGE POINT FILE\n')
+        outIPF.write('{0}\n'.format(numpts))
+        outIPF.write('pt_id,val,fid_val,no_obs,l.,s.,sig_l,sig_s,res_l,res_s,fid_x,fid_y\n')
+
+        for index, row in ipf_df.iterrows():
+            #Output coordinates to ipf file
+            outIPF.write('{0} {1} {2} {3}\n'.format(row['pt_id'], row['val'], row['fid_val'], row['no_obs']))
+            outIPF.write('{:0.6f}  {:0.6f}\n'.format(row['l.'], row['s.']))
+            outIPF.write('{:0.6f}  {:0.6f}\n'.format(row['sig_l'], row['sig_s']))
+            outIPF.write('{:0.6f}  {:0.6f}\n'.format(row['res_l'], row['res_s']))
+            outIPF.write('{:0.6f}  {:0.6f}\n\n'.format(row['fid_x'], row['fid_y']))
+
+        outIPF.close()
+    return
 
 def read_gpf(input_data):
     """
