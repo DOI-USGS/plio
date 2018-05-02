@@ -61,7 +61,7 @@ def test_write_ipf(ipf, file):
     test_arr = np.hstack(np.array(test_arr))
     test_arr = test_arr.reshape(-1, 12)
 
-    (truth_arr==test_arr).all()
+    assert (truth_arr==test_arr).all()
 
 @pytest.mark.parametrize('gpf, file', [(insight_gpf(), 'out.gpf')])
 def test_write_gpf(gpf, file):
@@ -85,7 +85,7 @@ def test_write_gpf(gpf, file):
     truth_arr = np.genfromtxt(gpf, skip_header=3)
     test_arr = np.genfromtxt(file, skip_header=3)
 
-    (truth_arr==test_arr).all()
+    assert (truth_arr==test_arr).all()
 
     # np.testing.assert_array_almost_equal(truth_arr, test_arr)
 
