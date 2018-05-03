@@ -37,7 +37,7 @@ install:
   - conda config --add channels conda-forge
   - conda install -q gdal h5py pandas sqlalchemy pyyaml networkx affine protobuf scipy pvl
   # Development installation
-  - conda install -q pytest pytest-cov sh coveralls
+  - conda install -q pytest pytest-cov sh coveralls nbsphinx
 
 script:
   - pytest --cov=plio
