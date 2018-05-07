@@ -41,6 +41,10 @@ class Translations(Base):  # pragma: no cover
         self.instrument = instrument
         self.translation = translation
 
+    def __repr__(self):
+        return 'Mission: {}\nInstrument: {}\nTranslation: {}'.format(self.mission,
+                                                                     self.instrument,
+                                                                     self.translation)
 
 class StringToMission(Base):  # pragma: no cover
     """
