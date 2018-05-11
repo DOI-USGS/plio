@@ -36,6 +36,7 @@ def setup_package():
         package_data={'plio' : list(examples) + ['data/*.db', 'data/*.py'] +\
                 ['sqlalchemy_json/*.py', 'sqlalchemy_json/LICENSE']},
         zip_safe=False,
+        scripts=['bin/socet2isis'],
         install_requires=[
             'gdal',
             'numpy',
