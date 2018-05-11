@@ -1,0 +1,72 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 1000
+    TileLines   = 1024
+
+    Group = Dimensions
+      Samples = 5000
+      Lines   = 7168
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = SignedWord
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName        = Mars_Reconnaissance_Orbiter
+    InstrumentId          = CTX
+    TargetName            = Mars
+    MissionPhaseName      = PSP
+    StartTime             = 2008-09-17T05:08:10.820
+    SpacecraftClockCount  = 0906095311:038
+    OffsetModeId          = 196/190/181
+    LineExposureDuration  = 1.877 <MSEC>
+    FocalPlaneTemperature = 293.4 <K>
+    SampleBitModeId       = SQROOT
+    SpatialSumming        = 1
+    SampleFirstPixel      = 0
+  End_Group
+
+  Group = Archive
+    DataSetId           = MRO-M-CTX-2-EDR-L0-V1.0
+    ProductId           = B01_010045_1878_XN_07N205W
+    ProducerId          = MRO_CTX_TEAM
+    ProductCreationTime = 2009-04-13T19:24:46
+    OrbitNumber         = 10045
+  End_Group
+
+  Group = BandBin
+    FilterName = BroadBand
+    Center     = 0.65 <micrometers>
+    Width      = 0.15 <micrometers>
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -74021
+    LeapSecond                = $base/kernels/lsk/naif0012.tls
+    TargetAttitudeShape       = $base/kernels/pck/pck00009.tpc
+    TargetPosition            = (Table, $base/kernels/spk/de405.bsp)
+    InstrumentPointing        = (Table,
+                                 $mro/kernels/ck/mro_sc_psp_080916_080922.bc,
+                                 $mro/kernels/fk/mro_v15.tf)
+    Instrument                = Null
+    SpacecraftClock           = $mro/kernels/sclk/MRO_SCLKSCET.00064.65536.tsc
+    InstrumentPosition        = (Table, $mro/kernels/spk/mro_psp8.bsp)
+    InstrumentAddendum        = $mro/kernels/iak/mroctxAddendum005.ti
+    ShapeModel                = $base/dems/molaMarsPlanetaryRadius0005.cub
+    InstrumentPositionQuality = Reconstructed
+    InstrumentPointingQuality = Reconstructed
+    CameraVersion             = 1
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
