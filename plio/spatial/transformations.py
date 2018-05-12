@@ -45,7 +45,6 @@ def line_sample_size(record, path):
         sample_size = int(sample_size)/2.0 + record['s.'] + 1
         return sample_size, line_size, img_index
 
-# converts known to ISIS keywords
 def known(record):
     """
     Converts the known field from a socet dataframe into the
@@ -67,7 +66,6 @@ def known(record):
     elif record['known'] == 1 or record['known'] == 2 or record['known'] == 3:
         return 'Constrained'
 
-# converts +/- 180 system to 0 - 360 system
 def to_360(num):
     """
     Transforms a given number into 0 - 360 space
@@ -140,7 +138,6 @@ def og2oc(dlat, dMajorRadius, dMinorRadius):
         print ("Error in og2oc conversion")
     return dlat
 
-# gets eRadius and pRadius from a .prj file
 def get_axis(file):
     """
     Gets eRadius and pRadius from a .prj file
@@ -291,7 +288,5 @@ def serial_numbers(image_dict, path):
     serial_dict = dict()
 
     for key in image_dict:
-        snum = sn.generate_serial_number(os.path.join(path, image_dict[key]))
-        snum = snum.replace('Mars_Reconnaissance_Orbiter', 'MRO')
-        serial_dict[key] = snum
+        serial_dict[key] = sn.generate_serial_number(os.path.join(path, image_dict[key]))
     return serial_dict
