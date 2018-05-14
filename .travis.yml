@@ -37,7 +37,7 @@ install:
   - conda config --add channels conda-forge
   - conda install -q gdal h5py pandas sqlalchemy pyyaml networkx affine protobuf scipy pvl
   # Development installation
-  - conda install -q pytest pytest-cov sh
+  - conda install -q pytest pytest-cov sh coveralls nbsphinx
 
 script:
   - pytest --cov=plio
@@ -51,7 +51,8 @@ after_success:
   - conda build --token $CONDA_UPLOAD_TOKEN --python $PYTHON_VERSION recipe -q
 
   # Docs to gh-pages
-  - source activate test_env  # Reactivate the env to have all deps installed.
+  - source activate test  # Reactivate the env to have all deps installed.
+  - pip install travis-sphinx
   - travis-sphinx build --source=docs --nowarn # The sphinx build script
   - travis-sphinx deploy --branches=dev
 
