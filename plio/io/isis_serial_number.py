@@ -82,6 +82,7 @@ def generate_serial_number(label):
 
     # Sort the keys to ensure proper iteration order
     keys = sorted(translation.keys())
+
     for k in keys:
         try:
             group = translation[k]
