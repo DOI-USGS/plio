@@ -20,6 +20,7 @@ def parse_args():
     parser.add_argument('at_file', help='Path to the .atf file for a project.')
     parser.add_argument('cub_file_path', help='Path to cube files related to ipf files.')
     parser.add_argument('cub_ipf_map', help='Path to map file for all ipfs and cubes.')
+    parser.add_argument('target_name', help='Name of the target body used in the control net')
     parser.add_argument('--outpath', help='Directory for the control network to be output to.',
                                         required = False)
 
@@ -73,10 +74,10 @@ def main(args):
 
     # Define column remap for socet dataframe
     column_remap = {'l.': 'y', 's.': 'x',
-                    'res_l': 'LineResidual', 'res_s': 'SampleResidual', 'known': 'Type',
-                    'lat_Y_North': 'AprioriY', 'long_X_East': 'AprioriX', 'ht': 'AprioriZ',
-                    'sig0': 'AprioriLatitudeSigma', 'sig1': 'AprioriLongitudeSigma',
-                    'sig2': 'AprioriRadiusSigma'}
+                                  'res_l': 'LineResidual', 'res_s': 'SampleResidual', 'known': 'Type',
+                                  'lat_Y_North': 'AprioriY', 'long_X_East': 'AprioriX', 'ht': 'AprioriZ',
+                                  'sig0': 'AprioriLatitudeSigma', 'sig1': 'AprioriLongitudeSigma',
+                                  'sig2': 'AprioriRadiusSigma'}
 
     # Rename the columns using the column remap above
     socet_df.rename(columns = column_remap, inplace=True)
@@ -86,7 +87,7 @@ def main(args):
     serial_dict = serial_numbers(image_dict, cub_path)
 
     # creates the control network
-    cn.to_isis(os.path.join(outpath, cnet_out + '.net'), socet_df, serial_dict)
+    cn.to_isis(os.path.join(outpath, cnet_out + '.net'), socet_df, serial_dict, targetname = args.target_name)
 
 if __name__ == '__main__':
     main(parse_args())
