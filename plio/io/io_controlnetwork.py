@@ -187,6 +187,7 @@ class IsisStore(object):
         header_bytes = find_in_dict(pvl_header, 'HeaderBytes')
         point_start_byte = find_in_dict(pvl_header, 'PointsStartByte')
         version = find_in_dict(pvl_header, 'Version')
+
         if version == 2:
             point_attrs = [i for i in cnf._CONTROLPOINTFILEENTRYV0002.fields_by_name if i != 'measures']
             measure_attrs = [i for i in cnf._CONTROLPOINTFILEENTRYV0002_MEASURE.fields_by_name]
