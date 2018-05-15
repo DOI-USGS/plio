@@ -1,6 +1,7 @@
 from time import gmtime, strftime
 
 import pandas as pd
+import numpy as np
 import pvl
 
 from plio.io import ControlNetFileV0002_pb2 as cnf
@@ -186,22 +187,23 @@ class IsisStore(object):
         header_bytes = find_in_dict(pvl_header, 'HeaderBytes')
         point_start_byte = find_in_dict(pvl_header, 'PointsStartByte')
         version = find_in_dict(pvl_header, 'Version')
+
         if version == 2:
             point_attrs = [i for i in cnf._CONTROLPOINTFILEENTRYV0002.fields_by_name if i != 'measures']
             measure_attrs = [i for i in cnf._CONTROLPOINTFILEENTRYV0002_MEASURE.fields_by_name]
-        
+
         cols = point_attrs + measure_attrs
 
         cp = cnf.ControlPointFileEntryV0002()
         self._handle.seek(header_start_byte)
         pbuf_header = cnf.ControlNetFileHeaderV0002()
         pbuf_header.ParseFromString(self._handle.read(header_bytes))
-        
+
         self._handle.seek(point_start_byte)
         cp = cnf.ControlPointFileEntryV0002()
         pts = []
         for s in pbuf_header.pointMessageSizes:
-            cp.ParseFromString(self._handle.read(s))            
+            cp.ParseFromString(self._handle.read(s))
             pt = [getattr(cp, i) for i in point_attrs if i != 'measures']
 
             for measure in cp.measures:
@@ -267,24 +269,24 @@ class IsisStore(object):
                     # As per protobuf docs for assigning to a repeated field.
                     if attr == 'aprioriCovar':
                         arr = g.iloc[0]['aprioriCovar']
-                        point_spec.aprioriCovar.extend(arr.ravel().tolist())
+                        if isinstance(arr, np.ndarray):
+                            arr = arr.ravel().tolist()
+
+                        point_spec.aprioriCovar.extend(arr)
                     else:
                         setattr(point_spec, attr, attrtype(g.iloc[0][attr]))
-            point_spec.type = 2  # Hardcoded to free
+            point_spec.type = 2  # Hardcoded to free this is bad
 
             # The reference index should always be the image with the lowest index
             point_spec.referenceIndex = 0
-
             # A single extend call is cheaper than many add calls to pack points
             measure_iterable = []
-
             for node_id, m in g.iterrows():
                 measure_spec = point_spec.Measure()
                 # For all of the attributes, set if they are an dict accessible attr of the obj.
                 for attr, attrtype in self.measure_attrs:
                     if attr in g.columns:
                         setattr(measure_spec, attr, attrtype(m[attr]))
-
                 measure_spec.serialnumber = serials[m.image_index]
                 measure_spec.sample = m.x
                 measure_spec.line = m.y
@@ -298,7 +300,6 @@ class IsisStore(object):
             point_message = point_spec.SerializeToString()
             point_sizes.append(point_spec.ByteSize())
             point_messages.append(point_message)
-
         return point_messages, point_sizes
 
     def create_buffer_header(self, networkid, targetname,
