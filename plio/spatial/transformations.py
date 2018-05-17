@@ -2,6 +2,8 @@ import os
 import math
 import pyproj
 
+import numpy as np
+
 import plio.io.isis_serial_number as sn
 
 def line_sample_size(record, path):
@@ -217,7 +219,7 @@ def lon_ISIS_coord(record, semi_major, semi_minor):
     coord_360 = to_360(ocentric_coord)
     return coord_360
 
-def body_fix(record, semi_major, semi_minor):
+def body_fix(record, semi_major, semi_minor, inverse = False):
     """
     Transforms latitude, longitude, and height of a socet point into
     a body fixed point
@@ -241,8 +243,19 @@ def body_fix(record, semi_major, semi_minor):
     """
     ecef = pyproj.Proj(proj='geocent', a=semi_major, b=semi_minor)
     lla = pyproj.Proj(proj='latlon', a=semi_major, b=semi_minor)
-    lon, lat, height = pyproj.transform(lla, ecef, record['long_X_East'], record['lat_Y_North'], record['ht'])
-    return lon, lat, height
+
+    if inverse:
+        lon, lat, height = pyproj.transform(ecef, lla, record[0], record[1], record[2])
+        return lon, lat, height
+    else:
+        y, x, z = pyproj.transform(lla, ecef, record[0], record[1], record[2])
+        return y, x, z
+
+def stat_toggle(record):
+    if record['stat'] == 0:
+        return True
+    else:
+        return False
 
 def apply_transformations(atf_dict, df):
     """
@@ -259,15 +272,21 @@ def apply_transformations(atf_dict, df):
          Pandas dataframe object
 
     """
-    prj_file = os.path.join(atf_dict['PATH'], atf_dict['PROJECT'].split('\\')[-1])
+    prj_file = os.path.join(atf_dict['PATH'], atf_dict['PROJECT'])
 
     eRadius, pRadius = get_axis(prj_file)
 
+    lla = np.array([[df['long_X_East']], [df['lat_Y_North']], [df['ht']]])
+
+    ecef = body_fix(lla, semi_major = eRadius, semi_minor = pRadius, inverse=False)
+
     df['s.'], df['l.'], df['image_index'] = (zip(*df.apply(line_sample_size, path = atf_dict['PATH'], axis=1)))
     df['known'] = df.apply(known, axis=1)
-    df['lat_Y_North'] = df.apply(lat_ISIS_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
-    df['long_X_East'] = df.apply(lon_ISIS_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
-    df['long_X_East'], df['lat_Y_North'], df['ht'] = zip(*df.apply(body_fix, semi_major = eRadius, semi_minor = pRadius, axis = 1))
+    df['long_X_East'] = ecef[0][0]
+    df['lat_Y_North'] = ecef[1][0]
+    df['ht'] = ecef[2][0]
+    df['aprioriCovar'] = df.apply(compute_cov_matrix, semimajor_axis = eRadius, axis=1)
+    df['stat'] = df.apply(stat_toggle, axis=1)
 
 def serial_numbers(image_dict, path):
     """
@@ -290,3 +309,85 @@ def serial_numbers(image_dict, path):
     for key in image_dict:
         serial_dict[key] = sn.generate_serial_number(os.path.join(path, image_dict[key]))
     return serial_dict
+
+# TODO: Does isis cnet need a convariance matrix for sigmas? Even with a static matrix of 1,1,1,1
+def compute_sigma_covariance_matrix(lat, lon, rad, latsigma, lonsigma, radsigma, semimajor_axis):
+
+    """
+    Given geospatial coordinates, desired accuracy sigmas, and an equitorial radius, compute a 2x3
+    sigma covariange matrix.
+    Parameters
+    ----------
+    lat : float
+          A point's latitude in degrees
+
+    lon : float
+          A point's longitude in degrees
+
+    rad : float
+          The radius (z-value) of the point in meters
+
+    latsigma : float
+               The desired latitude accuracy in meters (Default 10.0)
+
+    lonsigma : float
+               The desired longitude accuracy in meters (Default 10.0)
+
+    radsigma : float
+               The desired radius accuracy in meters (Defualt: 15.0)
+
+    semimajor_axis : float
+                     The semi-major or equitorial radius in meters (Default: 1737400.0 - Moon)
+    Returns
+    -------
+    rectcov : ndarray
+              (2,3) covariance matrix
+    """
+
+    lat = math.radians(lat)
+    lon = math.radians(lon)
+
+    # SetSphericalSigmasDistance
+    scaled_lat_sigma = latsigma / semimajor_axis
+
+    # This is specific to each lon.
+    scaled_lon_sigma = lonsigma * math.cos(lat) / semimajor_axis
+
+    # SetSphericalSigmas
+    cov = np.eye(3,3)
+    cov[0,0] = scaled_lat_sigma ** 2
+    cov[1,1] = scaled_lon_sigma ** 2
+    cov[2,2] = radsigma ** 2
+
+    # Approximate the Jacobian
+    j = np.zeros((3,3))
+    cosphi = math.cos(lat)
+    sinphi = math.sin(lat)
+    cos_lmbda = math.cos(lon)
+    sin_lmbda = math.sin(lon)
+    rcosphi = rad * cosphi
+    rsinphi = rad * sinphi
+    j[0,0] = -rsinphi * cos_lmbda
+    j[0,1] = -rcosphi * sin_lmbda
+    j[0,2] = cosphi * cos_lmbda
+    j[1,0] = -rsinphi * sin_lmbda
+    j[1,1] = rcosphi * cos_lmbda
+    j[1,2] = cosphi * sin_lmbda
+    j[2,0] = rcosphi
+    j[2,1] = 0.
+    j[2,2] = sinphi
+    mat = j.dot(cov)
+    mat = mat.dot(j.T)
+    rectcov = np.zeros((2,3))
+    rectcov[0,0] = mat[0,0]
+    rectcov[0,1] = mat[0,1]
+    rectcov[0,2] = mat[0,2]
+    rectcov[1,0] = mat[1,1]
+    rectcov[1,1] = mat[1,2]
+    rectcov[1,2] = mat[2,2]
+
+    return rectcov
+
+def compute_cov_matrix(record, semimajor_axis):
+    cov_matrix = compute_sigma_covariance_matrix(record['lat_Y_North'], record['long_X_East'], record['ht'], record['sig0'], record['sig1'], record['sig2'], semimajor_axis)
+    return cov_matrix.ravel().tolist()
