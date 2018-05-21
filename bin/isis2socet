@@ -2,16 +2,101 @@
 import argparse
 import os
 
+import pandas as pd
+
+from plio.io.io_bae import save_gpf, save_ipf
+from plio.spatial.transformations import apply_isis_transformations
+import plio.io.io_controlnetwork as cn
+import plio.io.isis_serial_number as sn
+
 def parse_args():
     parser = argparse.ArgumentParser()
 
     # Add args here
+    parser.add_argument('cnet_file', help='Path to an isis control network.')
+    parser.add_argument('e_radius', type=float, help='The semimajor radius of a given target.')
+    parser.add_argument('p_radius', type=float, help='The semiminor radius of a given target.')
+    parser.add_argument('cub_path', help='Path to the cub files associated with a control network.')
+    parser.add_argument('cub_extension', help='Extension for all cubes.')
+    parser.add_argument('cub_list', help='Path to a list file of all cubes being used')
+    parser.add_argument('out_gpf', help='Path to save location of gpf file and new ipf files.')
+    parser.add_argument('--adjusted', help='Flag for saving apriori values or adjusted values',
+                                      default=False, required = False)
 
     return parser.parse_args()
 
 
 def main(args):
-    print('Do some stuff')
+    # Create cub dict to map ipf to cub
+    df = cn.from_isis(args.cnet_file)
+
+    e_radius = args.e_radius
+    p_radius = e_radius * (1 - args.p_radius)
+
+    cub_path = args.cub_path
+    extension = args.cub_extension
+
+    with open(args.cub_list, 'r') as f:
+        lines = f.readlines()
+        cub_list = [cub.replace('\n', '') for cub in lines]
+
+    out_gpf = args.out_gpf
+
+    adjusted_flag = args.adjusted
+
+    # Create cub dict to map ipf to cub
+    cub_dict = {i: i + extension for i in cub_list}
+
+    # Create serial dict to match serial to ipf
+    serial_dict = {sn.generate_serial_number(os.path.join(cub_path, i + extension)): i for i in cub_list}
+
+    # Remove duplicate columns
+    # There are better ways to do this but pandas was not having it
+    columns = []
+    column_index = []
+
+    for i, column in enumerate(list(df.columns)):
+        if column not in columns:
+            column_index.append(i)
+            columns.append(column)
+
+    df = df.iloc[:, column_index]
+
+    # Begin translation
+    # Remap the ISIS columns to socet column names
+    column_map = {'id': 'pt_id', 'line': 'l.', 'sample': 's.',
+                  'lineResidual': 'res_l', 'sampleResidual': 'res_s', 'type': 'known',
+                  'aprioriLatitudeSigma': 'sig0', 'aprioriLongitudeSigma': 'sig1', 'aprioriRadiusSigma': 'sig2',
+                  'linesigma': 'sig_l', 'samplesigma': 'sig_s', 'ignore': 'stat'}
+
+    # Depending on the adjusted flag, set the renames for columns appropriately
+    if adjusted_flag:
+        column_map['adjustedY'] = 'lat_Y_North'
+        column_map['adjustedX'] = 'long_X_East'
+        column_map['adjustedZ'] = 'ht'
+    else:
+        column_map['aprioriY'] = 'lat_Y_North'
+        column_map['aprioriX'] = 'long_X_East'
+        column_map['aprioriZ'] = 'ht'
+
+    df.rename(columns = column_map, inplace=True)
+
+    apply_isis_transformations(df, e_radius, p_radius, serial_dict, extension, cub_path)
+
+    # Save the ipf(s)
+    save_ipf(df, os.path.split(out_gpf)[0])
+
+    # Get the first record from each group as there all the same, put them
+    # into a list, and sort it
+    points = [int(i[1].index[0]) for i in df.groupby('pt_id')]
+    points.sort()
+
+    # Set the gpf_df to only the values we need and do a small rename
+    gpf_df = df.iloc[points].copy()
+    gpf_df.rename(columns = {'pt_id': 'point_id'}, inplace=True)
+
+    # Save the gpf
+    save_gpf(gpf_df, out_gpf)
 
 if __name__ == '__main__':
     main(parse_args())
