@@ -317,11 +317,23 @@ def apply_isis_transformations(df, eRadius, pRadius, serial_dict, extension, cub
 
     Parameters
     ----------
-    atf_dict : dict
-               Dictionary containing information from an atf file
-
     df : object
          Pandas dataframe object
+
+    eRadius : float
+              Equitorial radius
+
+    pRadius : float
+              Polar radius
+
+    serial_dict : dict
+                  Dictionary mapping serials as keys to images as the values
+
+    extension : str
+                String extension of all cubes being used
+
+    cub_path : str
+               Path to all cubes being used
 
     """
     # Convert from geocentered coords (x, y, z), to lat lon coords (latitude, longitude, alltitude)
@@ -521,16 +533,52 @@ def reverse_known(record):
         return 3
 
 def fix_sample_line(record, serial_dict, extension, cub_path):
+    """
+    Extracts the sample, line data from a cube and computes deviation from the
+    center of the image
+
+    Parameters
+    ----------
+    record : dict
+             Dict containing the key serialnumber, l., and s.
+
+    serial_dict : dict
+                  Maps serial numbers to images
+
+    extension : str
+                Extension for cube being looked at
+
+    cub_path : str
+               Path to a given cube being looked at
+
+    Returns
+    -------
+    new_line : int
+               new line deviation from the center
+
+    new_sample : int
+                 new sample deviation from the center
+
+    """
     # Cube location to load
     cube = pvl.load(os.path.join(cub_path, serial_dict[record['serialnumber']] + extension))
     line_size = find_in_dict(cube, 'Lines')
     sample_size = find_in_dict(cube, 'Samples')
 
-    new_line = record['l.'] - (int(line_size)/2.0) - 1
-    new_sample = record['s.'] - (int(sample_size)/2.0) - 1
+    new_line = record['l.'] - (int(line_size/2.0)) - 1
+    new_sample = record['s.'] - (int(sample_size/2.0)) - 1
+    
     return new_line, new_sample
 
 def ignore_toggle(record):
+    """
+    Maps the stat column in a record to 0 or 1 based on True or False
+
+    Parameters
+    ----------
+    record : dict
+             Dict containing the key stat
+    """
     if record['stat'] == True:
         return 0
     else:

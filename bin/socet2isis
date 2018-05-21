@@ -34,11 +34,7 @@ def main(args):
     else:
         outpath = os.path.split(at_file)[0]
 
-    # with open(args.cub_ipf_map) as cub_ipf_map:
-    #     reader = csv.reader(cub_ipf_map, delimiter = ',')
-    #     image_dict = dict([(row[0], row[1]) for row in reader])
-
-        # Read in and setup the atf dict of information
+    # Read in and setup the atf dict of information
     atf_dict = read_atf(at_file)
 
     # Get the gpf and ipf files using atf dict
