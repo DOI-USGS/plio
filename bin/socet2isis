@@ -1,14 +1,11 @@
 #!/usr/bin/env python
-import argparse
 import os
 import sys
+import argparse
 import warnings
-import csv
-import numpy as np
 
-from plio.examples import get_path
 from plio.io.io_bae import read_atf, read_gpf, read_ipf
-from plio.spatial.transformations import *
+from plio.spatial.transformations import apply_socet_transformations, serial_numbers
 import plio.io.io_controlnetwork as cn
 
 import pandas as pd
@@ -19,10 +16,9 @@ def parse_args():
     # Add args here
     parser.add_argument('at_file', help='Path to the .atf file for a project.')
     parser.add_argument('cub_file_path', help='Path to cube files related to ipf files.')
-    parser.add_argument('cub_ipf_map', help='Path to map file for all ipfs and cubes.')
+    parser.add_argument('extension', help='Extension for all cubes being used.')
     parser.add_argument('target_name', help='Name of the target body used in the control net')
-    parser.add_argument('--outpath', help='Directory for the control network to be output to.',
-                                        required = False)
+    parser.add_argument('--outpath', help='Directory for the control network to be output to.')
 
     return parser.parse_args()
 
@@ -38,11 +34,11 @@ def main(args):
     else:
         outpath = os.path.split(at_file)[0]
 
-    with open(args.cub_ipf_map) as cub_ipf_map:
-        reader = csv.reader(cub_ipf_map, delimiter = ',')
-        image_dict = dict([(row[0], row[1]) for row in reader])
+    # with open(args.cub_ipf_map) as cub_ipf_map:
+    #     reader = csv.reader(cub_ipf_map, delimiter = ',')
+    #     image_dict = dict([(row[0], row[1]) for row in reader])
 
-    # Read in and setup the atf dict of information
+        # Read in and setup the atf dict of information
     atf_dict = read_atf(at_file)
 
     # Get the gpf and ipf files using atf dict
@@ -61,29 +57,27 @@ def main(args):
     point_diff = ipf_pt_idx.difference(gpf_pt_idx)
 
     if len(point_diff) != 0:
-        warnings.warn("The following points found in ipf files missing from gpf file: " +
-        "\n\n{}\n\n".format("\n".join(point_diff)) +
-        "Continuing, but these points will be missing from the control " +
-        "network.", stacklevel=3)
+        warnings.warn("The following points found in ipf files missing from gpf file: \n\n{}. \
+                      \n\nContinuing, but these points will be missing from the control network".format(list(point_diff)))
 
     # Merge the two dataframes on their point id columns
     socet_df = ipf_df.merge(gpf_df, left_on='pt_id', right_on='point_id')
 
     # Apply the transformations
-    apply_transformations(atf_dict, socet_df)
+    apply_socet_transformations(atf_dict, socet_df)
 
     # Define column remap for socet dataframe
-    column_remap = {'l.': 'y', 's.': 'x',
-                    'res_l': 'LineResidual', 'res_s': 'SampleResidual', 'known': 'Type',
-                    'lat_Y_North': 'AprioriY', 'long_X_East': 'AprioriX', 'ht': 'AprioriZ',
-                    'sig0': 'AprioriLatitudeSigma', 'sig1': 'AprioriLongitudeSigma',
-                    'sig2': 'AprioriRadiusSigma'}
+    column_map = {'pt_id': 'id', 'l.': 'y', 's.': 'x',
+                  'res_l': 'lineResidual', 'res_s': 'sampleResidual', 'known': 'Type',
+                  'lat_Y_North': 'aprioriY', 'long_X_East': 'aprioriX', 'ht': 'aprioriZ',
+                  'sig0': 'aprioriLatitudeSigma', 'sig1': 'aprioriLongitudeSigma', 'sig2': 'aprioriRadiusSigma',
+                  'sig_l': 'linesigma', 'sig_s': 'samplesigma'}
 
     # Rename the columns using the column remap above
-    socet_df.rename(columns = column_remap, inplace=True)
+    socet_df.rename(columns = column_map, inplace=True)
 
-    images = pd.unique(socet_df['ipf_file'])
-
+    # Build an image and serial dict assuming the cubes will be named as the IPFs are
+    image_dict = {i: i + args.extension for i in pd.unique(socet_df['ipf_file'])}
     serial_dict = serial_numbers(image_dict, cub_path)
 
     # creates the control network
