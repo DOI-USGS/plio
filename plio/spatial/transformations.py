@@ -1,10 +1,12 @@
 import os
+import pvl
 import math
 import pyproj
 
 import numpy as np
 
 import plio.io.isis_serial_number as sn
+from plio.utils.utils import find_in_dict
 
 def line_sample_size(record, path):
     """
@@ -165,7 +167,7 @@ def get_axis(file):
             files[ext[0]].append(ext[-1])
 
         eRadius = float(files['A_EARTH'][0])
-        pRadius = eRadius * (1 - float(files['E_EARTH'][0]))
+        pRadius = eRadius * math.sqrt(1 - (float(files['E_EARTH'][0]) ** 2))
 
         return eRadius, pRadius
 
@@ -219,7 +221,57 @@ def lon_ISIS_coord(record, semi_major, semi_minor):
     coord_360 = to_360(ocentric_coord)
     return coord_360
 
-def body_fix(record, semi_major, semi_minor, inverse = False):
+def lat_socet_coord(record, semi_major, semi_minor):
+    """
+    Function to convert lat_Y_North to ISIS_lat
+
+    Parameters
+    ----------
+    record : object
+             Pandas series object
+
+    semi_major : float
+                 Radius from the center of the body to the equater
+
+    semi_minor : float
+                 Radius from the pole to the center of mass
+
+    Returns
+    -------
+    coord_360 : float
+                Converted latitude into ocentric space, and mapped
+                into 0 to 360
+    """
+    ographic_coord = oc2og(record['lat_Y_North'], semi_major, semi_minor)
+    coord_180 = ((ographic_coord + 180) % 360) - 180
+    return coord_180
+
+def lon_socet_coord(record, semi_major, semi_minor):
+    """
+    Function to convert long_X_East to ISIS_lon
+
+    Parameters
+    ----------
+    record : object
+             Pandas series object
+
+    semi_major : float
+                 Radius from the center of the body to the equater
+
+    semi_minor : float
+                 Radius from the pole to the center of mass
+
+    Returns
+    -------
+    coord_360 : float
+                Converted longitude into ocentric space, and mapped
+                into 0 to 360
+    """
+    ographic_coord = oc2og(record['long_X_East'], semi_major, semi_minor)
+    coord_180 = ((ographic_coord + 180) % 360) - 180
+    return coord_180
+
+def body_fix(record, semi_major, semi_minor, inverse = False, **kwargs):
     """
     Transforms latitude, longitude, and height of a socet point into
     a body fixed point
@@ -245,10 +297,10 @@ def body_fix(record, semi_major, semi_minor, inverse = False):
     lla = pyproj.Proj(proj='latlon', a=semi_major, b=semi_minor)
 
     if inverse:
-        lon, lat, height = pyproj.transform(ecef, lla, record[0], record[1], record[2])
+        lon, lat, height = pyproj.transform(ecef, lla, record[0], record[1], record[2], **kwargs)
         return lon, lat, height
     else:
-        y, x, z = pyproj.transform(lla, ecef, record[0], record[1], record[2])
+        y, x, z = pyproj.transform(lla, ecef, record[0], record[1], record[2], **kwargs)
         return y, x, z
 
 def stat_toggle(record):
@@ -257,7 +309,59 @@ def stat_toggle(record):
     else:
         return False
 
-def apply_transformations(atf_dict, df):
+def apply_isis_transformations(df, eRadius, pRadius, serial_dict, extension, cub_path):
+    """
+    Takes a atf dictionary and a socet dataframe and applies the necessary
+    transformations to convert that dataframe into a isis compatible
+    dataframe
+
+    Parameters
+    ----------
+    atf_dict : dict
+               Dictionary containing information from an atf file
+
+    df : object
+         Pandas dataframe object
+
+    """
+    # Convert from geocentered coords (x, y, z), to lat lon coords (latitude, longitude, alltitude)
+    ecef = np.array([[df['long_X_East']], [df['lat_Y_North']], [df['ht']]])
+    lla = body_fix(ecef, semi_major = eRadius, semi_minor = pRadius, inverse=True)
+    df['long_X_East'], df['lat_Y_North'], df['ht'] = lla[0][0], lla[1][0], lla[2][0]
+
+    # df['lat_Y_North'] = df.apply(lat_socet_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
+    # df['long_X_East'] = df.apply(lon_socet_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
+
+    # Update the stat fields and add the val field as it is just a clone of stat
+    df['stat'] = df.apply(ignore_toggle, axis = 1)
+    df['val'] = df['stat']
+
+    # Update the known field, add the ipf_file field for saving, and
+    # update the line, sample using data from the cubes
+    df['known'] = df.apply(reverse_known, axis = 1)
+    df['ipf_file'] = df['serialnumber'].apply(lambda serial_number: serial_dict[serial_number])
+    df['l.'], df['s.'] = zip(*df.apply(fix_sample_line, serial_dict = serial_dict,
+                                       extension = extension,
+                                       cub_path = cub_path, axis = 1))
+
+    # Add dummy for generic value setting
+    x_dummy = lambda x: np.full(len(df), x)
+
+    df['sig0'] = x_dummy(1)
+    df['sig1'] = x_dummy(1)
+    df['sig2'] = x_dummy(1)
+
+    df['res0'] = x_dummy(0)
+    df['res1'] = x_dummy(0)
+    df['res2'] = x_dummy(0)
+
+    df['fid_x'] = x_dummy(0)
+    df['fid_y'] = x_dummy(0)
+
+    df['no_obs'] = x_dummy(1)
+    df['fid_val'] = x_dummy(0)
+
+def apply_socet_transformations(atf_dict, df):
     """
     Takes a atf dictionary and a socet dataframe and applies the necessary
     transformations to convert that dataframe into a isis compatible
@@ -275,6 +379,9 @@ def apply_transformations(atf_dict, df):
     prj_file = os.path.join(atf_dict['PATH'], atf_dict['PROJECT'])
 
     eRadius, pRadius = get_axis(prj_file)
+
+    # df['lat_Y_North'] = df.apply(lat_ISIS_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
+    # df['long_X_East'] = df.apply(lon_ISIS_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
 
     lla = np.array([[df['long_X_East']], [df['lat_Y_North']], [df['ht']]])
 
@@ -343,7 +450,6 @@ def compute_sigma_covariance_matrix(lat, lon, rad, latsigma, lonsigma, radsigma,
     rectcov : ndarray
               (2,3) covariance matrix
     """
-
     lat = math.radians(lat)
     lon = math.radians(lon)
 
@@ -355,8 +461,8 @@ def compute_sigma_covariance_matrix(lat, lon, rad, latsigma, lonsigma, radsigma,
 
     # SetSphericalSigmas
     cov = np.eye(3,3)
-    cov[0,0] = scaled_lat_sigma ** 2
-    cov[1,1] = scaled_lon_sigma ** 2
+    cov[0,0] = math.radians(scaled_lat_sigma) ** 2
+    cov[1,1] = math.radians(scaled_lon_sigma) ** 2
     cov[2,2] = radsigma ** 2
 
     # Approximate the Jacobian
@@ -391,3 +497,41 @@ def compute_sigma_covariance_matrix(lat, lon, rad, latsigma, lonsigma, radsigma,
 def compute_cov_matrix(record, semimajor_axis):
     cov_matrix = compute_sigma_covariance_matrix(record['lat_Y_North'], record['long_X_East'], record['ht'], record['sig0'], record['sig1'], record['sig2'], semimajor_axis)
     return cov_matrix.ravel().tolist()
+
+def reverse_known(record):
+    """
+    Converts the known field from an isis dataframe into the
+    socet known column
+
+    Parameters
+    ----------
+    record : object
+             Pandas series object
+
+    Returns
+    -------
+    : str
+      String representation of a known field
+    """
+    record_type = record['known']
+    if record_type == 0 or record_type == 2:
+        return 0
+
+    elif record_type == 1 or record_type == 3 or record_type == 4:
+        return 3
+
+def fix_sample_line(record, serial_dict, extension, cub_path):
+    # Cube location to load
+    cube = pvl.load(os.path.join(cub_path, serial_dict[record['serialnumber']] + extension))
+    line_size = find_in_dict(cube, 'Lines')
+    sample_size = find_in_dict(cube, 'Samples')
+
+    new_line = record['l.'] - (int(line_size)/2.0) - 1
+    new_sample = record['s.'] - (int(sample_size)/2.0) - 1
+    return new_line, new_sample
+
+def ignore_toggle(record):
+    if record['stat'] == True:
+        return 0
+    else:
+        return 1
