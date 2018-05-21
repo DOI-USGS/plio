@@ -36,7 +36,7 @@ def setup_package():
         package_data={'plio' : list(examples) + ['data/*.db', 'data/*.py'] +\
                 ['sqlalchemy_json/*.py', 'sqlalchemy_json/LICENSE']},
         zip_safe=False,
-        scripts=['bin/socet2isis'],
+        scripts=['bin/socet2isis', 'bin/isis2socet'],
         install_requires=[
             'gdal',
             'numpy',
@@ -46,7 +46,7 @@ def setup_package():
             'pandas',
             'sqlalchemy',
             'pyyaml',
-            'networkx', 
+            'networkx',
             'affine',
             'scipy'],
         classifiers=[
