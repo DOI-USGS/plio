@@ -9,11 +9,11 @@ import numpy as np
 import pandas as pd
 
 
-try:
+"""try:
     import autocnet
     autocnet_avail = True
 except:
-    autocnet_avail = False
+    autocnet_avail = False"""
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
