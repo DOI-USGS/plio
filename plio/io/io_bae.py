@@ -1,6 +1,7 @@
-import json
 import re
 import os
+import json
+from collections import defaultdict
 from functools import singledispatch
 
 import numpy as np
@@ -290,44 +291,48 @@ def read_atf(atf_file):
                  project
     """
     with open(atf_file) as f:
-
-        files = []
-        ipf = []
-        sup = []
+        # Extensions of files we want
+        files_ext = ['.prj', '.sup', '.ipf', '.gpf']
         files_dict = []
+        files = defaultdict(list)
 
-        # Grabs every PRJ, GPF, SUP, and IPF image from the ATF file
         for line in f:
-            if line[-4:-1] == 'prj' or line[-4:-1] == 'gpf' or line[-4:-1] == 'sup' or line[-4:-1] == 'ipf' or line[-4:-1] == 'atf':
-                files.append(line)
+            ext = os.path.splitext(line)[-1].strip()
 
-        files = np.array(files)
+            # Check is needed for split as all do not have a space
+            if ext in files_ext:
 
-        # Creates appropriate arrays for certain files in the right format
-        for file in files:
-            file = file.strip()
-            file = file.split(' ')
+                # If it is the .prj file, it strips the directory away and grabs file name
+                if ext == '.prj':
+                    files[ext].append(line.strip().split(' ')[1].split('\\')[-1])
 
-            # Grabs all the IPF files
-            if file[1].endswith('.ipf'):
-                ipf.append(file[1])
+                # If the ext is in the list of files we care about, it addes to the dict
+                files[ext].append(line.strip().split(' ')[-1])
 
-            # Grabs all the SUP files
-            if file[1].endswith('.sup'):
-                sup.append(file[1])
+            else:
 
-            files_dict.append(file)
+                # Adds to the dict even if not in files we care about
+                files[ext.strip()].append(line)
+
+        # Gets the base filepath
+        files['basepath'] = os.path.dirname(os.path.abspath(atf_file))
 
         # Creates a dict out of file lists for GPF, PRJ, IPF, and ATF
         files_dict = (dict(files_dict))
 
         # Sets the value of IMAGE_IPF to all IPF images
-        files_dict['IMAGE_IPF'] = ipf
+        files_dict['IMAGE_IPF'] = files['.ipf']
 
         # Sets the value of IMAGE_SUP to all SUP images
-        files_dict['IMAGE_SUP'] = sup
+        files_dict['IMAGE_SUP'] = files['.sup']
+
+        # Sets value for GPF file
+        files_dict['GP_FILE'] = files['.gpf'][0]
+
+        # Sets value for PRJ file
+        files_dict['PROJECT'] = files['.prj'][0]
 
         # Sets the value of PATH to the path of the ATF file
-        files_dict['PATH'] = os.path.dirname(os.path.abspath(atf_file))
+        files_dict['PATH'] = files['basepath']
 
         return files_dict
