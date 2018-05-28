@@ -187,11 +187,12 @@ class IsisStore(object):
         header_bytes = find_in_dict(pvl_header, 'HeaderBytes')
         point_start_byte = find_in_dict(pvl_header, 'PointsStartByte')
         version = find_in_dict(pvl_header, 'Version')
-        if version == 2:
-            point_attrs = [i for i in cnf._CONTROLPOINTFILEENTRYV0002.fields_by_name if i != 'measures']
-            measure_attrs = [i for i in cnf._CONTROLPOINTFILEENTRYV0002_MEASURE.fields_by_name]
 
-        cols = point_attrs + measure_attrs
+        if version == 2:
+            self.point_attrs = [i for i in cnf._CONTROLPOINTFILEENTRYV0002.fields_by_name if i != 'measures']
+            self.measure_attrs = [i for i in cnf._CONTROLPOINTFILEENTRYV0002_MEASURE.fields_by_name]
+
+        cols = self.point_attrs + self.measure_attrs
 
         cp = cnf.ControlPointFileEntryV0002()
         self._handle.seek(header_start_byte)
@@ -203,10 +204,10 @@ class IsisStore(object):
         pts = []
         for s in pbuf_header.pointMessageSizes:
             cp.ParseFromString(self._handle.read(s))
-            pt = [getattr(cp, i) for i in point_attrs if i != 'measures']
+            pt = [getattr(cp, i) for i in self.point_attrs if i != 'measures']
 
             for measure in cp.measures:
-                meas = pt + [getattr(measure, j) for j in measure_attrs]
+                meas = pt + [getattr(measure, j) for j in self.measure_attrs]
                 pts.append(meas)
         df = IsisControlNetwork(pts, columns=cols)
         df.header = pvl_header
