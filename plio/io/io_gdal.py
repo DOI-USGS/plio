@@ -310,10 +310,8 @@ class GeoDataset(object):
                 fp = self.footprint
                 # If we have a footprint, do not worry about computing a lat/lon transform
                 minx, maxx, miny, maxy = fp.GetEnvelope()
-                self._latlon_extent = [(minx, maxy),
-                                   (minx, miny),
-                                   (maxx, miny),
-                                   (maxx, maxy)]
+                self._latlon_extent = [(minx, miny),
+                                       (maxx, maxy)]
             else:
                 self._latlon_extent = []
                 for x, y in self.xy_extent:
@@ -321,6 +319,25 @@ class GeoDataset(object):
 
                     self._latlon_extent.append((x,y))
         return self._latlon_extent
+
+    @property
+    def latlon_corners(self):
+        if not getattr(self, '_latlon_corners', None):
+            if self.footprint:
+                fp = self.footprint
+
+                minx, maxx, miny, maxy = fp.GetEnvelope()
+                self._latlon_corners = [(minx, maxy),
+                                        (minx, miny),
+                                        (maxx, miny),
+                                        (maxx, maxy)]
+            else:
+                self._latlon_corners = []
+                for x, y in self.xy_corners:
+                    x, y = self.pixel_to_latlon(x,y)
+
+                    self._latlon_corners.append((x,y))
+        return self._latlon_corners
 
     @property
     def xy_extent(self):
