@@ -82,12 +82,31 @@ class Spectral_Profiler(object):
                               count=nrows)
             self.ancillary_data = pd.DataFrame(d, columns=columns,
                                                index=np.arange(nrows))
-
+            keys = []
+            vals = []
+            for k, v in label.items():
+                if k in ["ANCILLARY_AND_SUPPLEMENT_DATA", "L2D_RESULT_ARRAY",
+                         "SP_SPECTRUM_QA", "SP_SPECTRUM_REF1", "SP_SPECTRUM_RAD",
+                         "SP_SPECTRUM_REF2", "SP_SPECTRUM_RAW", "SP_SPECTRUM_WAV",
+                         "^ANCILLARY_AND_SUPPLEMENT_DATA", "^SP_SPECTRUM_WAV",
+                         "^SP_SPECTRUM_RAW", "^SP_SPECTRUM_REF2"," ^SP_SPECTRUM_RAD",
+                         "^SP_SPECTRUM_REF1", "^SP_SPECTRUM_QA", "^L2D_RESULT_ARRAY",
+                         "^SP_SPECTRUM_RAD"]:
+                    continue
+                if isinstance(v, pvl._collections.Units):
+                    k = "{}_{}".format(k, v.units)
+                    v = v.value
+                keys.append(k)
+                vals.append(v)
+            
+            vals = [vals] * len(self.ancillary_data)
+            new_anc = pd.DataFrame(vals, index=self.ancillary_data.index, columns=keys)
+            self.ancillary_data = self.ancillary_data.join(new_anc, how='inner')
             assert(ncols == len(columns))
 
             keys = []
             array_offsets = []
-            for d in ['WAV', 'RAW', 'REF', 'REF1', 'REF2', 'DAR', 'QA']:
+            for d in ['WAV', 'RAW', 'REF', 'REF1', 'REF2', 'DAR', 'QA', 'RAD']:
                 search_key = '^SP_SPECTRUM_{}'.format(d)
                 result = find_in_dict(label, search_key)
                 if result:
@@ -127,9 +146,14 @@ class Spectral_Profiler(object):
                     self.spectra[i][k] = arrays[k][i]
 
                 if cleaned:
-                    self.spectra[i] = self.spectra[i][self.spectra[i]['QA'] < qa_threshold]
+                    mask = self.spectra[i]['QA'] < qa_threshold
+                    self.spectra[i] = self.spectra[i][mask]
+            # If the spectra have been cleaned, the wavelength ids also need to be cleaned.
+            if cleaned:
+                self.wavelengths = self.wavelengths[mask.values].values
 
-            self.spectra = pd.Panel(self.spectra)
+            dfs = [v for k, v in self.spectra.items()]
+            self.spectra = pd.concat(dfs, axis=1, keys=range(nrows))
 
     def open_browse(self, extension='.jpg'):
         """
