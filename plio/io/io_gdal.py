@@ -226,13 +226,6 @@ class GeoDataset(object):
         return self._unit_type
 
     @property
-    def north_up(self):
-        if self.footprint:
-            return geofuncs.is_clockwise(json.loads(self.footprint.ExportToJson())['coordinates'][0][0])
-        else:
-            return True
-
-    @property
     def spatial_reference(self):
         if not getattr(self, '_srs', None):
             self._srs = osr.SpatialReference()
@@ -289,6 +282,25 @@ class GeoDataset(object):
             except:
                 self._footprint = None
 
+            try:
+                # Get the lat lon corners
+                lat = [i[0] for i in self.latlon_corners]
+                lon = [i[1] for i in self.latlon_corners]
+
+                # Compute a ogr geometry for the tiff which
+                # provides leverage for overlaps
+                ring = ogr.Geometry(ogr.wkbLinearRing)
+                for point in [*zip(lon, lat)]:
+                    ring.AddPoint(*point)
+                ring.AddPoint(lon[0], lat[0])
+
+                poly = ogr.Geometry(ogr.wkbPolygon)
+                poly.AddGeometry(ring)
+                poly.FlattenTo2D()
+                self._footprint = poly
+            except:
+                self._footprint = None
+
         return self._footprint
 
     @property
@@ -313,11 +325,13 @@ class GeoDataset(object):
                 self._latlon_extent = [(minx, miny),
                                        (maxx, maxy)]
             else:
+                # Attempt to compute a basic bounding box footprint
                 self._latlon_extent = []
-                for x, y in self.xy_extent:
-                    x, y = self.pixel_to_latlon(x,y)
-
-                    self._latlon_extent.append((x,y))
+                xy_extent = self.xy_extent
+                maxlon, minlat = self.pixel_to_latlon(*xy_extent[0])
+                minlon, maxlat = self.pixel_to_latlon(*xy_extent[1])
+                self._latlon_extent.append((minlat, minlon))
+                self._latlon_extent.append((maxlat, maxlon))
         return self._latlon_extent
 
     @property
@@ -496,15 +510,10 @@ class GeoDataset(object):
 
         if not pixels:
             array = band.ReadAsArray().astype(dtype)
-            if self.north_up == False:
-                array = np.flipud(array)
         else:
             # Check that the read start is not outside of the image
             xstart, ystart, xcount, ycount = pixels
             xmax, ymax = map(int, self.xy_extent[1])
-            # If the image is south up, flip the roi
-            if self.north_up == False:
-                ystart = ymax - (ystart + ycount)
             if xstart < 0:
                 xstart = 0
 
@@ -517,8 +526,7 @@ class GeoDataset(object):
             if ystart + ycount > ymax:
                 ycount = ymax - ystart
             array = band.ReadAsArray(xstart, ystart, xcount, ycount).astype(dtype)
-            #if self.north_up == False:
-            #    array = np.flipud(array)
+
         return array
 
     def compute_overlap(self, geodata, **kwargs):
