@@ -184,7 +184,9 @@ class GeoDataset(object):
         top left y, y-rotation, n-s pixel resolution]
         """
         if not getattr(self, '_geotransform', None):
-            if self.footprint:
+            try:
+                self._geotransform = self.dataset.GetGeoTransform()
+            except:
                 coords = json.loads(self.footprint.ExportToJson())['coordinates'][0][0]
                 ul, ur, lr, ll = geofuncs.find_four_corners(coords)
 
@@ -196,8 +198,7 @@ class GeoDataset(object):
                 yskew = (ur[1] - ystart) / xsize
                 yscale = (ll[1] - ystart) / ysize
                 self._geotransform = [xstart, xscale, xskew, ystart, yskew, yscale]
-            else:
-                self._geotransform = self.dataset.GetGeoTransform()
+
         return self._geotransform
 
     @property
