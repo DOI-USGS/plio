@@ -5,8 +5,7 @@ branches:
   only:
     - master
 
-dist:
-  - trusty
+dist: trusty
 
 os:
   - linux
