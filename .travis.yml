@@ -4,6 +4,10 @@ sudo: false
 branches:
   only:
     - master
+
+dist:
+  - trusty
+
 os:
   - linux
   - osx
