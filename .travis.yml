@@ -4,6 +4,7 @@ sudo: false
 branches:
   only:
     - master
+
 os:
   - linux
   - osx
@@ -35,7 +36,8 @@ before_install:
 
 install:
   - conda config --add channels conda-forge
-  - conda install -q gdal h5py pandas sqlalchemy pyyaml networkx affine protobuf scipy pvl
+  - conda install -c conda-forge libgdal gdal numpy
+  - conda install -q h5py pandas sqlalchemy pyyaml networkx affine protobuf scipy pvl
   # Development installation
   - conda install -q pytest pytest-cov sh coveralls nbsphinx
 

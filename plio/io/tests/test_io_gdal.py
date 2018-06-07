@@ -50,7 +50,12 @@ class TestMercator(unittest.TestCase):
     def test_latlon_extent(self):
         self.assertEqual(self.dataset.latlon_extent, [(55.33228905180849, 0.0),
                                                       (-55.3322890518085, 179.96751473604124)])
+
+    def test_latlon_corners(self):
+        self.assertEqual(self.dataset.latlon_corners, [(55.33228905180849, 0.0),
+                                                      (-55.3322890518085, 179.96751473604124)])
     """
+
     def test_spheroid(self):
         sphere = self.dataset.spheroid
         self.assertAlmostEqual(sphere[0], 3396190.0, 6)
@@ -111,6 +116,14 @@ class TestLambert(unittest.TestCase):
     def test_get_xy_extent(self):
         self.assertEqual(self.dataset.xy_extent, [(0, 0), (239, 275)])
 
+    def test_latlon_extent(self):
+        self.assertEqual(self.dataset.latlon_extent, [(-29.721669024636785, 37.834604457982444),
+                                                      (69.44231975603968, 69.99086737565507)])
+    def test_latlon_corners(self):
+        self.assertEqual(self.dataset.latlon_corners, [(-29.721669024636785, 69.99086737565507),
+                                                       (-29.721669024636785, 37.834604457982444),
+                                                       (69.44231975603968, 37.834604457982444),
+                                                       (69.44231975603968, 69.99086737565507)])
     def test_get_no_data_value(self):
         self.assertEqual(self.dataset.no_data_value, 0.0)
 
