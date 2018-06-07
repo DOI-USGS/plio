@@ -18,8 +18,7 @@ class Test_Spectral_Profiler_IO(unittest.TestCase):
     def test_openspc(self):
         ds = io_spectral_profiler.Spectral_Profiler(self.examplefile)
         self.assertEqual(ds.nspectra, 38)
-        self.assertIsInstance(ds.spectra, pd.Panel)
-        self.assertEqual(ds.spectra[0].columns.tolist(), ['RAW', 'REF1', 'REF2', 'QA'])
+        self.assertEqual(ds.spectra[0].columns.tolist(), ['RAW', 'REF1', 'REF2', 'QA', 'RAD'])
 
     def test_read_browse(self):
         ds = io_spectral_profiler.Spectral_Profiler(self.examplefile)
