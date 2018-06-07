@@ -227,7 +227,6 @@ class GeoDataset(object):
         return self._unit_type
 
     @property
-<<<<<<< HEAD
     def north_up(self):
         return True
         if self.footprint:
@@ -236,8 +235,6 @@ class GeoDataset(object):
             return True
 
     @property
-=======
->>>>>>> 2f82f6bf36ebf5124f2f0448f824f3eb14f05e64
     def spatial_reference(self):
         if not getattr(self, '_srs', None):
             self._srs = osr.SpatialReference()
