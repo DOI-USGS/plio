@@ -20,7 +20,7 @@ def setup_package():
 
     setup(
         name = "plio",
-        version = '0.1.2',
+        version = '0.1.3',
         author = "Jay Laura",
         author_email = "jlaura@usgs.gov",
         description = ("I/O API to support planetary data formats."),
