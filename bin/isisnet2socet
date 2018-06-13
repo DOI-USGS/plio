@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import os
+import math
 
 import pandas as pd
 
@@ -15,7 +16,7 @@ def parse_args():
     # Add args here
     parser.add_argument('cnet_file', help='Path to an isis control network.')
     parser.add_argument('e_radius', type=float, help='The semimajor radius of a given target.')
-    parser.add_argument('p_radius', type=float, help='The semiminor radius of a given target.')
+    parser.add_argument('eccentricity', type=float, help='The eccentricity of a given target.')
     parser.add_argument('cub_path', help='Path to the cub files associated with a control network.')
     parser.add_argument('cub_extension', help='Extension for all cubes.')
     parser.add_argument('cub_list', help='Path to a list file of all cubes being used')
@@ -31,7 +32,7 @@ def main(args):
     df = cn.from_isis(args.cnet_file)
 
     e_radius = args.e_radius
-    p_radius = e_radius * (1 - args.p_radius)
+    p_radius = e_radius * math.sqrt((1 - (args.eccentricity ** 2)))
 
     cub_path = args.cub_path
     extension = args.cub_extension
@@ -65,9 +66,9 @@ def main(args):
     # Begin translation
     # Remap the ISIS columns to socet column names
     column_map = {'id': 'pt_id', 'line': 'l.', 'sample': 's.',
-                  'lineResidual': 'res_l', 'sampleResidual': 'res_s', 'type': 'known',
-                  'aprioriLatitudeSigma': 'sig0', 'aprioriLongitudeSigma': 'sig1', 'aprioriRadiusSigma': 'sig2',
-                  'linesigma': 'sig_l', 'samplesigma': 'sig_s', 'ignore': 'stat'}
+                               'lineResidual': 'res_l', 'sampleResidual': 'res_s', 'type': 'known',
+                               'aprioriLatitudeSigma': 'sig0', 'aprioriLongitudeSigma': 'sig1', 'aprioriRadiusSigma': 'sig2',
+                               'linesigma': 'sig_l', 'samplesigma': 'sig_s', 'ignore': 'stat'}
 
     # Depending on the adjusted flag, set the renames for columns appropriately
     if adjusted_flag:
