@@ -64,10 +64,10 @@ def main(args):
 
     # Define column remap for socet dataframe
     column_map = {'pt_id': 'id', 'l.': 'y', 's.': 'x',
-                  'res_l': 'lineResidual', 'res_s': 'sampleResidual', 'known': 'Type',
-                  'lat_Y_North': 'aprioriY', 'long_X_East': 'aprioriX', 'ht': 'aprioriZ',
-                  'sig0': 'aprioriLatitudeSigma', 'sig1': 'aprioriLongitudeSigma', 'sig2': 'aprioriRadiusSigma',
-                  'sig_l': 'linesigma', 'sig_s': 'samplesigma'}
+                               'res_l': 'lineResidual', 'res_s': 'sampleResidual', 'known': 'Type',
+                               'lat_Y_North': 'aprioriY', 'long_X_East': 'aprioriX', 'ht': 'aprioriZ',
+                               'sig0': 'aprioriLatitudeSigma', 'sig1': 'aprioriLongitudeSigma', 'sig2': 'aprioriRadiusSigma',
+                               'sig_l': 'linesigma', 'sig_s': 'samplesigma'}
 
     # Rename the columns using the column remap above
     socet_df.rename(columns = column_map, inplace=True)
