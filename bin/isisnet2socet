@@ -31,7 +31,7 @@ def main(args):
     df = cn.from_isis(args.cnet_file)
 
     e_radius = args.e_radius
-    p_radius = e_radius * (1 - args.p_radius)
+    p_radius = e_radius * (1 - (args.p_radius ** 2))
 
     cub_path = args.cub_path
     extension = args.cub_extension

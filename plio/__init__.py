@@ -7,3 +7,4 @@ from . import data
 from . import examples
 from . import geofuncs
 from . import utils
+from . import spatial

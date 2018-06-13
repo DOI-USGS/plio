@@ -392,7 +392,7 @@ def apply_socet_transformations(atf_dict, df):
 
     eRadius, pRadius = get_axis(prj_file)
 
-    # df['lat_Y_North'] = df.apply(lat_ISIS_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
+    df['lat_Y_North'] = df.apply(lat_ISIS_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
     # df['long_X_East'] = df.apply(lon_ISIS_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
 
     lla = np.array([[df['long_X_East']], [df['lat_Y_North']], [df['ht']]])
@@ -567,7 +567,7 @@ def fix_sample_line(record, serial_dict, extension, cub_path):
 
     new_line = record['l.'] - (int(line_size/2.0)) - 1
     new_sample = record['s.'] - (int(sample_size/2.0)) - 1
-    
+
     return new_line, new_sample
 
 def ignore_toggle(record):
