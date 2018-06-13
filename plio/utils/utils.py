@@ -181,3 +181,17 @@ def lookup(df, lookupfile=None, lookupdf=None, sep=',', skiprows=1, left_on='scl
     # combine the df and the new metadata
     df = pd.concat([metadata, df], axis=1)
     return df
+
+def compute_log_values(low, high, step):
+    """
+    Given a low value, a high value, and a step size,
+    generate a log(array) from low to high with a number 
+    of entries equal to step. 
+    """
+    ya = math.log(low)
+    yb = math.log(high)
+    ninertia = inertia[2]
+    norm = (yb - ya) / (step - 1.0)
+    iner = np.exp(ya + np.arange(step) * norm)
+
+    return iner
