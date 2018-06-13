@@ -567,7 +567,7 @@ def fix_sample_line(record, serial_dict, extension, cub_path):
 
     new_line = record['l.'] - (int(line_size/2.0)) - 1
     new_sample = record['s.'] - (int(sample_size/2.0)) - 1
-    
+
     return new_line, new_sample
 
 def ignore_toggle(record):
