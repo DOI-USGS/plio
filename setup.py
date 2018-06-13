@@ -6,9 +6,6 @@ from plio.examples import available
 with open('README.rst', 'r') as f:
     long_description = f.read()
 
-
-VERSION = plio.__version__
-
 def setup_package():
     examples = set()
     for i in available():
@@ -23,7 +20,7 @@ def setup_package():
 
     setup(
         name = "plio",
-        version = VERSION,
+        version = '0.1.3',
         author = "Jay Laura",
         author_email = "jlaura@usgs.gov",
         description = ("I/O API to support planetary data formats."),

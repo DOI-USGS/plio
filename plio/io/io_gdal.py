@@ -227,6 +227,14 @@ class GeoDataset(object):
         return self._unit_type
 
     @property
+    def north_up(self):
+        return True
+        if self.footprint:
+            return geofuncs.is_clockwise(json.loads(self.footprint.ExportToJson())['coordinates'][0][0])
+        else:
+            return True
+
+    @property
     def spatial_reference(self):
         if not getattr(self, '_srs', None):
             self._srs = osr.SpatialReference()
@@ -511,10 +519,15 @@ class GeoDataset(object):
 
         if not pixels:
             array = band.ReadAsArray().astype(dtype)
+            #if self.north_up == False:
+            #    array = np.flipud(array)
         else:
             # Check that the read start is not outside of the image
             xstart, ystart, xcount, ycount = pixels
             xmax, ymax = map(int, self.xy_extent[1])
+            # If the image is south up, flip the roi
+            #if self.north_up == False:
+            #    ystart = ymax - (ystart + ycount)
             if xstart < 0:
                 xstart = 0
 
