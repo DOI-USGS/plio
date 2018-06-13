@@ -392,7 +392,7 @@ def apply_socet_transformations(atf_dict, df):
 
     eRadius, pRadius = get_axis(prj_file)
 
-    df['lat_Y_North'] = df.apply(lat_ISIS_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
+    # df['lat_Y_North'] = df.apply(lat_ISIS_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
     # df['long_X_East'] = df.apply(lon_ISIS_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
 
     lla = np.array([[df['long_X_East']], [df['lat_Y_North']], [df['ht']]])
