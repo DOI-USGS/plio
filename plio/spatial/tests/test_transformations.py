@@ -11,6 +11,14 @@ from plio.spatial import transformations as trans
 def test_stat_toggle(stat, expected):
     assert trans.stat_toggle(stat) == expected
 
+@pytest.mark.parametrize("stat, expected",
+                         [({'stat':True}, 0),
+                          ({'stat':False}, 1),
+                          ({'stat':False}, True),  # Is this the desired result?
+                          ({'stat':True}, False)])
+def test_ignore_toggle(stat, expected):
+    assert trans.ignore_toggle(stat) == expected
+
 def test_get_axis():
     fname = get_path('CTX_Athabasca_Middle.prj')
     erad, prad = trans.get_axis(fname)
@@ -43,6 +51,18 @@ def test_oc2og(og, major, minor, oc):
                           ({'known':True},'Constrained')])
 def test_known(known, expected):
     assert trans.known(known) == expected
+
+
+@pytest.mark.parametrize("known, expected",
+                         [({'known':0},0),
+                          ({'known':2},0),
+                          ({'known':1},3),
+                          ({'known':3},3),
+                          ({'known':4},3),
+                          ({'known':False},0),  # Is this the desired result?
+                          ({'known':True},3)])
+def test_known(known, expected):
+    assert trans.reverse_known(known) == expected
 
 @pytest.mark.parametrize("num, expected",
                          [(0, 0),
