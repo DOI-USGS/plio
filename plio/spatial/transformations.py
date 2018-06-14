@@ -171,9 +171,10 @@ def get_axis(file):
 
         return eRadius, pRadius
 
-def lat_ISIS_coord(record, semi_major, semi_minor):
+def reproject(record, semi_major, semi_minor, source_proj, dest_proj, **kwargs):
     """
-    Function to convert lat_Y_North to ISIS_lat
+    Transforms a set of coordinates (y, x, z) from one coordinate system to a different
+    coordinate system. Also handles ocentric to ographic transformations, and vise versa.
 
     Parameters
     ----------
@@ -186,122 +187,23 @@ def lat_ISIS_coord(record, semi_major, semi_minor):
     semi_minor : float
                  Radius from the pole to the center of mass
 
-    Returns
-    -------
-    coord_360 : float
-                Converted latitude into ocentric space, and mapped
-                into 0 to 360
-    """
-    ocentric_coord = og2oc(record['lat_Y_North'], semi_major, semi_minor)
-    coord_360 = to_360(ocentric_coord)
-    return coord_360
+    source_proj : str
+                         Pyproj string that defines a projection space ie. 'geocent'
 
-def lon_ISIS_coord(record, semi_major, semi_minor):
-    """
-    Function to convert long_X_East to ISIS_lon
-
-    Parameters
-    ----------
-    record : object
-             Pandas series object
-
-    semi_major : float
-                 Radius from the center of the body to the equater
-
-    semi_minor : float
-                 Radius from the pole to the center of mass
-
-    Returns
-    -------
-    coord_360 : float
-                Converted longitude into ocentric space, and mapped
-                into 0 to 360
-    """
-    ocentric_coord = og2oc(record['long_X_East'], semi_major, semi_minor)
-    coord_360 = to_360(ocentric_coord)
-    return coord_360
-
-def lat_socet_coord(record, semi_major, semi_minor):
-    """
-    Function to convert lat_Y_North to ISIS_lat
-
-    Parameters
-    ----------
-    record : object
-             Pandas series object
-
-    semi_major : float
-                 Radius from the center of the body to the equater
-
-    semi_minor : float
-                 Radius from the pole to the center of mass
-
-    Returns
-    -------
-    coord_360 : float
-                Converted latitude into ocentric space, and mapped
-                into 0 to 360
-    """
-    ographic_coord = oc2og(record['lat_Y_North'], semi_major, semi_minor)
-    coord_180 = ((ographic_coord + 180) % 360) - 180
-    return coord_180
-
-def lon_socet_coord(record, semi_major, semi_minor):
-    """
-    Function to convert long_X_East to ISIS_lon
-
-    Parameters
-    ----------
-    record : object
-             Pandas series object
-
-    semi_major : float
-                 Radius from the center of the body to the equater
-
-    semi_minor : float
-                 Radius from the pole to the center of mass
-
-    Returns
-    -------
-    coord_360 : float
-                Converted longitude into ocentric space, and mapped
-                into 0 to 360
-    """
-    ographic_coord = oc2og(record['long_X_East'], semi_major, semi_minor)
-    coord_180 = ((ographic_coord + 180) % 360) - 180
-    return coord_180
-
-def body_fix(record, semi_major, semi_minor, inverse = False, **kwargs):
-    """
-    Transforms latitude, longitude, and height of a socet point into
-    a body fixed point
-
-    Parameters
-    ----------
-    record : object
-             Pandas series object
-
-    semi_major : float
-                 Radius from the center of the body to the equater
-
-    semi_minor : float
-                 Radius from the pole to the center of mass
+    dest_proj : str
+                      Pyproj string that defines a project space ie. 'latlon'
 
     Returns
     -------
     : list
-      Body fixed lat, lon and height coordinates as lat, lon, ht
+      Transformed coordinates as y, x, z
 
     """
-    ecef = pyproj.Proj(proj='geocent', a=semi_major, b=semi_minor)
-    lla = pyproj.Proj(proj='latlon', a=semi_major, b=semi_minor)
+    source_pyproj = pyproj.Proj(proj = source_proj, a = semi_major, b = semi_minor)
+    dest_pyproj = pyproj.Proj(proj = dest_proj, a = semi_major, b = semi_minor)
 
-    if inverse:
-        lon, lat, height = pyproj.transform(ecef, lla, record[0], record[1], record[2], **kwargs)
-        return lon, lat, height
-    else:
-        y, x, z = pyproj.transform(lla, ecef, record[0], record[1], record[2], **kwargs)
-        return y, x, z
+    y, x, z = pyproj.transform(source_pyproj, dest_pyproj, record[0], record[1], record[2], **kwargs)
+    return y, x, z
 
 def stat_toggle(record):
     if record['stat'] == 0:
@@ -338,11 +240,10 @@ def apply_isis_transformations(df, eRadius, pRadius, serial_dict, extension, cub
     """
     # Convert from geocentered coords (x, y, z), to lat lon coords (latitude, longitude, alltitude)
     ecef = np.array([[df['long_X_East']], [df['lat_Y_North']], [df['ht']]])
-    lla = body_fix(ecef, semi_major = eRadius, semi_minor = pRadius, inverse=True)
-    df['long_X_East'], df['lat_Y_North'], df['ht'] = lla[0][0], lla[1][0], lla[2][0]
+    lla = reproject(ecef, semi_major = eRadius, semi_minor = pRadius,
+                           source_proj = 'latlon', dest_proj = 'geocent')
 
-    # df['lat_Y_North'] = df.apply(lat_socet_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
-    # df['long_X_East'] = df.apply(lon_socet_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
+    df['long_X_East'], df['lat_Y_North'], df['ht'] = lla[0][0], lla[1][0], lla[2][0]
 
     # Update the stat fields and add the val field as it is just a clone of stat
     df['stat'] = df.apply(ignore_toggle, axis = 1)
@@ -392,12 +293,10 @@ def apply_socet_transformations(atf_dict, df):
 
     eRadius, pRadius = get_axis(prj_file)
 
-    # df['lat_Y_North'] = df.apply(lat_ISIS_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
-    # df['long_X_East'] = df.apply(lon_ISIS_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
-
     lla = np.array([[df['long_X_East']], [df['lat_Y_North']], [df['ht']]])
 
-    ecef = body_fix(lla, semi_major = eRadius, semi_minor = pRadius, inverse=False)
+    ecef = reproject(lla, semi_major = eRadius, semi_minor = pRadius,
+                              source_proj = 'geocent', dest_proj = 'latlon')
 
     df['s.'], df['l.'], df['image_index'] = (zip(*df.apply(line_sample_size, path = atf_dict['PATH'], axis=1)))
     df['known'] = df.apply(known, axis=1)
