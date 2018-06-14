@@ -56,7 +56,7 @@ after_success:
   - source activate test  # Reactivate the env to have all deps installed.
   - pip install travis-sphinx
   - travis-sphinx build --source=docs --nowarn # The sphinx build script
-  - travis-sphinx deploy --branches=dev
+  - travis-sphinx deploy
 
 notifications:
   webhooks:
