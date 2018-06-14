@@ -41,6 +41,7 @@ requirements:
     - networkx
     - scipy
     - certifi
+    - pyproj
 
 test:
   imports:
