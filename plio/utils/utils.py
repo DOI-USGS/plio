@@ -181,3 +181,24 @@ def lookup(df, lookupfile=None, lookupdf=None, sep=',', skiprows=1, left_on='scl
     # combine the df and the new metadata
     df = pd.concat([metadata, df], axis=1)
     return df
+
+def split_all_ext(path):
+    """
+    General function for removeing all potential extensions from a file.
+
+    Parameters
+    ----------
+    path : str
+              Path or file name with potential extension
+
+    Returns
+    -------
+    base : str
+               Path or file name with all potnetial extensions removed
+    """
+    base, ext = os.path.splitext(path)
+
+    while len(ext) is not 0:
+        base, ext = os.path.splitext(base)
+
+    return base

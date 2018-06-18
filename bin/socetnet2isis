@@ -4,19 +4,20 @@ import sys
 import argparse
 import warnings
 
-from plio.io.io_bae import read_atf, read_gpf, read_ipf
-from plio.spatial.transformations import apply_socet_transformations, serial_numbers
-import plio.io.io_controlnetwork as cn
-
 import pandas as pd
+
+from plio.io.io_bae import read_atf, read_gpf, read_ipf
+import plio.io.io_controlnetwork as cn
+import plio.io.isis_serial_number as sn
+from plio.spatial.transformations import apply_socet_transformations
+from plio.utils.utils import split_all_ext
 
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    # Add args here
     parser.add_argument('at_file', help='Path to the .atf file for a project.')
-    parser.add_argument('cub_file_path', help='Path to cube files related to ipf files.')
-    parser.add_argument('extension', help='Extension for all cubes being used.')
+    parser.add_argument('cub_list', help='Path to a list file containing paths to the associated\
+                                                                 Isis cubes.')
     parser.add_argument('target_name', help='Name of the target body used in the control net')
     parser.add_argument('--outpath', help='Directory for the control network to be output to.')
 
@@ -26,10 +27,14 @@ def parse_args():
 def main(args):
     # Setup the at_file, path to cubes, and control network out path
     at_file = args.at_file
-    cnet_out = os.path.split(os.path.splitext(at_file)[0])[1]
-    cub_path = args.cub_file_path
 
-    if(args.outpath):
+    with open(args.cub_list, 'r') as f:
+        lines = f.readlines()
+        cub_list = [cub.replace('\n', '') for cub in lines]
+
+    cnet_out = os.path.split(os.path.splitext(at_file)[0])[1]
+
+    if( args.outpath ):
         outpath = args.outpath
     else:
         outpath = os.path.split(at_file)[0]
@@ -72,9 +77,8 @@ def main(args):
     # Rename the columns using the column remap above
     socet_df.rename(columns = column_map, inplace=True)
 
-    # Build an image and serial dict assuming the cubes will be named as the IPFs are
-    image_dict = {i: i + args.extension for i in pd.unique(socet_df['ipf_file'])}
-    serial_dict = serial_numbers(image_dict, cub_path)
+    # Build a serial dict assuming the cubes will be named as the IPFs are
+    serial_dict = {split_all_ext(os.path.split(i)[-1]): sn.generate_serial_number(i) for i in cub_list}
 
     # creates the control network
     cn.to_isis(os.path.join(outpath, cnet_out + '.net'), socet_df, serial_dict, targetname = args.target_name)
