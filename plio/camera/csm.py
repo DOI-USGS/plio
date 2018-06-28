@@ -5,7 +5,7 @@ try:
     import usgscam as cam
     from cycsm.isd import Isd
     camera_support = True
-else:
+except:
     camera_support = False
 import requests
 
