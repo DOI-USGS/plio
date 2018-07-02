@@ -43,6 +43,7 @@ requirements:
     - certifi
     - pyproj
     - usgscam
+    - jinja2
 
 test:
   imports:
