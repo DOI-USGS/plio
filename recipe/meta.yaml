@@ -42,6 +42,7 @@ requirements:
     - scipy
     - certifi
     - pyproj
+    - usgscam
 
 test:
   imports:
