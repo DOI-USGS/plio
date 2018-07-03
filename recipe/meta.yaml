@@ -49,6 +49,7 @@ requirements:
     - pyproj
     - cycsm
     - usgscam
+    - jinja2
 
 test:
   imports:
