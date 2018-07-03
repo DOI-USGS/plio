@@ -3,7 +3,7 @@ import os
 import jinja2
 import numpy as np
 
-from plio.camera.footprint import generate_gcps
+from plio.spatial.footprint import generate_gcps
 
 def warped_vrt(camera, raster_size, fpath, outpath=None, no_data_value=0):
     gcps = generate_gcps(camera)
