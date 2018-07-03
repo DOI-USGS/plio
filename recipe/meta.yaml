@@ -8,6 +8,11 @@ source:
 build:
   number: 1
 
+extra:
+  channels:
+    - usgs-astrogeology
+    - conda-forge
+
 requirements:
   build:
     - python
@@ -42,6 +47,8 @@ requirements:
     - scipy
     - certifi
     - pyproj
+    - cycsm
+    - usgscam
 
 test:
   imports:
