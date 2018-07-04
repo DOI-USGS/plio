@@ -218,7 +218,7 @@ def stat_toggle(record):
     else:
         return False
 
-def apply_isis_transformations(df, eRadius, pRadius, serial_dict, extension, cub_path):
+def apply_isis_transformations(df, eRadius, pRadius, serial_dict, cub_dict):
     """
     Takes a atf dictionary and a socet dataframe and applies the necessary
     transformations to convert that dataframe into a isis compatible
@@ -261,8 +261,7 @@ def apply_isis_transformations(df, eRadius, pRadius, serial_dict, extension, cub
     df['known'] = df.apply(reverse_known, axis = 1)
     df['ipf_file'] = df['serialnumber'].apply(lambda serial_number: serial_dict[serial_number])
     df['l.'], df['s.'] = zip(*df.apply(fix_sample_line, serial_dict = serial_dict,
-                                       extension = extension,
-                                       cub_path = cub_path, axis = 1))
+                                       cub_dict = cub_dict, axis = 1))
 
     # Add dummy for generic value setting
     x_dummy = lambda x: np.full(len(df), x)
@@ -312,28 +311,6 @@ def apply_socet_transformations(atf_dict, df):
     df['ht'] = ecef[2][0]
     df['aprioriCovar'] = df.apply(compute_cov_matrix, semimajor_axis = eRadius, axis=1)
     df['stat'] = df.apply(stat_toggle, axis=1)
-
-def serial_numbers(image_dict, path):
-    """
-    Creates a dict of serial numbers with the cub being the key
-
-    Parameters
-    ----------
-    images : list
-
-    path : str
-
-    extension : str
-
-    Returns
-    -------
-    serial_dict : dict
-    """
-    serial_dict = dict()
-
-    for key in image_dict:
-        serial_dict[key] = sn.generate_serial_number(os.path.join(path, image_dict[key]))
-    return serial_dict
 
 # TODO: Does isis cnet need a convariance matrix for sigmas? Even with a static matrix of 1,1,1,1
 def compute_sigma_covariance_matrix(lat, lon, rad, latsigma, lonsigma, radsigma, semimajor_axis):
@@ -438,7 +415,7 @@ def reverse_known(record):
     elif record_type == 1 or record_type == 3 or record_type == 4:
         return 3
 
-def fix_sample_line(record, serial_dict, extension, cub_path):
+def fix_sample_line(record, serial_dict, cub_dict):
     """
     Extracts the sample, line data from a cube and computes deviation from the
     center of the image
@@ -451,11 +428,8 @@ def fix_sample_line(record, serial_dict, extension, cub_path):
     serial_dict : dict
                   Maps serial numbers to images
 
-    extension : str
-                Extension for cube being looked at
-
-    cub_path : str
-               Path to a given cube being looked at
+    cub_dict : dict
+                     Maps basic cub names to their assocated absoluate path cubs
 
     Returns
     -------
@@ -467,12 +441,12 @@ def fix_sample_line(record, serial_dict, extension, cub_path):
 
     """
     # Cube location to load
-    cube = pvl.load(os.path.join(cub_path, serial_dict[record['serialnumber']] + extension))
+    cube = pvl.load(cub_dict[serial_dict[record['serialnumber']]])
     line_size = find_in_dict(cube, 'Lines')
     sample_size = find_in_dict(cube, 'Samples')
 
-    new_line = record['l.'] - (int(line_size/2.0)) - 1
-    new_sample = record['s.'] - (int(sample_size/2.0)) - 1
+    new_line = record['l.'] - (int(line_size / 2.0)) - 1
+    new_sample = record['s.'] - (int(sample_size / 2.0)) - 1
 
     return new_line, new_sample
 
