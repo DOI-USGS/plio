@@ -1,25 +1,24 @@
 #!/usr/bin/env python
-import argparse
 import os
 import math
+import argparse
 
 import pandas as pd
 
 from plio.io.io_bae import save_gpf, save_ipf
-from plio.spatial.transformations import apply_isis_transformations
 import plio.io.io_controlnetwork as cn
 import plio.io.isis_serial_number as sn
+from plio.spatial.transformations import apply_isis_transformations
+from plio.utils.utils import split_all_ext
 
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    # Add args here
     parser.add_argument('cnet_file', help='Path to an isis control network.')
     parser.add_argument('e_radius', type=float, help='The semimajor radius of a given target.')
     parser.add_argument('eccentricity', type=float, help='The eccentricity of a given target.')
-    parser.add_argument('cub_path', help='Path to the cub files associated with a control network.')
-    parser.add_argument('cub_extension', help='Extension for all cubes.')
-    parser.add_argument('cub_list', help='Path to a list file of all cubes being used')
+    parser.add_argument('cub_list', help='Path to a list file of all cubes being used. This \
+                                                                 includes file paths an extnsions.')
     parser.add_argument('out_gpf', help='Path to save location of gpf file and new ipf files.')
     parser.add_argument('--adjusted', help='Flag for saving apriori values or adjusted values',
                                       default=False, required = False)
@@ -34,9 +33,6 @@ def main(args):
     e_radius = args.e_radius
     p_radius = e_radius * math.sqrt((1 - (args.eccentricity ** 2)))
 
-    cub_path = args.cub_path
-    extension = args.cub_extension
-
     with open(args.cub_list, 'r') as f:
         lines = f.readlines()
         cub_list = [cub.replace('\n', '') for cub in lines]
@@ -46,10 +42,10 @@ def main(args):
     adjusted_flag = args.adjusted
 
     # Create cub dict to map ipf to cub
-    cub_dict = {i: i + extension for i in cub_list}
+    cub_dict = {split_all_ext(os.path.split(i)[1]): i for i in cub_list}
 
     # Create serial dict to match serial to ipf
-    serial_dict = {sn.generate_serial_number(os.path.join(cub_path, i + extension)): i for i in cub_list}
+    serial_dict = {sn.generate_serial_number(i): split_all_ext(os.path.split(i)[-1]) for i in cub_list}
 
     # Remove duplicate columns
     # There are better ways to do this but pandas was not having it
@@ -82,7 +78,7 @@ def main(args):
 
     df.rename(columns = column_map, inplace=True)
 
-    apply_isis_transformations(df, e_radius, p_radius, serial_dict, extension, cub_path)
+    apply_isis_transformations(df, e_radius, p_radius, serial_dict, cub_dict)
 
     # Save the ipf(s)
     save_ipf(df, os.path.split(out_gpf)[0])
