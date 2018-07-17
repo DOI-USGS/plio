@@ -64,11 +64,35 @@ def known(record):
     : str
       String representation of a known field
     """
-    if record['known'] == 0:
-        return 'Free'
 
-    elif record['known'] == 1 or record['known'] == 2 or record['known'] == 3:
-        return 'Constrained'
+    lookup = {0: 'Free',
+              1: 'Constrained',
+              2: 'Constrained',
+              3: 'Constrained'}
+    return lookup[record['known']]
+
+def reverse_known(record):
+    """
+    Converts the known field from an isis dataframe into the
+    socet known column
+
+    Parameters
+    ----------
+    record : object
+             Pandas series object
+
+    Returns
+    -------
+    : str
+      String representation of a known field
+    """
+    lookup = {0:0,
+              2:0,
+              1:3,
+              3:3,
+              4:3}
+    record_type = record['known']
+    return lookup[record_type]
 
 def to_360(num):
     """
@@ -393,27 +417,7 @@ def compute_cov_matrix(record, semimajor_axis):
     cov_matrix = compute_sigma_covariance_matrix(record['lat_Y_North'], record['long_X_East'], record['ht'], record['sig0'], record['sig1'], record['sig2'], semimajor_axis)
     return cov_matrix.ravel().tolist()
 
-def reverse_known(record):
-    """
-    Converts the known field from an isis dataframe into the
-    socet known column
 
-    Parameters
-    ----------
-    record : object
-             Pandas series object
-
-    Returns
-    -------
-    : str
-      String representation of a known field
-    """
-    record_type = record['known']
-    if record_type == 0 or record_type == 2:
-        return 0
-
-    elif record_type == 1 or record_type == 3 or record_type == 4:
-        return 3
 
 def fix_sample_line(record, serial_dict, cub_dict):
     """
