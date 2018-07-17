@@ -35,7 +35,8 @@ before_install:
   - python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
 
 install:
-  - conda config --add channels conda-forge usgs-astrogeology
+  - conda config --add channels conda-forge 
+  - conda config --add channels usgs-astrogeology
   - conda install -c conda-forge libgdal gdal numpy pyproj h5py pvl scipy protobuf affine jinja2 networkx pandas sqlalchemy pyyaml
   - conda install -c usgs-astrogeology usgscam
   # Development installation
