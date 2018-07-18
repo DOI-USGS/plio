@@ -36,7 +36,7 @@ class Crism(GeoDataset, HCube):
             return getattr(self, name)
 
         except KeyError as keyerr:
-            raise AttributeError("'M3' object has no attribute '{}'".format(name)) from None
+            raise AttributeError("'Crism' object has no attribute '{}'".format(name)) from None
 
     @property
     def wavelengths(self):
