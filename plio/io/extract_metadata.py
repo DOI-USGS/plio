@@ -1,5 +1,10 @@
-from osgeo import osr
-
+try:
+    from osgeo import osr
+    hasosr = True
+except:
+    hasosr = False
+    
+    
 import_options = ['ImportFromWkt', 'ImportFromProj4',
                   'ImportFromEPSG', 'ImportFromUSGS',
                   'ImportFromXML']
@@ -20,7 +25,10 @@ def extract_projstring(proj_string):
           OSR spatial reference object
 
     """
-    srs = osr.SpatialReference()
+    if hasosr:
+        srs = osr.SpatialReference()
+    else:
+        return
     for import_option in import_options:
         try:
             func = getattr(srs, import_option)
