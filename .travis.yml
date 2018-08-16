@@ -41,7 +41,7 @@ install:
   - conda config --add channels conda-forge
   - if $HAS_GDAL; then
       conda install libgdal gdal numpy pyproj h5py pvl scipy protobuf affine jinja2 networkx pandas sqlalchemy pyyaml ncurses pytest pytest-cov sh coveralls nbsphinx
-    else:
+    else
       conda install numpy pyproj h5py pvl scipy protobuf affine jinja2 networkx pandas sqlalchemy pyyaml ncurses pytest pytest-cov sh coveralls nbsphinx
     fi
 
