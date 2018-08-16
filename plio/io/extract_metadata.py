@@ -4,10 +4,10 @@ try:
 except:
     hasosr = False
     
-    
 import_options = ['ImportFromWkt', 'ImportFromProj4',
                   'ImportFromEPSG', 'ImportFromUSGS',
                   'ImportFromXML']
+
 
 def extract_projstring(proj_string):
     """
