@@ -40,9 +40,9 @@ install:
   - conda config --add channels usgs-astrogeology
   - conda config --add channels conda-forge
   - if $HAS_GDAL; then
-      conda install libgdal gdal numpy pyproj h5py pvl scipy protobuf affine jinja2 networkx pandas sqlalchemy pyyaml ncurses pytest pytest-cov sh coveralls nbsphinx
+      conda install libgdal gdal numpy pyproj h5py pvl scipy protobuf affine jinja2 networkx pandas sqlalchemy pyyaml ncurses pytest pytest-cov sh coveralls nbsphinx;
     else
-      conda install numpy pyproj h5py pvl scipy protobuf affine jinja2 networkx pandas sqlalchemy pyyaml ncurses pytest pytest-cov sh coveralls nbsphinx
+      conda install numpy pyproj h5py pvl scipy protobuf affine jinja2 networkx pandas sqlalchemy pyyaml ncurses pytest pytest-cov sh coveralls nbsphinx;
     fi
 
 script:
