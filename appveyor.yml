@@ -40,7 +40,7 @@ install:
   - cmd: conda create -q -n test_env python=%PYTHON_VERSION%
   - cmd: activate test_env
   - cmd: conda config --add channels conda-forge
-  - cmd: conda install -c conda-forge pvl protobuf gdal numpy pandas sqlalchemy pyyaml networkx affine h5py scipy
+  - cmd: conda install -c conda-forge pvl protobuf gdal numpy pandas sqlalchemy pyyaml networkx affine h5py scipy pyproj
   - cmd: conda install -c conda-forge pytest pytest-cov
   # https://pythonhosted.org/CodeChat/appveyor.yml.html
   - cmd: python -m pip install -U pip

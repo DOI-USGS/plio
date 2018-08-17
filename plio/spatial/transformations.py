@@ -64,11 +64,35 @@ def known(record):
     : str
       String representation of a known field
     """
-    if record['known'] == 0:
-        return 'Free'
 
-    elif record['known'] == 1 or record['known'] == 2 or record['known'] == 3:
-        return 'Constrained'
+    lookup = {0: 'Free',
+              1: 'Constrained',
+              2: 'Constrained',
+              3: 'Constrained'}
+    return lookup[record['known']]
+
+def reverse_known(record):
+    """
+    Converts the known field from an isis dataframe into the
+    socet known column
+
+    Parameters
+    ----------
+    record : object
+             Pandas series object
+
+    Returns
+    -------
+    : str
+      String representation of a known field
+    """
+    lookup = {0:0,
+              2:0,
+              1:3,
+              3:3,
+              4:3}
+    record_type = record['known']
+    return lookup[record_type]
 
 def to_360(num):
     """
@@ -171,9 +195,17 @@ def get_axis(file):
 
         return eRadius, pRadius
 
-def lat_ISIS_coord(record, semi_major, semi_minor):
+def reproject(record, semi_major, semi_minor, source_proj, dest_proj, **kwargs):
     """
-    Function to convert lat_Y_North to ISIS_lat
+    Thin wrapper around PyProj's Transform() function to transform 1 or more three-dimensional
+    point from one coordinate system to another. If converting between Cartesian
+    body-centered body-fixed (BCBF) coordinates and Longitude/Latitude/Altitude coordinates,
+    the values input for semi-major and semi-minor axes determine whether latitudes are
+    planetographic or planetocentric and determine the shape of the datum for altitudes.
+    If semi_major == semi_minor, then latitudes are interpreted/created as planetocentric
+    and altitudes are interpreted/created as referenced to a spherical datum.
+    If semi_major != semi_minor, then latitudes are interpreted/created as planetographic
+    and altitudes are interpreted/created as referenced to an ellipsoidal datum.
 
     Parameters
     ----------
@@ -186,122 +218,23 @@ def lat_ISIS_coord(record, semi_major, semi_minor):
     semi_minor : float
                  Radius from the pole to the center of mass
 
-    Returns
-    -------
-    coord_360 : float
-                Converted latitude into ocentric space, and mapped
-                into 0 to 360
-    """
-    ocentric_coord = og2oc(record['lat_Y_North'], semi_major, semi_minor)
-    coord_360 = to_360(ocentric_coord)
-    return coord_360
+    source_proj : str
+                         Pyproj string that defines a projection space ie. 'geocent'
 
-def lon_ISIS_coord(record, semi_major, semi_minor):
-    """
-    Function to convert long_X_East to ISIS_lon
-
-    Parameters
-    ----------
-    record : object
-             Pandas series object
-
-    semi_major : float
-                 Radius from the center of the body to the equater
-
-    semi_minor : float
-                 Radius from the pole to the center of mass
-
-    Returns
-    -------
-    coord_360 : float
-                Converted longitude into ocentric space, and mapped
-                into 0 to 360
-    """
-    ocentric_coord = og2oc(record['long_X_East'], semi_major, semi_minor)
-    coord_360 = to_360(ocentric_coord)
-    return coord_360
-
-def lat_socet_coord(record, semi_major, semi_minor):
-    """
-    Function to convert lat_Y_North to ISIS_lat
-
-    Parameters
-    ----------
-    record : object
-             Pandas series object
-
-    semi_major : float
-                 Radius from the center of the body to the equater
-
-    semi_minor : float
-                 Radius from the pole to the center of mass
-
-    Returns
-    -------
-    coord_360 : float
-                Converted latitude into ocentric space, and mapped
-                into 0 to 360
-    """
-    ographic_coord = oc2og(record['lat_Y_North'], semi_major, semi_minor)
-    coord_180 = ((ographic_coord + 180) % 360) - 180
-    return coord_180
-
-def lon_socet_coord(record, semi_major, semi_minor):
-    """
-    Function to convert long_X_East to ISIS_lon
-
-    Parameters
-    ----------
-    record : object
-             Pandas series object
-
-    semi_major : float
-                 Radius from the center of the body to the equater
-
-    semi_minor : float
-                 Radius from the pole to the center of mass
-
-    Returns
-    -------
-    coord_360 : float
-                Converted longitude into ocentric space, and mapped
-                into 0 to 360
-    """
-    ographic_coord = oc2og(record['long_X_East'], semi_major, semi_minor)
-    coord_180 = ((ographic_coord + 180) % 360) - 180
-    return coord_180
-
-def body_fix(record, semi_major, semi_minor, inverse = False, **kwargs):
-    """
-    Transforms latitude, longitude, and height of a socet point into
-    a body fixed point
-
-    Parameters
-    ----------
-    record : object
-             Pandas series object
-
-    semi_major : float
-                 Radius from the center of the body to the equater
-
-    semi_minor : float
-                 Radius from the pole to the center of mass
+    dest_proj : str
+                      Pyproj string that defines a project space ie. 'latlon'
 
     Returns
     -------
     : list
-      Body fixed lat, lon and height coordinates as lat, lon, ht
+      Transformed coordinates as y, x, z
 
     """
-    ecef = pyproj.Proj(proj='geocent', a=semi_major, b=semi_minor)
-    lla = pyproj.Proj(proj='latlon', a=semi_major, b=semi_minor)
+    source_pyproj = pyproj.Proj(proj = source_proj, a = semi_major, b = semi_minor)
+    dest_pyproj = pyproj.Proj(proj = dest_proj, a = semi_major, b = semi_minor)
 
-    if inverse:
-        lon, lat, height = pyproj.transform(ecef, lla, record[0], record[1], record[2], **kwargs)
-        return lon, lat, height
-    else:
-        y, x, z = pyproj.transform(lla, ecef, record[0], record[1], record[2], **kwargs)
-        return y, x, z
+    y, x, z = pyproj.transform(source_pyproj, dest_pyproj, record[0], record[1], record[2], **kwargs)
+    return y, x, z
 
 def stat_toggle(record):
     if record['stat'] == 0:
@@ -309,7 +242,7 @@ def stat_toggle(record):
     else:
         return False
 
-def apply_isis_transformations(df, eRadius, pRadius, serial_dict, extension, cub_path):
+def apply_isis_transformations(df, eRadius, pRadius, serial_dict, cub_dict):
     """
     Takes a atf dictionary and a socet dataframe and applies the necessary
     transformations to convert that dataframe into a isis compatible
@@ -338,11 +271,10 @@ def apply_isis_transformations(df, eRadius, pRadius, serial_dict, extension, cub
     """
     # Convert from geocentered coords (x, y, z), to lat lon coords (latitude, longitude, alltitude)
     ecef = np.array([[df['long_X_East']], [df['lat_Y_North']], [df['ht']]])
-    lla = body_fix(ecef, semi_major = eRadius, semi_minor = pRadius, inverse=True)
-    df['long_X_East'], df['lat_Y_North'], df['ht'] = lla[0][0], lla[1][0], lla[2][0]
+    lla = reproject(ecef, semi_major = eRadius, semi_minor = pRadius,
+                           source_proj = 'latlon', dest_proj = 'geocent')
 
-    # df['lat_Y_North'] = df.apply(lat_socet_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
-    # df['long_X_East'] = df.apply(lon_socet_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
+    df['long_X_East'], df['lat_Y_North'], df['ht'] = lla[0][0], lla[1][0], lla[2][0]
 
     # Update the stat fields and add the val field as it is just a clone of stat
     df['stat'] = df.apply(ignore_toggle, axis = 1)
@@ -353,8 +285,7 @@ def apply_isis_transformations(df, eRadius, pRadius, serial_dict, extension, cub
     df['known'] = df.apply(reverse_known, axis = 1)
     df['ipf_file'] = df['serialnumber'].apply(lambda serial_number: serial_dict[serial_number])
     df['l.'], df['s.'] = zip(*df.apply(fix_sample_line, serial_dict = serial_dict,
-                                       extension = extension,
-                                       cub_path = cub_path, axis = 1))
+                                       cub_dict = cub_dict, axis = 1))
 
     # Add dummy for generic value setting
     x_dummy = lambda x: np.full(len(df), x)
@@ -392,12 +323,10 @@ def apply_socet_transformations(atf_dict, df):
 
     eRadius, pRadius = get_axis(prj_file)
 
-    # df['lat_Y_North'] = df.apply(lat_ISIS_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
-    # df['long_X_East'] = df.apply(lon_ISIS_coord, semi_major = eRadius, semi_minor = pRadius, axis=1)
-
     lla = np.array([[df['long_X_East']], [df['lat_Y_North']], [df['ht']]])
 
-    ecef = body_fix(lla, semi_major = eRadius, semi_minor = pRadius, inverse=False)
+    ecef = reproject(lla, semi_major = eRadius, semi_minor = pRadius,
+                              source_proj = 'geocent', dest_proj = 'latlon')
 
     df['s.'], df['l.'], df['image_index'] = (zip(*df.apply(line_sample_size, path = atf_dict['PATH'], axis=1)))
     df['known'] = df.apply(known, axis=1)
@@ -406,28 +335,6 @@ def apply_socet_transformations(atf_dict, df):
     df['ht'] = ecef[2][0]
     df['aprioriCovar'] = df.apply(compute_cov_matrix, semimajor_axis = eRadius, axis=1)
     df['stat'] = df.apply(stat_toggle, axis=1)
-
-def serial_numbers(image_dict, path):
-    """
-    Creates a dict of serial numbers with the cub being the key
-
-    Parameters
-    ----------
-    images : list
-
-    path : str
-
-    extension : str
-
-    Returns
-    -------
-    serial_dict : dict
-    """
-    serial_dict = dict()
-
-    for key in image_dict:
-        serial_dict[key] = sn.generate_serial_number(os.path.join(path, image_dict[key]))
-    return serial_dict
 
 # TODO: Does isis cnet need a convariance matrix for sigmas? Even with a static matrix of 1,1,1,1
 def compute_sigma_covariance_matrix(lat, lon, rad, latsigma, lonsigma, radsigma, semimajor_axis):
@@ -510,29 +417,9 @@ def compute_cov_matrix(record, semimajor_axis):
     cov_matrix = compute_sigma_covariance_matrix(record['lat_Y_North'], record['long_X_East'], record['ht'], record['sig0'], record['sig1'], record['sig2'], semimajor_axis)
     return cov_matrix.ravel().tolist()
 
-def reverse_known(record):
-    """
-    Converts the known field from an isis dataframe into the
-    socet known column
 
-    Parameters
-    ----------
-    record : object
-             Pandas series object
 
-    Returns
-    -------
-    : str
-      String representation of a known field
-    """
-    record_type = record['known']
-    if record_type == 0 or record_type == 2:
-        return 0
-
-    elif record_type == 1 or record_type == 3 or record_type == 4:
-        return 3
-
-def fix_sample_line(record, serial_dict, extension, cub_path):
+def fix_sample_line(record, serial_dict, cub_dict):
     """
     Extracts the sample, line data from a cube and computes deviation from the
     center of the image
@@ -545,11 +432,8 @@ def fix_sample_line(record, serial_dict, extension, cub_path):
     serial_dict : dict
                   Maps serial numbers to images
 
-    extension : str
-                Extension for cube being looked at
-
-    cub_path : str
-               Path to a given cube being looked at
+    cub_dict : dict
+                     Maps basic cub names to their assocated absoluate path cubs
 
     Returns
     -------
@@ -561,12 +445,12 @@ def fix_sample_line(record, serial_dict, extension, cub_path):
 
     """
     # Cube location to load
-    cube = pvl.load(os.path.join(cub_path, serial_dict[record['serialnumber']] + extension))
+    cube = pvl.load(cub_dict[serial_dict[record['serialnumber']]])
     line_size = find_in_dict(cube, 'Lines')
     sample_size = find_in_dict(cube, 'Samples')
 
-    new_line = record['l.'] - (int(line_size/2.0)) - 1
-    new_sample = record['s.'] - (int(sample_size/2.0)) - 1
+    new_line = record['l.'] - (int(line_size / 2.0)) - 1
+    new_sample = record['s.'] - (int(sample_size / 2.0)) - 1
 
     return new_line, new_sample
 
