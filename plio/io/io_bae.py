@@ -103,7 +103,7 @@ def read_ipf_str(input_data):
     # Build dict of column names and their data types
     dtype_dict = dict(zip(columns, col_dtype))
 
-    # Hard conversion of data types to ensure 'pt_id' is treated as string, 'val', ,fid_val, 'no_obs' flags treated as int
+    # Hard conversion of data types to ensure 'pt_id' is treated as string, 'val', 'fid_val', 'no_obs' flags treated as int
     df = df.astype(dtype_dict)
 
     return df
