@@ -15,7 +15,7 @@ if gdal:
 def conditional_gdal(func):
     def has_gdal(*args, **kwargs):
         if gdal:
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
         else:
             warning.warn('Trying to call a GDAL method, but GDAL is not installed.')
         return None
