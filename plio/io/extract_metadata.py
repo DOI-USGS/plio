@@ -21,10 +21,7 @@ def extract_projstring(proj_string):
           OSR spatial reference object
 
     """
-    if hasosr:
-        srs = osr.SpatialReference()
-    else:
-        return
+    srs = osr.SpatialReference()
     for import_option in import_options:
         try:
             func = getattr(srs, import_option)
