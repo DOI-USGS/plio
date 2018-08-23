@@ -1,7 +1,7 @@
 import pytest
 
 from plio.io import extract_metadata as em
-form plio.io import gdal
+from plio.io import gdal
 
 @pytest.fixture
 def wkt_moon():

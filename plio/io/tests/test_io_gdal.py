@@ -9,7 +9,7 @@ from plio.examples import get_path
 sys.path.insert(0, os.path.abspath('..'))
 
 from plio.io import io_gdal
-from plio.io import gdal) 
+from plio.io import gdal
 
 
 @pytest.mark.skipif(gdal is None, reason="GDAL not installed")
