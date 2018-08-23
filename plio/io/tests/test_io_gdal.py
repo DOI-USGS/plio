@@ -1,5 +1,6 @@
 import os
 import sys
+import unittest
 
 import numpy as np
 import pytest
@@ -13,7 +14,7 @@ from plio.io import gdal
 
 
 @pytest.mark.skipif(gdal is None, reason="GDAL not installed")
-class TestMercator():
+class TestMercator(unittest.TestCase):
     def setUp(self):
         self.dataset = io_gdal.GeoDataset(get_path('Mars_MGS_MOLA_ClrShade_MAP2_0.0N0.0_MERC.tif'))
 
