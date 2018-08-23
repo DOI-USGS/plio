@@ -1,17 +1,11 @@
 import datetime
 import json
 
-try:
-    import usgscam as cam
-    from cycsm.isd import Isd
-    camera_support = True
-except:
-    camera_support = False
 import requests
 
 from plio.utils.utils import find_in_dict
 from plio.io.io_json import NumpyEncoder
-
+from plio.camera import conditional_cameras, cam, cycsm_isd
 
 def data_from_cube(header):
     data = {}
@@ -28,16 +22,15 @@ def data_from_cube(header):
     data['SPACECRAFT_CLOCK_START_COUNT'] = find_in_dict(header, 'SpacecraftClockCount')
     return data
 
+@conditional_cameras
 def create_camera(obj, url='http://smalls:8002/api/1.0/missions/mars_reconnaissance_orbiter/csm_isd'):
-    if not camera_support:
-        print("Usgscam library not installed. Camera capabilities are disabled")
     
     data = json.dumps(data_from_cube(obj.metadata), cls=NumpyEncoder)
     r = requests.post(url, data=data)
 
     # Get the ISD back and instantiate a local ISD for the image
     isd = r.json()['data']['isd']
-    i = Isd.loads(isd)
+    i = cycsm_isd.Isd.loads(isd)
 
     # Create the plugin and camera as usual
     plugin = cam.genericls.Plugin()
