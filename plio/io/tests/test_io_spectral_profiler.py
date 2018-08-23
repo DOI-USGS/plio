@@ -19,7 +19,8 @@ class Test_Spectral_Profiler_IO(unittest.TestCase):
         ds = io_spectral_profiler.Spectral_Profiler(self.examplefile)
         self.assertEqual(ds.nspectra, 38)
         self.assertEqual(ds.spectra[0].columns.tolist(), ['RAW', 'REF1', 'REF2', 'QA', 'RAD'])
-
+    
+    @pytest.mark.skipif(gdal is None, reason="GDAL not installed")
     def test_read_browse(self):
         ds = io_spectral_profiler.Spectral_Profiler(self.examplefile)
         ds.open_browse()
