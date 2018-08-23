@@ -13,7 +13,7 @@ def srs_mars():
     wktsrs = 'PROJCS["Mercator",GEOGCS["GCS_Moon_2000",DATUM["D_Moon_2000",SPHEROID["Moon_2000_IAU_IAG",1737400.0,0.0]],PRIMEM["Reference_Meridian",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Mercator"],PARAMETER["False_Easting",0.0],PARAMETER["False_Northing",0.0],PARAMETER["Central_Meridian",180.0],PARAMETER["Standard_Parallel_1",0.0],UNIT["Meter",1.0]]'
     return em.extract_projstring(wktsrs)
 
-@pytest.skipip(gdal is None, reason="GDAL not installed")
+@pytest.skipif(gdal is None, reason="GDAL not installed")
 def test_false_easting(srs_mars):
     e = em.get_false_easting(srs_mars)
     assert e == 0.0
