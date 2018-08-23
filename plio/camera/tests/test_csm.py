@@ -5,9 +5,7 @@ from unittest import mock
 import pytest
 import pvl
 
-import usgscam
-
-from plio.camera import csm
+from plio.camera import csm, cam, conditional_cameras
 from plio.examples import get_path
 
 def mock_requests_post(*args, **kwargs):
@@ -35,11 +33,13 @@ def header():
 def req_obj():
     return 
 
+@pytest.mark.skipif(cam is None, reason="Cameras not installed")
 def test_data_from_cube(header):
     data = csm.data_from_cube(header)
     assert data['START_TIME'] == datetime.datetime(2008, 9, 17, 5, 8, 10, 820000)
 
+@pytest.mark.skipif(cam is None, reason="Cameras not installed")
 @mock.patch('requests.post', side_effect=mock_requests_post)
 def test_create_camera(header):
-    cam = csm.create_camera(header)
-    assert isinstance(cam, usgscam.genericls.SensorModel)
+    created_camera = csm.create_camera(header)
+    assert isinstance(create_camera, cam.genericls.SensorModel)
