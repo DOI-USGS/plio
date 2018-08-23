@@ -4,7 +4,6 @@ import pvl
 import numpy as np
 
 from plio.utils.utils import find_in_dict
-from plio.io.io_gdal import GeoDataset
 
 class Spectral_Profiler(object):
 
@@ -169,5 +168,7 @@ class Spectral_Profiler(object):
         -------
 
         """
+
+        from plio.io.io_gdal import GeoDataset
         path, ext = os.path.splitext(self.input_data)
         self.browse = GeoDataset(path + extension)

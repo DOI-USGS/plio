@@ -1,14 +1,10 @@
-try:
-    from osgeo import osr
-    hasosr = True
-except:
-    hasosr = False
-    
+from plio.io import osr, conditional_gdal
     
 import_options = ['ImportFromWkt', 'ImportFromProj4',
                   'ImportFromEPSG', 'ImportFromUSGS',
                   'ImportFromXML']
 
+@conditional_gdal
 def extract_projstring(proj_string):
     """
     Import an OSR supported projection string into
@@ -25,10 +21,7 @@ def extract_projstring(proj_string):
           OSR spatial reference object
 
     """
-    if hasosr:
-        srs = osr.SpatialReference()
-    else:
-        return
+    srs = osr.SpatialReference()
     for import_option in import_options:
         try:
             func = getattr(srs, import_option)
@@ -42,6 +35,7 @@ def extract_projstring(proj_string):
     srs.MorphFromESRI()
     return srs
 
+@conditional_gdal
 def get_standard_parallels(srs):
     """
     Get all standard parallels for a given map projection
@@ -62,6 +56,7 @@ def get_standard_parallels(srs):
         parallels[i] = srs.GetProjParm('Standard_Parallel_{}'.format(i+1), 0.0)
     return parallels
 
+@conditional_gdal
 def get_central_meridian(srs):
     """
     Get the central meridian of the projection
@@ -79,6 +74,7 @@ def get_central_meridian(srs):
 
     return srs.GetProjParm('central_meridian', 0.0)
 
+@conditional_gdal
 def get_spheroid(srs):
     """
     Get the semi-major, semi-minor, and inverse flattening
@@ -100,6 +96,7 @@ def get_spheroid(srs):
     invflattening = srs.GetInvFlattening()
     return semimajor, semiminor, invflattening
 
+@conditional_gdal
 def get_projection_name(srs):
     """
     Extract the projection name from a
@@ -118,6 +115,7 @@ def get_projection_name(srs):
     proj_name = srs.GetAttrValue("PROJECTION", 0)
     return proj_name
 
+@conditional_gdal
 def get_false_easting(srs):
     """
     Extract the false easting parameter from a
@@ -136,6 +134,7 @@ def get_false_easting(srs):
 
     return srs.GetProjParm('False_Easting', 0)
 
+@conditional_gdal
 def get_false_northing(srs):
     """
     Extract the false northing parameter from a
@@ -154,6 +153,7 @@ def get_false_northing(srs):
 
     return srs.GetProjParm('False_Northing', 0)
 
+@conditional_gdal
 def get_scale_factor(srs):
     """
     Extract the scale factor, k, from a spatial reference system (if present)
@@ -171,6 +171,7 @@ def get_scale_factor(srs):
 
     return srs.GetProjParm('scale_factor', 1.0)
 
+@conditional_gdal
 def get_latitude_of_origin(srs):
     """
     Extract the latitude of origin from

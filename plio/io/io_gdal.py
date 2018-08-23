@@ -6,20 +6,12 @@ import warnings
 import affine
 import numpy as np
 import pvl
-try:
-    # Try the full GDAL stack
-    import gdal
-    from osgeo import ogr
-    import osr
-    gdal.UseExceptions()
-    has_gdal = True
-except:
-    has_gdal = False
 
-from plio.io import extract_metadata
+
+from plio.io import extract_metadata, conditional_gdal
 from plio.geofuncs import geofuncs
 from plio.utils.utils import find_in_dict
-
+from plio.io import gdal, ogr, osr
 
 NP2GDAL_CONVERSION = {
   "uint8": 1,
@@ -158,7 +150,7 @@ class GeoDataset(object):
 
         """
         self.file_name = file_name
-        if not has_gdal:
+        if not gdal:
             raise ImportError('No module name gdal.')
         self.dataset = gdal.Open(file_name)
         if self.dataset is None:
@@ -581,7 +573,7 @@ def array_to_raster(array, file_name, projection=None,
               A GDAL supported bittype, e.g. GDT_Int32
               Default: GDT_Float64
     """
-    if not has_gdal:
+    if not gdal:
         raise ImportError('No module named gdal.')
     driver = gdal.GetDriverByName(outformat)
     try:
@@ -617,7 +609,7 @@ def array_to_raster(array, file_name, projection=None,
             bnd.WriteArray(array[:,:,i - 1])
             dataset.FlushCache()
 
-
+@conditional_gdal
 def match_rasters(match_to, match_from, destination,
                   resampling_method='GRA_Bilinear', ndv=0):
     """
@@ -657,9 +649,6 @@ def match_rasters(match_to, match_from, destination,
 
     match_from__srs = match_from.dataset.GetProjection()
     match_from__gt = match_from.geotransform
-
-    if not has_gdal:
-        raise ImportError('No module named gdal.')
 
     dst = gdal.GetDriverByName('GTiff').Create(destination, width, height, 1,
                                                gdalconst.GDT_Float64)

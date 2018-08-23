@@ -3,14 +3,17 @@ import sys
 import unittest
 
 import numpy as np
+import pytest
 
 from plio.examples import get_path
 
 sys.path.insert(0, os.path.abspath('..'))
 
 from plio.io import io_gdal
+from plio.io import gdal
 
 
+@pytest.mark.skipif(gdal is None, reason="GDAL not installed")
 class TestMercator(unittest.TestCase):
     def setUp(self):
         self.dataset = io_gdal.GeoDataset(get_path('Mars_MGS_MOLA_ClrShade_MAP2_0.0N0.0_MERC.tif'))
@@ -101,7 +104,7 @@ class TestMercator(unittest.TestCase):
         self.assertEqual(arr.dtype, np.int8)
         self.assertAlmostEqual(np.mean(arr), 10.10353227, 6)
 
-
+@pytest.mark.skipif(gdal is None, reason="GDAL not installed")
 class TestLambert(unittest.TestCase):
     def setUp(self):
         self.dataset = io_gdal.GeoDataset(get_path('Lunar_LRO_LOLA_Shade_MAP2_90.0N20.0_LAMB.tif'))
@@ -143,6 +146,7 @@ class TestLambert(unittest.TestCase):
         self.assertEqual(sp, [73.0, 42.0])
 
 
+@pytest.mark.skipif(gdal is None, reason="GDAL not installed")
 class TestPolar(unittest.TestCase):
     def setUp(self):
         self.dataset = io_gdal.GeoDataset(get_path('Mars_MGS_MOLA_ClrShade_MAP2_90.0N0.0_POLA.tif'))
@@ -171,6 +175,7 @@ class TestPolar(unittest.TestCase):
         self.assertAlmostEqual(pixel[0], 0.0, 6)
         self.assertAlmostEqual(pixel[1], 0.0, 6)
 
+@pytest.mark.skipif(gdal is None, reason="GDAL not installed")
 class TestWriter(unittest.TestCase):
     def setUp(self):
         self.arr = np.random.random((100,100))
@@ -240,11 +245,3 @@ class TestWriter(unittest.TestCase):
         except:
             pass
 
-class TestWithoutGdal(unittest.TestCase):
-    def test_without_gdal(self):
-        io_gdal.has_gdal = False
-        with self.assertRaises(ImportError):
-            io_gdal.GeoDataset('foo')
-
-    def tearDown(self):
-        io_gdal.has_gdal = True
