@@ -3,6 +3,7 @@ import sys
 import unittest
 
 import pandas as pd
+import pytest
 
 sys.path.insert(0, os.path.abspath('..'))
 
