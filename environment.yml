@@ -1,13 +1,22 @@
 name: plio
 channels:
   - conda-forge
+  - usgs-astrogeology
 dependencies:
-  - pip:
-    - pvl
-    - protobuf==3.0.0b2
-  - gdal>2.x
-  - h5py
-  - pandas
-  - sqlalchemy
-  - pyyaml
+  - libgdal
+  - gdal
+  - numpy 
+  - pyproj 
+  - h5py 
+  - pvl 
+  - scipy 
+  - protobuf 
+  - affine 
+  - jinja2 
   - networkx 
+  - pandas 
+  - sqlalchemy 
+  - pyyaml 
+  - ncurses 
+  - pytest 
+  - pytest-cov
