@@ -22,7 +22,7 @@ def socetset_keywords_to_json(keywords, ell=None):
        The serialized JSON string.
     """
     matcher = re.compile(r'\b(?!\d)\w+\b')
-    numeric_matcher = re.compile(r'\W-?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?')
+    numeric_matcher = re.compile(r'\W?-?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?')
     stream = {}
 
     def parse(fi):
