@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
 
-from plio.io.io_bae import socetset_keywords_to_json, read_gpf, save_gpf, read_ipf, save_ipf
+from plio.io.io_bae import socetset_keywords_to_dict, read_gpf, save_gpf, read_ipf, save_ipf
 from plio.examples import get_path
 
 import pytest
@@ -89,13 +89,47 @@ def test_write_gpf(gpf, file):
 
     # np.testing.assert_array_almost_equal(truth_arr, test_arr)
 
-def test_create_from_socet_lis():
-    socetlis = get_path('socet_isd.lis')
-    socetell = get_path('ellipsoid.ell')
-    js = json.loads(socetset_keywords_to_json(socetlis))
-    assert isinstance(js, dict)  # This is essentially a JSON linter
-    # Manually validated
-    assert 'RECTIFICATION_TERMS' in js.keys()
-    assert 'SEMI_MAJOR_AXIS' in js.keys()  # From ellipsoid file
-    assert 'NUMBER_OF_EPHEM' in js.keys()
-    assert len(js['EPHEM_PTS']) / 3 == js['NUMBER_OF_EPHEM']
+class TestISDFromSocetLis():
+
+    def test_parse_with_empty_newlines(self):
+        # Ensure all keys read when whitespace present
+        empty_newlines = r"""T0_QUAT 1.0000000000000000000000000e-01
+
+T1_QUAT 1.0000000000000000000000000e-01"""
+        data = socetset_keywords_to_dict(empty_newlines)
+        assert len(data.keys()) == 2
+
+    def test_duplicate_key_check(self):
+        duplicate_keys = r"""T 1
+T 1"""
+        with pytest.raises(ValueError):
+            data = socetset_keywords_to_dict(duplicate_keys)
+
+    def test_multiple_per_line(self):
+        multiple_per_line = r"""T 1 1 1"""
+        data = socetset_keywords_to_dict(multiple_per_line)
+        assert len(data['T']) == 3
+
+    def test_key_on_different_line(self):
+        key_on_different_line = r"""A
+0.0 1.00000000000000e+00 2.00000000000000e+00
+3.0000000000000e+00 4.00000000000000e+00 5.00000000000000e+00
+B 1.0e-01 2.000000e+00 3.00000000000000e+00"""
+        data = socetset_keywords_to_dict(key_on_different_line)
+        assert len(data['A']) == 6
+        assert data['A'] == [0, 1, 2, 3, 4, 5]
+
+        assert len(data['B']) == 3
+        assert data['B'] == [0.1, 2, 3]
+
+    def test_key_on_different_line_whitespace(self):
+        key_on_different_line_whitespace = r"""A
+    0.0 1.00000000000000e+00 2.00000000000000e+00
+    3.0000000000000e+00 4.00000000000000e+00 5.00000000000000e+00
+B 1.0e-01 2.000000e+00 3.00000000000000e+00"""
+        data = socetset_keywords_to_dict(key_on_different_line_whitespace)
+        assert len(data['A']) == 6
+        assert data['A'] == [0, 1, 2, 3, 4, 5]
+
+        assert len(data['B']) == 3
+        assert data['B'] == [0.1, 2, 3]

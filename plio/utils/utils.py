@@ -9,6 +9,48 @@ import pandas as pd
 
 import numpy as np
 
+def is_number(s):
+    """
+    Check if an argument is convertable to a number
+
+    Parameters
+    ----------
+    s : object
+        The argument to check for conversion
+
+    Returns
+    -------
+     : bool
+       True if conversion is possible, otherwise False.
+    """
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+    
+def convert_string_to_float(s):
+    """
+    Attempt to convert a string to a float.
+
+    Parameters
+    ---------
+    s : str
+        The string to convert
+
+    Returns
+    -------
+    : float / str
+      If successful, the converted value, else the argument is passed back
+      out.
+    """
+    
+    try:
+        return float(s)
+    except TypeError:
+        return s
+
+
 def metadatatoband(metadata):
     wv2band = []
     for k, v in metadata.items():
