@@ -47,7 +47,7 @@ requirements:
     - scipy
     - certifi
     - pyproj
-    - cycsm
+    - csmapi
     - usgscam
     - jinja2
 
