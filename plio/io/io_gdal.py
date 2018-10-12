@@ -269,6 +269,7 @@ class GeoDataset(object):
     @property
     def footprint(self):
         if not hasattr(self, '_footprint'):
+            # Try to get the footprint from the image
             try:
                 polygon_pvl = find_in_dict(self.metadata, 'Polygon')
                 start_polygon_byte = find_in_dict(polygon_pvl, 'StartByte')
@@ -280,27 +281,31 @@ class GeoDataset(object):
                     # Sloppy unicode to string because GDAL pukes on unicode
                     stream = str(f.read(num_polygon_bytes))
                     self._footprint = ogr.CreateGeometryFromWkt(stream)
+
             except:
                 self._footprint = None
 
-            try:
-                # Get the lat lon corners
-                lat = [i[0] for i in self.latlon_corners]
-                lon = [i[1] for i in self.latlon_corners]
+                # If the image does not have a footprint, try getting the image from projected
+                # coordinates
+                try:
+                    # Get the lat lon corners
+                    lat = [i[0] for i in self.latlon_corners]
+                    lon = [i[1] for i in self.latlon_corners]
 
-                # Compute a ogr geometry for the tiff which
-                # provides leverage for overlaps
-                ring = ogr.Geometry(ogr.wkbLinearRing)
-                for point in [*zip(lon, lat)]:
-                    ring.AddPoint(*point)
-                ring.AddPoint(lon[0], lat[0])
+                    # Compute a ogr geometry for the tiff which
+                    # provides leverage for overlaps
+                    ring = ogr.Geometry(ogr.wkbLinearRing)
+                    for point in [*zip(lon, lat)]:
+                        ring.AddPoint(*point)
+                    ring.AddPoint(lon[0], lat[0])
 
-                poly = ogr.Geometry(ogr.wkbPolygon)
-                poly.AddGeometry(ring)
-                poly.FlattenTo2D()
-                self._footprint = poly
-            except:
-                self._footprint = None
+                    poly = ogr.Geometry(ogr.wkbPolygon)
+                    poly.AddGeometry(ring)
+                    poly.FlattenTo2D()
+                    self._footprint = poly
+
+                except:
+                    self._footprint = None
 
         return self._footprint
 

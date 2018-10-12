@@ -8,7 +8,7 @@ class HCube(object):
     """
     A Mixin class for use with the io_gdal.GeoDataset class
     to optionally add support for spectral labels, label
-    based indexing, and lazy loading for reads. 
+    based indexing, and lazy loading for reads.
     """
 
     @property
@@ -23,11 +23,11 @@ class HCube(object):
             except:
                 self._wavelengths = []
         return self._wavelengths
-    
+
     @property
     def tolerance(self):
         return getattr(self, '_tolerance', 2)
-    
+
     @tolerance.setter
     def tolerance(self, val):
         if isinstance(val, int):
@@ -43,15 +43,15 @@ class HCube(object):
     def __getitem__(self, key):
         i = _iLocIndexer(self)
         return i[key]
-    
+
     @property
     def loc(self):
         return _LocIndexer(self)
-    
+
     @property
     def iloc(self):
         return _iLocIndexer(self)
-    
+
     def _read(self, key):
         ifnone = lambda a, b: b if a is None else a
 
@@ -69,10 +69,15 @@ class HCube(object):
             ystep = ystop - ystart
         else:
             raise TypeError("Loc style access elements must be slices, e.g., [:] or [10:100]")
-            
+
         pixels = (xstart, ystart, xstep, ystep)
         if isinstance(key[0], (int, np.integer)):
             return self.read_array(band=int(key[0]+1), pixels=pixels)
+
+        elif isinstance(key[0], slice):
+            # Given some slice iterate over the bands and get the bands and pixel space requested
+            return [self.read_array(i, pixels = pixels) for i in list(range(1, self.nbands + 1))[key[0]]]
+
         else:
             arrs = []
             for b in key[0]:
