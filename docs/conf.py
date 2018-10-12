@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!$CONDA_PREFIX/bin/python
 # -*- coding: utf-8 -*-
 #
 # autocnet documentation build configuration file, created by
@@ -16,7 +16,6 @@
 import sys
 import os
 from unittest.mock import MagicMock
-
 
 autodoc_mock_imports = ['proj4', 'gdal', 'osr','ogr', 'osgeo', 'osgeo.gdal',
                         'osgeo.gdalconst']
