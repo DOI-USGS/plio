@@ -2,13 +2,42 @@ import os
 import numpy as np
 from .io_gdal import GeoDataset
 from .hcube import HCube
+
+try:
+    from libpysat.derived import crism
+    from libpysat.derived.utils import get_derived_funcs
+    libpysat_enabled = True
+except:
+    print('No libpysat module. Unable to attach derived product functions')
+    libpysat_enabled = False
+
 import gdal
 
 
 class Crism(GeoDataset, HCube):
     """
-    An M3 specific reader with the spectral mixin.
+    An Crism specific reader with the spectral mixin.
     """
+    def __init__(self, file_name):
+
+        GeoDataset.__init__(self, file_name)
+        HCube.__init__(self)
+
+        self.derived_funcs = {}
+
+        if libpysat_enabled:
+            self.derived_funcs = get_derived_funcs(crism)
+
+    def __getattr__(self, name):
+        try:
+            func = self.derived_funcs[name]
+
+            setattr(self, name, func.__get__(self))
+            return getattr(self, name)
+
+        except KeyError as keyerr:
+            raise AttributeError("'Crism' object has no attribute '{}'".format(name)) from None
+
     @property
     def wavelengths(self):
         if not hasattr(self, '_wavelengths'):
