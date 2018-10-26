@@ -76,7 +76,10 @@ class HCube(object):
 
         elif isinstance(key[0], slice):
             # Given some slice iterate over the bands and get the bands and pixel space requested
-            return [self.read_array(i, pixels = pixels) for i in list(range(1, self.nbands + 1))[key[0]]]
+            arrs = []
+            for band in list(list(range(1, self.nbands + 1))[key[0]]):
+                arrs.append(self.read_array(band, pixels = pixels))
+            return np.stack(arrs)
 
         else:
             arrs = []
