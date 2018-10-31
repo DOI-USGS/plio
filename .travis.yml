@@ -10,8 +10,10 @@ os:
   - osx
 
 env:
-  - PYTHON_VERSION=3.5
-  - PYTHON_VERSION=3.6
+  - PYTHON_VERSION=3.5 HAS_GDAL=true
+  - PYTHON_VERSION=3.6 HAS_GDAL=true
+  - PYTHON_VERSION=3.5 HAS_GDAL=false
+  - PYTHON_VERSION=3.6 HAS_GDAL=false
 
 before_install:
   # We do this conditionally because it saves us some downloading if the
@@ -36,8 +38,12 @@ before_install:
 
 install:
   - conda config --add channels usgs-astrogeology
-  - conda config --add channels conda-forge 
-  - conda install libgdal gdal numpy pyproj h5py pvl scipy protobuf affine jinja2 networkx pandas sqlalchemy pyyaml ncurses usgscam pytest pytest-cov sh coveralls nbsphinx
+  - conda config --add channels conda-forge
+  - if $HAS_GDAL; then
+      conda env update -n test -f environment.yml;
+    else
+      conda env update -n test -f environment_noGDAL.yml;
+    fi
 
 script:
   - pytest --cov=plio

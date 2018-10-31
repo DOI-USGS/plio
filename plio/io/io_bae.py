@@ -7,53 +7,66 @@ from functools import singledispatch
 import numpy as np
 import pandas as pd
 
-def socetset_keywords_to_json(keywords, ell=None):
+from plio.utils.utils import is_number, convert_string_to_float
+
+def socetset_keywords_to_dict(keywords, ell=None):
     """
     Convert a SocetCet keywords.list file to JSON
 
     Parameters
     ----------
     keywords : str
-               Path to the socetset keywords.list file
+               Path to the socetset keywords.list file or a raw string that
+               will be split on '\n' and parsed.
+    
+    ell : str
+          Optional path to the ellipsoid keywords.list file or a raw string 
+          that will be split on '\n' and parsed
 
     Returns
     -------
-     : str
-       The serialized JSON string.
+     data : dict 
+            A dictionary containing the socet keywords parsed.
+
     """
-    matcher = re.compile(r'\b(?!\d)\w+\b')
-    numeric_matcher = re.compile(r'\W-?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?')
-    stream = {}
+    data = {}
 
-    def parse(fi):
-        with open(fi, 'r') as f:
-            for l in f:
-                l = l.rstrip()
-                if not l:
+    def parse(lines):
+        for l in lines:
+            l = l.strip()
+            if not l:
+                continue
+            elems = l.split()
+            if is_number(elems[0]) is False:
+                key = elems[0]
+                if key in data.keys():
+                    raise ValueError('Duplicate dictionary key: {}'.format(key))
+                data[key] = []
+                if len(elems) == 1:
                     continue
-                matches = matcher.findall(l)
-                if matches:
-                    key = matches[0]
-                    stream[key] = []
-                    # Case where the kw are strings after the key
-                    if len(matches) > 1:
-                        stream[key] = matches[1:]
-                    # Case where the kw are numeric types after the key
-                    else:
-                        nums = numeric_matcher.findall(l)
-                        if len(nums) == 1:
-                            stream[key] = float(nums[0])
-                        else:
-                            stream[key] += map(float, nums)
+                if len(elems) == 2:
+                    data[key] = convert_string_to_float(elems[1])
                 else:
-                    # Case where the values are on a newline after the key
-                    nums = numeric_matcher.findall(l)
-                    stream[key] += map(float, nums)
+                    data[key] += [convert_string_to_float(e) for e in elems[1:]]
+            else:
+                data[key] += [convert_string_to_float(e) for e in elems]
 
+    if os.path.exists(keywords):
+        with open(keywords, 'r') as f:
+            keywords = f.readlines()
+    else:
+        keywords = keywords.split('\n')
     parse(keywords)
+   
     if ell:
+        if os.path.exists(ell):
+            with open(ell, 'r') as f:
+                ell = f.readlines()
+        else:
+            ell = ell.split('\n')
         parse(ell)
-    return json.dumps(stream)
+
+    return data
 
 @singledispatch
 def read_ipf(arg): # pragma: no cover

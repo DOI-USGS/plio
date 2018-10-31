@@ -47,9 +47,10 @@ requirements:
     - scipy
     - certifi
     - pyproj
-    - cycsm
+    - csmapi
     - usgscam
     - jinja2
+
 
 test:
   imports:
