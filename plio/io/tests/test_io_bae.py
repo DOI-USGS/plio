@@ -14,7 +14,7 @@ import pytest
 def insight_gpf():
     return get_path('InSightE08_XW.gpf')
 
-@pytests.fixture
+@pytest.fixture
 def example_str_id_gpf():
     return get_path('InSightE08_string_id.gpf')
 
