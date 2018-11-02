@@ -28,7 +28,7 @@ def insight_ipf():
 
 @pytest.fixture
 def example_str_id_ipf():
-    return get_path('example_str_id_ipf.ipf')
+    return get_path('example_string_id_ipf.ipf')
 
 @pytest.fixture()
 def insight_expected_ipf():
