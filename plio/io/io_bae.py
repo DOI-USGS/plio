@@ -147,7 +147,7 @@ def read_ipf_list(input_data_list):
 
 def save_ipf(df, output_path):
     """
-    Write a socet gpf file from a gpf-defined pandas dataframe
+    Write a socet ipf file from an ipf-defined pandas dataframe
 
     Parameters
     ----------
