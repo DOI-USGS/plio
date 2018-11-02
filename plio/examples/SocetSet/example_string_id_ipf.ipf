@@ -18,3 +18,4 @@ pt_id,val,fid_val,no_obs,l.,s.,sig_l,sig_s,res_l,res_s,fid_x,fid_y
 0.000000  0.000000
 -0.025129  -0.002447
 0.000000  0.000000
+

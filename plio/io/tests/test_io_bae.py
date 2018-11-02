@@ -71,10 +71,11 @@ def test_write_ipf(ipf, file):
 
     assert (truth_arr == test_arr).all()
 
-@pytest.mark.parametrize('ipf, file', [(example_str_id_ipf(), 'out.ipf')])
+@pytest.mark.parametrize('ipf, file', [(example_str_id_ipf(), 'plio/io/tests/temp')])
 def test_write_str_id_ipf(ipf, file):
     df = read_ipf(ipf)
     save_ipf(df, file)
+    file = os.path.join(file, 'example_string_id_ipf.ipf')
 
     with open(ipf) as f:
         fl = f.readlines()
@@ -143,9 +144,7 @@ def test_write_str_id_gpf(gpf, file):
 def test_gpf_dtypes(gpf):
     """
     This test makes sure that a GPF whose point IDs only contain numbers
-    are always treated as strings.
-    We test by manually comparing files and not using filecmp so that we
-    are not testing float point precision differences, e.g. 0.0 == 0.00000000.
+    are always treated as strings after they're read in.
     """
     # Read the GPF file under test into a pandas dataframe
     df = read_gpf(gpf)
@@ -163,15 +162,13 @@ def test_gpf_dtypes(gpf):
 def test_ipf_dtypes(ipf):
     """
     This test makes sure that a IPF whose point IDs only contain numbers
-    are always treated as strings.
-    We test by manually comparing files and not using filecmp so that we
-    are not testing float point precision differences, e.g. 0.0 == 0.00000000.
+    are always treated as strings after they're read in.
     """
     # Read the IPF file under test into a pandas dataframe
     df = read_ipf(ipf)
     
     # Truth list of column data types
-    truth_dtypes = ['O','int64','int64','int64','float64','float64','float64','float64','float64','float64','float64','float64']
+    truth_dtypes = ['O','int64','int64','int64','float64','float64','float64','float64','float64','float64','float64','float64', 'O']
     
     # Test list of column data types
     test_dtypes = list(df.dtypes)
