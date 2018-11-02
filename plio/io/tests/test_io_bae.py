@@ -71,12 +71,10 @@ def test_write_ipf(ipf, file):
 
     assert (truth_arr == test_arr).all()
 
-@pytest.mark.parametrize('ipf, file', [(example_str_id_ipf(), 'plio/io/tests/temp')])
-def test_write_ipf(ipf, file):
+@pytest.mark.parametrize('ipf, file', [(example_str_id_ipf(), 'out.ipf')])
+def test_write_str_id_ipf(ipf, file):
     df = read_ipf(ipf)
     save_ipf(df, file)
-
-    file = os.path.join(file, 'out.ipf')
 
     with open(ipf) as f:
         fl = f.readlines()
@@ -159,7 +157,7 @@ def test_gpf_dtypes(gpf):
     test_dtypes = list(df.dtypes)
     
     # Check that the type of each column matches the truth list
-    assert col_dtypes == test_dtypes
+    assert truth_dtypes == test_dtypes
 
 @pytest.mark.parametrize('ipf', [(example_str_id_ipf())])
 def test_ipf_dtypes(ipf):
@@ -179,7 +177,7 @@ def test_ipf_dtypes(ipf):
     test_dtypes = list(df.dtypes)
     
     # Check that the type of each column matches the truth list
-    assert col_dtypes == test_dtypes
+    assert truth_dtypes == test_dtypes
 
 class TestISDFromSocetLis():
 
