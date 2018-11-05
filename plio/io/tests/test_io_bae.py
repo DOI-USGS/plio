@@ -150,7 +150,7 @@ def test_gpf_dtypes(gpf):
     df = read_gpf(gpf)
     
     # Truth list of column data types
-    truth_dtypes = ['O','int64','int64','float64','float64','float64','float64','float64','float64','float64','float64','float64']
+    truth_dtypes = ['O','int32','int32','float32','float32','float32','float32','float32','float32','float32','float32','float32']
     
     # Test list of column data types
     test_dtypes = list(df.dtypes)
@@ -168,7 +168,7 @@ def test_ipf_dtypes(ipf):
     df = read_ipf(ipf)
     
     # Truth list of column data types
-    truth_dtypes = ['O','int64','int64','int64','float64','float64','float64','float64','float64','float64','float64','float64', 'O']
+    truth_dtypes = ['O','int32','int32','int32','float32','float32','float32','float32','float32','float32','float32','float32', 'O']
     
     # Test list of column data types
     test_dtypes = list(df.dtypes)
