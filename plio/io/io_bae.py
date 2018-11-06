@@ -110,7 +110,7 @@ def read_ipf_str(input_data):
 
     assert int(cnt) == len(df), 'Dataframe length {} does not match point length {}.'.format(int(cnt), len(df))
 
-    # List of data types for columns in Socet set GPF file
+    # List of data types for columns in Socet set IPF file
     col_dtype = ['str','int32','int32','int32','float64','float64','float64','float64','float64','float64','float64','float64']
 
     # Build dict of column names and their data types

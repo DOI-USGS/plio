@@ -20,7 +20,19 @@ def example_str_id_gpf():
 
 @pytest.fixture()
 def insight_expected_gpf():
-    return pd.read_csv(get_path('InSightE08_XW.csv'))
+    dtype_dict = {'point_id': 'str',
+               'stat': 'int32',
+               'known': 'int32',
+               'lat_Y_North': 'float64',
+               'long_X_East': 'float64',
+               'ht': 'float64',
+               'sig0': 'float64',
+               'sig1': 'float64',
+               'sig2': 'float64',
+               'res0': 'float64',
+               'res1': 'float64',
+               'res2': 'float64'}
+    return pd.read_csv(get_path('InSightE08_XW.csv'), dtype=dtype_dict)
 
 @pytest.fixture
 def insight_ipf():
@@ -32,7 +44,19 @@ def example_str_id_ipf():
 
 @pytest.fixture()
 def insight_expected_ipf():
-    return pd.read_csv(get_path('P20_008845_1894_XN_09N203W.csv'))
+    dtype_dict = {'pt_id': 'str',
+                  'val': 'int32',
+                  'fid_val': 'int32',
+                  'no_obs': 'int32',
+                  'l.': 'float64',
+                  's.': 'float64',
+                  'sig_l': 'float64',
+                  'sig_s': 'float64',
+                  'res_l': 'float64',
+                  'res_s': 'float64',
+                  'fid_x': 'float64',
+                  'fid_y': 'float64'}
+    return pd.read_csv(get_path('P20_008845_1894_XN_09N203W.csv'), dtype=dtype_dict)
 
 @pytest.mark.parametrize('ipf, expected', [([insight_ipf()],insight_expected_ipf())])
 def test_read_ipf(ipf, expected):
