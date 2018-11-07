@@ -110,8 +110,14 @@ def read_ipf_str(input_data):
 
     assert int(cnt) == len(df), 'Dataframe length {} does not match point length {}.'.format(int(cnt), len(df))
 
-    # Soft conversion of numeric types to numerics, allows str in first col for point_id
-    df = df.apply(pd.to_numeric, errors='ignore')
+    # List of data types for columns in Socet set IPF file
+    col_dtype = ['str','int32','int32','int32','float64','float64','float64','float64','float64','float64','float64','float64']
+
+    # Build dict of column names and their data types
+    dtype_dict = dict(zip(columns, col_dtype))
+
+    # Hard conversion of data types to ensure 'pt_id' is treated as string, 'val', 'fid_val', 'no_obs' flags treated as int
+    df = df.astype(dtype_dict)
 
     return df
 
@@ -141,7 +147,7 @@ def read_ipf_list(input_data_list):
 
 def save_ipf(df, output_path):
     """
-    Write a socet gpf file from a gpf-defined pandas dataframe
+    Write a socet ipf file from an ipf-defined pandas dataframe
 
     Parameters
     ----------
@@ -235,8 +241,14 @@ def read_gpf(input_data):
 
     df = pd.DataFrame(d, columns=columns)
 
-    # Soft conversion of numeric types to numerics, allows str in first col for point_id
-    df = df.apply(pd.to_numeric, errors='ignore')
+    # List of data types for columns in Socet set GPF file
+    col_dtype = ['str','int32','int32','float64','float64','float64','float64','float64','float64','float64','float64','float64']
+
+    # Build dict of column names and their data types
+    dtype_dict = dict(zip(columns, col_dtype))
+
+    # Hard conversion of data types to ensure 'point_id' is treated as string and 'stat' and 'known' flags treated as int
+    df = df.astype(dtype_dict)
 
     # Validate the read data with the header point count
     assert int(cnt) == len(df), 'Dataframe length {} does not match point length {}.'.format(int(cnt), len(df))
