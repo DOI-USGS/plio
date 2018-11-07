@@ -17,6 +17,7 @@ environment:
     - PYTHON: "C:\\Miniconda35\\Scripts\\activate.bat"
       PYTHON_VERSION: 3.5
     - PYTHON: "C:\\Miniconda36\\Scripts\\activate.bat"
+      PYTHON_VERSION: 3.6
 
 matrix:
   exclude:
