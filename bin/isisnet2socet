@@ -13,7 +13,6 @@ import pandas as pd
 from plio.io.io_bae import save_gpf, save_ipf
 import plio.io.io_controlnetwork as cn
 import plio.io.isis_serial_number as sn
-from plio.spatial.transformations import apply_isis_transformations
 from plio.utils.utils import find_in_dict, split_all_ext
 
 def parse_args():
