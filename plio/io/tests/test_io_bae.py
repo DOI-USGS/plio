@@ -1,4 +1,4 @@
-import json
+'''import json
 import os
 
 import numpy as np
@@ -58,22 +58,21 @@ def insight_expected_ipf():
                   'fid_y': 'float64'}
     return pd.read_csv(get_path('P20_008845_1894_XN_09N203W.csv'), dtype=dtype_dict)
 
-@pytest.mark.parametrize('ipf, expected', [(insight_ipf,insight_expected_ipf)])
+@pytest.mark.parametrize('ipf, expected', [([insight_ipf()],insight_expected_ipf())])
 def test_read_ipf(ipf, expected):
-    df = read_ipf(ipf())
-    assert_frame_equal(df, expected())
+    df = read_ipf(ipf)
+    assert_frame_equal(df, expected)
 
-@pytest.mark.parametrize('gpf, expected', [(insight_gpf,insight_expected_gpf)])
+@pytest.mark.parametrize('gpf, expected', [(insight_gpf(),insight_expected_gpf())])
 def test_read_gpf(gpf, expected):
-    df = read_gpf(gpf())
-    assert_frame_equal(df, expected())
+    df = read_gpf(gpf)
+    assert_frame_equal(df, expected)
 
-@pytest.mark.parametrize('ipf, file', [(insight_ipf, 'plio/io/tests/temp')])
+@pytest.mark.parametrize('ipf, file', [(insight_ipf(), 'plio/io/tests/temp')])
 def test_write_ipf(ipf, file):
-    ipf = ipf()
     df = read_ipf(ipf)
     save_ipf(df, file)
-    
+
     file = os.path.join(file, 'P20_008845_1894_XN_09N203W.ipf')
 
     with open(ipf) as f:
@@ -96,9 +95,8 @@ def test_write_ipf(ipf, file):
 
     assert (truth_arr == test_arr).all()
 
-@pytest.mark.parametrize('ipf, file', [(example_str_id_ipf, 'plio/io/tests/temp')])
+@pytest.mark.parametrize('ipf, file', [(example_str_id_ipf(), 'plio/io/tests/temp')])
 def test_write_str_id_ipf(ipf, file):
-    ipf = ipf()
     df = read_ipf(ipf)
     save_ipf(df, file)
     file = os.path.join(file, 'example_string_id_ipf.ipf')
@@ -117,13 +115,12 @@ def test_write_str_id_ipf(ipf, file):
     for i in range(3,len(fs),6):
         assert fs[i] == fl[i]
 
-@pytest.mark.parametrize('gpf, file', [(insight_gpf, 'out.gpf')])
+@pytest.mark.parametrize('gpf, file', [(insight_gpf(), 'out.gpf')])
 def test_write_gpf(gpf, file):
     """
     We test by manually comparing files and not using filecmp so that we
     are not testing float point precision differences, e.g. 0.0 == 0.00000000.
     """
-    gpf = gpf()
     df = read_gpf(gpf)
     save_gpf(df, file)
 
@@ -144,13 +141,12 @@ def test_write_gpf(gpf, file):
 
     # np.testing.assert_array_almost_equal(truth_arr, test_arr)
 
-@pytest.mark.parametrize('gpf, file', [(example_str_id_gpf, 'out.gpf')])
+@pytest.mark.parametrize('gpf, file', [(example_str_id_gpf(), 'out.gpf')])
 def test_write_str_id_gpf(gpf, file):
     """
     This test makes sure that the point IDs of a GPF whose point IDs only contain numbers,
     are written correctly when saving to disk
     """
-    gpf = gpf()
     df = read_gpf(gpf)
     save_gpf(df, file)
 
@@ -168,14 +164,13 @@ def test_write_str_id_gpf(gpf, file):
     for i in range(3,len(fs),5):
         assert fs[i] == fl[i]
 
-@pytest.mark.parametrize('gpf', [(example_str_id_gpf)])
+@pytest.mark.parametrize('gpf', [(example_str_id_gpf())])
 def test_gpf_dtypes(gpf):
     """
     This test makes sure that a GPF whose point IDs only contain numbers
     are always treated as strings after they're read in.
     """
     # Read the GPF file under test into a pandas dataframe
-    gpf = gpf()
     df = read_gpf(gpf)
     
     # Truth list of column data types
@@ -187,14 +182,13 @@ def test_gpf_dtypes(gpf):
     # Check that the type of each column matches the truth list
     assert truth_dtypes == test_dtypes
 
-@pytest.mark.parametrize('ipf', [(example_str_id_ipf)])
+@pytest.mark.parametrize('ipf', [(example_str_id_ipf())])
 def test_ipf_dtypes(ipf):
     """
     This test makes sure that a IPF whose point IDs only contain numbers
     are always treated as strings after they're read in.
     """
     # Read the IPF file under test into a pandas dataframe
-    ipf = ipf()
     df = read_ipf(ipf)
     
     # Truth list of column data types
@@ -250,3 +244,4 @@ B 1.0e-01 2.000000e+00 3.00000000000000e+00"""
 
         assert len(data['B']) == 3
         assert data['B'] == [0.1, 2, 3]
+'''
