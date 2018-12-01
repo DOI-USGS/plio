@@ -35,29 +35,35 @@ def expanded_indexer(key, ndim):
 class _LocIndexer(object):
     def __init__(self, data_array):
         self.data_array = data_array
-    
+
     def __getitem__(self, key):
         # expand the indexer so we can handle Ellipsis
         key = expanded_indexer(key, 3)
         sl = key[0]
         ifnone = lambda a, b: b if a is None else a
         if isinstance(sl, slice):
-            sl = list(range(ifnone(sl.start, 0), self.data_array.nbands, ifnone(sl.step, 1)))
+            sl = list(range(ifnone(sl.start, 0),
+                            ifnone(sl.stop, len(self.data_array.wavelengths)),
+                            ifnone(sl.step, 1)))
 
         if isinstance(sl, (int, float)):
             idx = self._get_idx(sl)
-        else:    
+        else:
             idx = [self._get_idx(s) for s in sl]
         key = (idx, key[1], key[2])
-        return self.data_array._read(key)   
-    
+
+        if len(self.data_array.data) != 0:
+            return self.data_array.data[key]
+
+        return self.data_array._read(key)
+
     def _get_idx(self, value, tolerance=2):
         vals = np.abs(self.data_array.wavelengths-value)
         minidx = np.argmin(vals)
         if vals[minidx] >= tolerance:
             warnings.warn("Absolute difference between requested value and found values is {}".format(vals[minidx]))
         return minidx
-    
+
 class _iLocIndexer(object):
     def __init__(self, data_array):
         self.data_array = data_array
@@ -69,8 +75,12 @@ class _iLocIndexer(object):
         ifnone = lambda a, b: b if a is None else a
         if isinstance(sl, slice):
             sl = list(range(ifnone(sl.start, 0),
-                            ifnone(sl.stop, self.data_array.nbands),
+                            ifnone(sl.stop, len(self.data_array.wavelengths)),
                             ifnone(sl.step, 1)))
-        
+
         key = (key[0], key[1], key[2])
+
+        if len(self.data_array.data) != 0:
+            return self.data_array.data[key]
+
         return self.data_array._read(key)

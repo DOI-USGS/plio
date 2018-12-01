@@ -4,12 +4,12 @@ from .io_gdal import GeoDataset
 from .hcube import HCube
 
 try:
-    from libpysat.derived import m3
-    from libpysat.derived.utils import get_derived_funcs
-    libpysat_enabled = True
+    from libpyhat.derived import m3
+    from libpyhat.derived.utils import get_derived_funcs
+    libpyhat_enabled = True
 except:
-    print('No libpysat module. Unable to attach derived product functions')
-    libpysat_enabled = False
+    print('No libpyhat module. Unable to attach derived product functions')
+    libpyhat_enabled = False
 
 import gdal
 
@@ -25,7 +25,7 @@ class M3(GeoDataset, HCube):
 
         self.derived_funcs = {}
 
-        if libpysat_enabled:
+        if libpyhat_enabled:
             self.derived_funcs = get_derived_funcs(m3)
 
     def __getattr__(self, name):
