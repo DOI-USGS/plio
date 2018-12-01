@@ -14,8 +14,8 @@ def apollo_lbl():
 def ctx_lbl():
     return get_path('ctx.pvl')
 
-@pytest.mark.parametrize("label, expected", [(apollo_lbl(), 'APOLLO15/METRIC/1971-07-31T14:02:27.179'),
-                                             (ctx_lbl(),'MRO/CTX/0906095311:038')
+@pytest.mark.parametrize("label, expected", [(apollo_lbl, 'APOLLO15/METRIC/1971-07-31T14:02:27.179'),
+                                             (ctx_lbl,'MRO/CTX/0906095311:038')
                                              ])
 def test_generate_serial_number(label, expected):
     serial = isis_serial_number.generate_serial_number(label)
