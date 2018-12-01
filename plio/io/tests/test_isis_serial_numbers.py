@@ -18,7 +18,7 @@ def ctx_lbl():
                                              (ctx_lbl,'MRO/CTX/0906095311:038')
                                              ])
 def test_generate_serial_number(label, expected):
-    serial = isis_serial_number.generate_serial_number(label)
+    serial = isis_serial_number.generate_serial_number(label())
     assert serial == expected
 
     
