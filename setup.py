@@ -20,7 +20,7 @@ def setup_package():
 
     setup(
         name = "plio",
-        version = '0.1.4',
+        version = '1.0.0',
         author = "Jay Laura",
         author_email = "jlaura@usgs.gov",
         description = ("I/O API to support planetary data formats."),
@@ -35,8 +35,12 @@ def setup_package():
         zip_safe=False,
         scripts=['bin/socetnet2isis', 'bin/isisnet2socet'],
         install_requires=[
+            'libgdal',
             'gdal',
             'numpy',
+            'pyproj',
+            'jinja2',
+            'ncurses',
             'pvl',
             'protobuf',
             'h5py',

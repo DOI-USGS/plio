@@ -97,12 +97,13 @@ class TestMercator(unittest.TestCase):
     def test_read_array(self):
         arr = self.dataset.read_array()
         self.assertEqual(arr.shape, (1694, 2304))
-        self.assertEqual(arr.dtype, np.float32)
+        self.assertEqual(arr.dtype, np.int8)
 
     def test_read_array_set_dtype(self):
-        arr = self.dataset.read_array(dtype='int8')
-        self.assertEqual(arr.dtype, np.int8)
-        self.assertAlmostEqual(np.mean(arr), 10.10353227, 6)
+        arr = self.dataset.read_array(dtype="float32")
+        self.assertEqual(arr.dtype, np.float32)
+        self.assertEqual(np.min(arr), 0)
+        self.assertEqual(np.max(arr), 255)
 
 @pytest.mark.skipif(gdal is None, reason="GDAL not installed")
 class TestLambert(unittest.TestCase):
