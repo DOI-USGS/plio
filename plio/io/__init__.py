@@ -1,6 +1,7 @@
 # Conditional imports for GDAL
 import importlib
 import warnings
+import sys
 
 if 'osgeo' in sys.modules:
     gdal = importlib.util.find_spec('gdal')
