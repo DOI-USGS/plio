@@ -2,15 +2,19 @@
 import importlib
 import warnings
 
-gdal = importlib.util.find_spec('gdal')
-ogr = importlib.util.find_spec('osgeo.ogr')
-osr = importlib.util.find_spec('osr')
+if 'osgeo' in sys.modules:
+    gdal = importlib.util.find_spec('gdal')
+    ogr = importlib.util.find_spec('osgeo.ogr')
+    osr = importlib.util.find_spec('osr')
 
-if gdal:
     gdal = gdal.loader.load_module()
     ogr = ogr.loader.load_module()
     osr = osr.loader.load_module()
     gdal.UseExceptions() 
+else:
+    gdal = None
+    ogr = None
+    osr = None
 
 def conditional_gdal(func):
     def has_gdal(*args, **kwargs):
