@@ -77,7 +77,7 @@ class Spectral_Profiler(object):
                         ncols -= 1
             strbytes = map(str, bytelengths)
             rowdtype = list(zip(columns, map(''.join, zip(['>'] * ncols, datatypes, strbytes))))
-            d = np.fromstring(indata.read(rowbytes * nrows), dtype=rowdtype,
+            d = np.frombuffer(indata.read(rowbytes * nrows), dtype=rowdtype,
                               count=nrows)
             self.ancillary_data = pd.DataFrame(d, columns=columns,
                                                index=np.arange(nrows))
@@ -124,7 +124,7 @@ class Spectral_Profiler(object):
                 lines = d['LINES']
                 scaling_factor = d['SCALING_FACTOR']
 
-                arr = np.fromstring(indata.read(lines * 296*2), dtype='>H').astype(np.float64)
+                arr = np.frombuffer(indata.read(lines * 296*2), dtype='>H').astype(np.float64)
                 arr = arr.reshape(lines, -1)
 
                 # If the data is scaled, apply the scaling factor
