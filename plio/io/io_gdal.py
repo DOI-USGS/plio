@@ -14,6 +14,7 @@ from plio.utils.utils import find_in_dict
 from plio.io import gdal, ogr, osr
 
 NP2GDAL_CONVERSION = {
+  "byte": 1,
   "uint8": 1,
   "int8": 1,
   "uint16": 2,
@@ -26,16 +27,11 @@ NP2GDAL_CONVERSION = {
   "complex128": 11,
 }
 
-GDAL2NP_CONVERSION = {}
+GDAL2NP_CONVERSION = {v:k for k,v in NP2GDAL_CONVERSION.items()}
 
 DEFAULT_PROJECTIONS = {'mars':'GEOGCS["Mars 2000",DATUM["D_Mars_2000",SPHEROID["Mars_2000_IAU_IAG",3396190.0,169.89444722361179]],PRIMEM["Greenwich",0],UNIT["Decimal_Degree",0.0174532925199433]]',
                        'moon':'GEOGCS["Moon 2000",DATUM["D_Moon_2000",SPHEROID["Moon_2000_IAU_IAG",1737400.0,0.0]],PRIMEM["Greenwich",0],UNIT["Decimal_Degree",0.0174532925199433]]'}
 DEFAULT_RADII = {'mars': 3396190.0}
-
-for k, v in iter(NP2GDAL_CONVERSION.items()):
-    GDAL2NP_CONVERSION[v] = k
-
-GDAL2NP_CONVERSION[1] = 'int8'
 
 
 class GeoDataset(object):
@@ -488,7 +484,7 @@ class GeoDataset(object):
         px, py = map(int, self.inverse_affine * (lon, lat))
         return px, py
 
-    def read_array(self, band=1, pixels=None, dtype='float32'):
+    def read_array(self, band=1, pixels=None, dtype=None):
         """
         Extract the required data as a NumPy array
 
@@ -502,7 +498,7 @@ class GeoDataset(object):
                  [xstart, ystart, xstop, ystop]. Default pixels=None.
 
         dtype : str
-                The NumPy dtype for the output array. Default dtype='float32'.
+                The NumPy dtype for the output array. Defaults to the band dtype.
 
         Returns
         -------
@@ -511,6 +507,9 @@ class GeoDataset(object):
 
         """
         band = self.dataset.GetRasterBand(band)
+
+        if dtype is None:
+            dtype = GDAL2NP_CONVERSION[band.DataType]
 
         dtype = getattr(np, dtype)
 
