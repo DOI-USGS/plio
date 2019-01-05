@@ -1,5 +1,4 @@
-===============================
-Planetary Input / Output
+Planetary Input / Output [![Join the chat at https://gitter.im/USGS-Astrogeology/plio](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/USGS-Astrogeology/plio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ===============================
 
 A planetary surface data input/output library written in Python. The release version of `plio` is avaiable via conda-forge. 
@@ -39,12 +38,17 @@ It is possible to list all of the versions of `plio` available on your platform 
 conda search plio --channel conda-forge
 ```
 
-.. image:: https://badges.gitter.im/USGS-Astrogeology/plio.svg
-   :alt: Join the chat at https://gitter.im/USGS-Astrogeology/plio
-   :target: https://gitter.im/USGS-Astrogeology/plio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+Installing development branch of plio
+=====================================
 
-.. image:: https://travis-ci.org/USGS-Astrogeology/plio.svg?branch=master
-   :target: https://travis-ci.org/USGS-Astrogeology/plio
+We maintain a development branch of plio that is used as a staging area for our releases. The badges and information below describe the bleeding edge builds.
 
-.. image:: https://coveralls.io/repos/github/USGS-Astrogeology/plio/badge.svg?branch=master 
-   :target: https://coveralls.io/github/USGS-Astrogeology/plio?branch=master
+[![Build Status](https://travis-ci.org/USGS-Astrogeology/plio.svg?branch=dev)](https://travis-ci.org/USGS-Astrogeology/plio)
+
+[![Coverage Status](https://coveralls.io/repos/github/USGS-Astrogeology/plio/badge.svg?branch=master)](https://coveralls.io/github/USGS-Astrogeology/plio?branch=master)
+
+To install the development version: 
+
+```
+conda install -c usgs-astrogeology/label/dev plio
+```
