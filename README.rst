@@ -2,6 +2,43 @@
 Planetary Input / Output
 ===============================
 
+A planetary surface data input/output library written in Python. The release version of `plio` is avaiable via conda-forge. 
+
+Current build status
+====================
+
+[![Linux](https://img.shields.io/circleci/project/github/conda-forge/plio-feedstock/master.svg?label=Linux)](https://circleci.com/gh/conda-forge/plio-feedstock)
+[![OSX](https://img.shields.io/travis/conda-forge/plio-feedstock/master.svg?label=macOS)](https://travis-ci.org/conda-forge/plio-feedstock)
+[![Windows](https://img.shields.io/appveyor/ci/conda-forge/plio-feedstock/master.svg?label=Windows)](https://ci.appveyor.com/project/conda-forge/plio-feedstock/branch/master)
+
+Current release info
+====================
+
+| Name | Downloads | Version | Platforms |
+| --- | --- | --- | --- |
+| [![Conda Recipe](https://img.shields.io/badge/recipe-plio-green.svg)](https://anaconda.org/conda-forge/plio) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/plio.svg)](https://anaconda.org/conda-forge/plio) | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/plio.svg)](https://anaconda.org/conda-forge/plio) | [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/plio.svg)](https://anaconda.org/conda-forge/plio) |
+
+Installing plio
+===============
+
+Installing `plio` from the `conda-forge` channel can be achieved by adding `conda-forge` to your channels with:
+
+```
+conda config --add channels conda-forge
+```
+
+Once the `conda-forge` channel has been enabled, `plio` can be installed with:
+
+```
+conda install plio
+```
+
+It is possible to list all of the versions of `plio` available on your platform with:
+
+```
+conda search plio --channel conda-forge
+```
+
 .. image:: https://badges.gitter.im/USGS-Astrogeology/plio.svg
    :alt: Join the chat at https://gitter.im/USGS-Astrogeology/plio
    :target: https://gitter.im/USGS-Astrogeology/plio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
@@ -11,17 +48,3 @@ Planetary Input / Output
 
 .. image:: https://coveralls.io/repos/github/USGS-Astrogeology/plio/badge.svg?branch=master 
    :target: https://coveralls.io/github/USGS-Astrogeology/plio?branch=master
-
-
-A planetary file I/O API
-
-Installation
-------------
-Installation is unfortunately complicated due to the difficulty in installing GDAL.  These are the steps that have been successfully tested on Linux and OSX.
-
-1. Install Anaconda or Miniconda with Python 3.5
-2. Create a new environment to ensure that the installed package is not going to collide with existing packages
-
-   ``conda create --name <somename> python=3``
-3. Ensure that the `conda-forge` channel is added to your conda config.  For instructions, see: https://conda.io/docs/user-guide/tasks/manage-channels.html
-4. Install ``plio`` with ``conda install -c usgs-astrogeology plio``.
