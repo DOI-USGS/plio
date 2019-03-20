@@ -14,15 +14,13 @@ from plio.examples import get_path
 
 import pytest
 
-@pytest.fixture
-def apollo_cnet():
-    return get_path('apollo_out.net')
-
 sys.path.insert(0, os.path.abspath('..'))
 
-
-def test_cnet_read(apollo_cnet):
-    df = io_controlnetwork.from_isis(apollo_cnet)
+@pytest.mark.parametrize('cnet_file',
+                         (get_path('apollo_out.net'), get_path('apollo_out_v5.net'))
+)
+def test_cnet_read(cnet_file):
+    df = io_controlnetwork.from_isis(cnet_file)
     assert len(df) == find_in_dict(df.header, 'NumberOfMeasures')
     assert isinstance(df, io_controlnetwork.IsisControlNetwork)
     assert len(df.groupby('id')) == find_in_dict(df.header, 'NumberOfPoints')
