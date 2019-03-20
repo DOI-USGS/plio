@@ -3,8 +3,11 @@ from time import gmtime, strftime
 import pandas as pd
 import numpy as np
 import pvl
+import struct
 
 from plio.io import ControlNetFileV0002_pb2 as cnf
+from plio.io import ControlNetFileHeaderV0005_pb2 as cnh5
+from plio.io import ControlPointFileEntryV0005_pb2 as cnp5
 from plio.utils.utils import xstr, find_in_dict
 
 HEADERSTARTBYTE = 65536
@@ -192,23 +195,50 @@ class IsisStore(object):
             self.point_attrs = [i for i in cnf._CONTROLPOINTFILEENTRYV0002.fields_by_name if i != 'measures']
             self.measure_attrs = [i for i in cnf._CONTROLPOINTFILEENTRYV0002_MEASURE.fields_by_name]
 
-        cols = self.point_attrs + self.measure_attrs
+            cols = self.point_attrs + self.measure_attrs
 
-        cp = cnf.ControlPointFileEntryV0002()
-        self._handle.seek(header_start_byte)
-        pbuf_header = cnf.ControlNetFileHeaderV0002()
-        pbuf_header.ParseFromString(self._handle.read(header_bytes))
+            cp = cnf.ControlPointFileEntryV0002()
+            self._handle.seek(header_start_byte)
+            pbuf_header = cnf.ControlNetFileHeaderV0002()
+            pbuf_header.ParseFromString(self._handle.read(header_bytes))
 
-        self._handle.seek(point_start_byte)
-        cp = cnf.ControlPointFileEntryV0002()
-        pts = []
-        for s in pbuf_header.pointMessageSizes:
-            cp.ParseFromString(self._handle.read(s))
-            pt = [getattr(cp, i) for i in self.point_attrs if i != 'measures']
+            self._handle.seek(point_start_byte)
+            cp = cnf.ControlPointFileEntryV0002()
+            pts = []
+            for s in pbuf_header.pointMessageSizes:
+                cp.ParseFromString(self._handle.read(s))
+                pt = [getattr(cp, i) for i in self.point_attrs if i != 'measures']
 
-            for measure in cp.measures:
-                meas = pt + [getattr(measure, j) for j in self.measure_attrs]
-                pts.append(meas)
+                for measure in cp.measures:
+                    meas = pt + [getattr(measure, j) for j in self.measure_attrs]
+                    pts.append(meas)
+
+        elif version == 5:
+            self.point_attrs = [i for i in cnp5._CONTROLPOINTFILEENTRYV0005.fields_by_name if i != 'measures']
+            self.measure_attrs = [i for i in cnp5._CONTROLPOINTFILEENTRYV0005_MEASURE.fields_by_name]
+
+            cols = self.point_attrs + self.measure_attrs
+
+            cp = cnp5.ControlPointFileEntryV0005()
+            self._handle.seek(header_start_byte)
+            pbuf_header = cnh5.ControlNetFileHeaderV0005()
+            pbuf_header.ParseFromString(self._handle.read(header_bytes))
+
+            self._handle.seek(point_start_byte)
+            cp = cnp5.ControlPointFileEntryV0005()
+            pts = []
+            byte_count = 0;
+            while byte_count < find_in_dict(pvl_header, 'PointsBytes'):
+                message_size = struct.unpack('I', self._handle.read(4))[0]
+                cp.ParseFromString(self._handle.read(message_size))
+                pt = [getattr(cp, i) for i in self.point_attrs if i != 'measures']
+
+                for measure in cp.measures:
+                    meas = pt + [getattr(measure, j) for j in self.measure_attrs]
+                    pts.append(meas)
+
+                byte_count += 4 + message_size
+
         df = IsisControlNetwork(pts, columns=cols)
         df.header = pvl_header
         return df
