@@ -195,8 +195,6 @@ class IsisStore(object):
             self.point_attrs = [i for i in cnf._CONTROLPOINTFILEENTRYV0002.fields_by_name if i != 'measures']
             self.measure_attrs = [i for i in cnf._CONTROLPOINTFILEENTRYV0002_MEASURE.fields_by_name]
 
-            cols = self.point_attrs + self.measure_attrs
-
             cp = cnf.ControlPointFileEntryV0002()
             self._handle.seek(header_start_byte)
             pbuf_header = cnf.ControlNetFileHeaderV0002()
@@ -216,8 +214,6 @@ class IsisStore(object):
         elif version == 5:
             self.point_attrs = [i for i in cnp5._CONTROLPOINTFILEENTRYV0005.fields_by_name if i != 'measures']
             self.measure_attrs = [i for i in cnp5._CONTROLPOINTFILEENTRYV0005_MEASURE.fields_by_name]
-
-            cols = self.point_attrs + self.measure_attrs
 
             cp = cnp5.ControlPointFileEntryV0005()
             self._handle.seek(header_start_byte)
@@ -239,6 +235,7 @@ class IsisStore(object):
 
                 byte_count += 4 + message_size
 
+        cols = self.point_attrs + self.measure_attrs
         df = IsisControlNetwork(pts, columns=cols)
         df.header = pvl_header
         return df
