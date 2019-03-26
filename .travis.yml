@@ -55,7 +55,7 @@ after_success:
   - conda install -q conda-build anaconda-client
   - conda config --set anaconda_upload no
   - conda build recipe -q
-  - buildir=(`conda build recipe --output`)
+  - builddir=(`conda build recipe --output`)
   - anaconda -t="$CONDA_UPLOAD_TOKEN" upload $builddir --label dev --force;
 
   # Docs to gh-pages
