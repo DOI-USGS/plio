@@ -3,7 +3,7 @@ import importlib
 import warnings
 import sys
 
-if 'osgeo' in sys.modules:
+try:
     gdal = importlib.util.find_spec('gdal')
     ogr = importlib.util.find_spec('osgeo.ogr')
     osr = importlib.util.find_spec('osr')
@@ -12,7 +12,7 @@ if 'osgeo' in sys.modules:
     ogr = ogr.loader.load_module()
     osr = osr.loader.load_module()
     gdal.UseExceptions() 
-else:
+except:
     gdal = None
     ogr = None
     osr = None
