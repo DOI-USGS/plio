@@ -24,7 +24,7 @@ class Spectral_Profiler(object):
               with key as the spectra index and value as the start byte offset
     """
 
-    def __init__(self, input_data, cleaned=True, qa_threshold=2000):
+    def __init__(self, input_data, label=None, cleaned=True, qa_threshold=2000):
         """
         Read the .spc file, parse the label, and extract the spectra
 
@@ -33,6 +33,9 @@ class Spectral_Profiler(object):
 
         input_data : string
                      The PATH to the input .spc file
+
+        label : string
+                The PATH to an optional detached label associated with the .spc
 
         cleaned : boolean
                   If True, mask the data based on the QA array.
@@ -49,8 +52,10 @@ class Spectral_Profiler(object):
                         'MSB_INTEGER':'i',
                         'MSB_UNSIGNED_INTEGER':'u'}
 
-
-        label = pvl.load(input_data)
+        if label:
+            label = pvl.load(label)
+        else:
+            label = pvl.load(input_data)
         self.label = label
         self.input_data = input_data
         with open(input_data, 'rb') as indata:
@@ -63,7 +68,10 @@ class Spectral_Profiler(object):
             columns = []
             bytelengths = []
             datatypes = []
-            ancillary_data_offset = find_in_dict(label, "^ANCILLARY_AND_SUPPLEMENT_DATA").value
+            try:
+                ancillary_data_offset = find_in_dict(self.label, "^ANCILLARY_AND_SUPPLEMENT_DATA").value
+            except:
+                ancillary_data_offset = find_in_dict(self.label, "^ANCILLARY_AND_SUPPLEMENT_DATA")[1].value
             indata.seek(ancillary_data_offset - 1)
             for i in ancillary_data.items():
                 if i[0] == 'COLUMN':
@@ -109,7 +117,10 @@ class Spectral_Profiler(object):
                 search_key = '^SP_SPECTRUM_{}'.format(d)
                 result = find_in_dict(label, search_key)
                 if result:
-                    array_offsets.append(result.value)
+                    try:
+                        array_offsets.append(result.value)
+                    except:
+                        array_offsets.append(result[1].value) # 2C V3.0
                     keys.append('SP_SPECTRUM_{}'.format(d))
 
             offsets = dict(zip(keys, array_offsets))
