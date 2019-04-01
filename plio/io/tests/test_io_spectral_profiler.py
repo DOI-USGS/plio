@@ -30,5 +30,16 @@ class Test_Spectral_Profiler_IO(unittest.TestCase):
         self.assertIsInstance(ds.browse, GeoDataset)
         self.assertEqual(ds.browse.read_array().shape, (512, 456))
 
+class Test_Spectral_Profiler_IO_Detached(unittest.TestCase):
+    
+    def setUp(self):
+        self.examplefile = get_path('SP_2C_03_04184_N187_E0053.spc')
+        self.examplelabel = get_path('SP_2C_03_04184_N187_E0053.lbl')
+        
+    def test_openspc(self):
+        ds = io_spectral_profiler.Spectral_Profiler(self.examplefile, self.examplelabel)
+        self.assertEqual(ds.nspectra, 38)
+        self.assertEqual(ds.spectra[0].columns.tolist(), ['RAW', 'REF1', 'REF2', 'QA', 'RAD'])
+
 if __name__ == '__main__':
     unittest.main()
