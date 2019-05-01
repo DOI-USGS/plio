@@ -14,10 +14,14 @@ environment:
       PYTHON_VERSION: 3.5
     - PYTHON: "C:\\Miniconda36-x64\\Scripts\\activate.bat"
       PYTHON_VERSION: 3.6
+    - PYTHON: "C:\\Miniconda37-x64\\Scripts\\activate.bat"
+      PYTHON_VERSION: 3.7
     - PYTHON: "C:\\Miniconda35\\Scripts\\activate.bat"
       PYTHON_VERSION: 3.5
     - PYTHON: "C:\\Miniconda36\\Scripts\\activate.bat"
       PYTHON_VERSION: 3.6
+    - PYTHON: "C:\\Miniconda37\\Scripts\\activate.bat"
+      PYTHON_VERSION: 3.7    
 
 matrix:
   exclude:
@@ -25,11 +29,15 @@ matrix:
       platform: x86
     - PYTHON: "C:\\Miniconda36-x64\\Scripts\\activate.bat"
       platform: x86
+    - PYTHON: "C:\\Miniconda37-x64\\Scripts\\activate.bat"
+      platform: x86
     - PYTHON: "C:\\Miniconda35\\Scripts\\activate.bat"
       platform: x64
     - PYTHON: "C:\\Miniconda36\\Scripts\\activate.bat"
       platform: x64
-
+    - PYTHON: "C:\\Miniconda37\\Scripts\\activate.bat"
+      platform: x64
+      
 configuration:
   - Release
 
