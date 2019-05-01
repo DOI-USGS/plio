@@ -42,6 +42,7 @@ configuration:
   - Release
 
 install:
+  - mkdir C:\Users\appveyor\.conda
   - cmd: call %PYTHON%
   - cmd: conda config --set always_yes yes --set changeps1 no
   - cmd: conda update -q conda
