@@ -7,53 +7,66 @@ from functools import singledispatch
 import numpy as np
 import pandas as pd
 
-def socetset_keywords_to_json(keywords, ell=None):
+from plio.utils.utils import is_number, convert_string_to_float
+
+def socetset_keywords_to_dict(keywords, ell=None):
     """
     Convert a SocetCet keywords.list file to JSON
 
     Parameters
     ----------
     keywords : str
-               Path to the socetset keywords.list file
+               Path to the socetset keywords.list file or a raw string that
+               will be split on '\n' and parsed.
+    
+    ell : str
+          Optional path to the ellipsoid keywords.list file or a raw string 
+          that will be split on '\n' and parsed
 
     Returns
     -------
-     : str
-       The serialized JSON string.
+     data : dict 
+            A dictionary containing the socet keywords parsed.
+
     """
-    matcher = re.compile(r'\b(?!\d)\w+\b')
-    numeric_matcher = re.compile(r'\W-?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?')
-    stream = {}
+    data = {}
 
-    def parse(fi):
-        with open(fi, 'r') as f:
-            for l in f:
-                l = l.rstrip()
-                if not l:
+    def parse(lines):
+        for l in lines:
+            l = l.strip()
+            if not l:
+                continue
+            elems = l.split()
+            if is_number(elems[0]) is False:
+                key = elems[0]
+                if key in data.keys():
+                    raise ValueError('Duplicate dictionary key: {}'.format(key))
+                data[key] = []
+                if len(elems) == 1:
                     continue
-                matches = matcher.findall(l)
-                if matches:
-                    key = matches[0]
-                    stream[key] = []
-                    # Case where the kw are strings after the key
-                    if len(matches) > 1:
-                        stream[key] = matches[1:]
-                    # Case where the kw are numeric types after the key
-                    else:
-                        nums = numeric_matcher.findall(l)
-                        if len(nums) == 1:
-                            stream[key] = float(nums[0])
-                        else:
-                            stream[key] += map(float, nums)
+                if len(elems) == 2:
+                    data[key] = convert_string_to_float(elems[1])
                 else:
-                    # Case where the values are on a newline after the key
-                    nums = numeric_matcher.findall(l)
-                    stream[key] += map(float, nums)
+                    data[key] += [convert_string_to_float(e) for e in elems[1:]]
+            else:
+                data[key] += [convert_string_to_float(e) for e in elems]
 
+    if os.path.exists(keywords):
+        with open(keywords, 'r') as f:
+            keywords = f.readlines()
+    else:
+        keywords = keywords.split('\n')
     parse(keywords)
+   
     if ell:
+        if os.path.exists(ell):
+            with open(ell, 'r') as f:
+                ell = f.readlines()
+        else:
+            ell = ell.split('\n')
         parse(ell)
-    return json.dumps(stream)
+
+    return data
 
 @singledispatch
 def read_ipf(arg): # pragma: no cover
@@ -97,8 +110,14 @@ def read_ipf_str(input_data):
 
     assert int(cnt) == len(df), 'Dataframe length {} does not match point length {}.'.format(int(cnt), len(df))
 
-    # Soft conversion of numeric types to numerics, allows str in first col for point_id
-    df = df.apply(pd.to_numeric, errors='ignore')
+    # List of data types for columns in Socet set IPF file
+    col_dtype = ['str','int32','int32','int32','float64','float64','float64','float64','float64','float64','float64','float64']
+
+    # Build dict of column names and their data types
+    dtype_dict = dict(zip(columns, col_dtype))
+
+    # Hard conversion of data types to ensure 'pt_id' is treated as string, 'val', 'fid_val', 'no_obs' flags treated as int
+    df = df.astype(dtype_dict)
 
     return df
 
@@ -128,7 +147,7 @@ def read_ipf_list(input_data_list):
 
 def save_ipf(df, output_path):
     """
-    Write a socet gpf file from a gpf-defined pandas dataframe
+    Write a socet ipf file from an ipf-defined pandas dataframe
 
     Parameters
     ----------
@@ -222,8 +241,14 @@ def read_gpf(input_data):
 
     df = pd.DataFrame(d, columns=columns)
 
-    # Soft conversion of numeric types to numerics, allows str in first col for point_id
-    df = df.apply(pd.to_numeric, errors='ignore')
+    # List of data types for columns in Socet set GPF file
+    col_dtype = ['str','int32','int32','float64','float64','float64','float64','float64','float64','float64','float64','float64']
+
+    # Build dict of column names and their data types
+    dtype_dict = dict(zip(columns, col_dtype))
+
+    # Hard conversion of data types to ensure 'point_id' is treated as string and 'stat' and 'known' flags treated as int
+    df = df.astype(dtype_dict)
 
     # Validate the read data with the header point count
     assert int(cnt) == len(df), 'Dataframe length {} does not match point length {}.'.format(int(cnt), len(df))

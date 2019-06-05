@@ -1,0 +1,553 @@
+PDS_VERSION_ID                       = "PDS3"
+
+/*** FILE FORMAT ***/
+RECORD_TYPE                          = "UNDEFINED"
+FILE_NAME                            = "SP_2C_03_04184_N187_E0053.spc"
+
+/*** POINTERS TO START BYTE OFFSET OF OBJECTS IN FILE ***/
+^ANCILLARY_AND_SUPPLEMENT_DATA       = ("SP_2C_03_04184_N187_E0053.spc", 1 <BYTES>)
+^SP_SPECTRUM_WAV                     = ("SP_2C_03_04184_N187_E0053.spc", 6309 <BYTES>)
+^SP_SPECTRUM_RAW                     = ("SP_2C_03_04184_N187_E0053.spc", 6901 <BYTES>)
+^SP_SPECTRUM_REF2                    = ("SP_2C_03_04184_N187_E0053.spc", 29397 <BYTES>)
+^SP_SPECTRUM_RAD                     = ("SP_2C_03_04184_N187_E0053.spc", 51893 <BYTES>)
+^SP_SPECTRUM_REF1                    = ("SP_2C_03_04184_N187_E0053.spc", 74389 <BYTES>)
+^SP_SPECTRUM_QA                      = ("SP_2C_03_04184_N187_E0053.spc", 96885 <BYTES>)
+^L2D_RESULT_ARRAY                    = ("SP_2C_03_04184_N187_E0053.spc", 119381 <BYTES>)
+
+/*** BASIC INFORMATION ***/
+MISSION_NAME                         = "SELENE"
+DATA_SET_ID                          = "SLN-L-SP-4-LEVEL2C-V3.0"
+DATA_SET_NAME                        = "SELENE MOON SP 4 LEVEL2C V3.0"
+L2DB_ORIGINAL_ID                     = "SP_Level2C"
+PRODUCT_ID                           = "SP_2C_03_04184_N187_E0053"
+INSTRUMENT_TYPE                      = "REFLECTANCE SPECTROMETER"
+INSTRUMENT_ID                        = "SP"
+INSTRUMENT_NAME                      = "SPECTRAL PROFILER"
+INSTRUMENT_HOST_NAME                 = "SELENE MAIN ORBITER"
+TARGET_TYPE                          = "SATELLITE"
+TARGET_NAME                          = "MOON"
+START_TIME                           = 2008-09-16T04:37:49.995417
+STOP_TIME                            = 2008-09-16T04:38:03.463336
+
+/*** GENERAL DATA DESCRIPTION PARAMETERS ***/
+SOFTWARE_NAME                        = "RGC_SP_plus"
+SOFTWARE_VERSION                     = "1.0"
+PROCESS_VERSION_ID                   = "L2C"
+PRODUCT_CREATION_TIME                = 2016-03-28T20:32:18
+PROGRAM_START_TIME                   = 2016-03-28T15:50:11
+PRODUCER_ID                          = "LISM"
+PRODUCT_SET_ID                       = "SP_Level2C"
+PRODUCT_VERSION_ID                   = "03"
+REGISTERED_PRODUCT                   = "Y"
+LEVEL2B1_FILE_NAME                   = "SP_2B1_02_04184_1AN0E00557N.spc"
+SOURCE_FILE_NAME                     = "SP_2B2_02_04184_N187_E0053.spc"
+SPICE_METAKERNEL_FILE_NAME           = "RGC_INF_TCv401IK_MIv200IK_SPv105IK_RISE100i_05_LongCK_D_V02_de421_110706.mk"
+
+/*** SCENE RELATED PARAMETERS ***/
+MISSION_PHASE_NAME                   = "Nominal"
+REVOLUTION_NUMBER                    = 4184
+STRIP_SEQUENCE_NUMBER                = 3
+SCENE_SEQUENCE_NUMBER                = 111
+REV_STRIP_SCENE                      = "N/A"
+OBSERVATION_MODE_ID                  = "OBS-NORMAL"
+SENSOR_DESCRIPTION                   = "SP is a nadir-looking spectrometer which has a reflective telescope, two plane gratings, and three 128-element detectors covering 296 bands in 500 - 2600 nm. The first detector is Si PIN photodiode, and the rest are InGaAs."
+SENSOR_DESCRIPTION2                  = "CENTER_LATITUDE and CENTER_LONGITUDE of  footprints were re-calculated in this version (ver.3)."
+EXPOSURE_MODE_ID                     = "SHORT"
+SHORT_EXPOSURE_DURATION              = 26.000 <ms>
+LONG_EXPOSURE_DURATION               = 77.000 <ms>
+CALIBRATION_MODE_ID                  = "NONE"
+SPACECRAFT_CLOCK_START_COUNT         = "905575060.5417 <s>"
+SPACECRAFT_CLOCK_STOP_COUNT          = "905575074.0097 <s>"
+UPPER_LEFT_LATITUDE                  = 18.364346 <deg>
+UPPER_LEFT_LONGITUDE                 = 5.289752 <deg>
+UPPER_RIGHT_LATITUDE                 = 18.364346 <deg>
+UPPER_RIGHT_LONGITUDE                = 5.289752 <deg>
+LOWER_LEFT_LATITUDE                  = 19.035673 <deg>
+LOWER_LEFT_LONGITUDE                 = 5.280144 <deg>
+LOWER_RIGHT_LATITUDE                 = 19.035673 <deg>
+LOWER_RIGHT_LONGITUDE                = 5.280144 <deg>
+LOCATION_FLAG                        = "A"
+ROLL_CANT                            = "NO"
+MOON_SUN_DISTANCE                    = 150756262 <km>
+VIS_FOCAL_PLANE_TEMPERATURE          =  21.06 <degC>
+N1_FOCAL_PLANE_TEMPERATURE           =  18.42 <degC>
+N2_FOCAL_PLANE_TEMPERATURE           = 243.00 <K>
+SATELLITE_MOVING_DIRECTION           = +1
+A_AXIS_RADIUS                        = 1737.400 <km>
+B_AXIS_RADIUS                        = 1737.400 <km>
+C_AXIS_RADIUS                        = 1737.400 <km>
+SPACECRAFT_ALTITUDE                  = 120.804 <km>
+SPACECRAFT_GROUND_SPEED              = 1.511 <km/s>
+
+/*** CAMERA RELATED PARAMETERS ***/
+VIS_BAND_NUMBER                      = 84
+VIS_SPECTRAL_COVERAGE                = (482.6 <nm>, 980.6 <nm>)
+VIS_BAND_WIDTH                       = 6.0 <nm>
+N1_BAND_NUMBER                       = 100
+N1_SPECTRAL_COVERAGE                 = (894.4 <nm>, 1688.9 <nm>)
+N1_BAND_WIDTH                        = 8.0 <nm>
+N2_BAND_NUMBER                       = 112
+N2_SPECTRAL_COVERAGE                 = (1694.9 <nm>, 2583.1 <nm>)
+N2_BAND_WIDTH                        = 8.0 <nm>
+PROCESS_PARAMETER_FILE_NAME          = "SP_higher_level_proc_param.txt"
+DAYTIME_EQUATOR_CROSSING_LON         = "N/A"
+IMAGER                               = "MV2"
+TM_DATA_SET_NAME                     = "MVA2A0_02NM04184_003_0111.sl2"
+TM_CORRECTED_START_TIME              = 2008-09-16T04:37:46.038504
+TM_CORRECTED_STOP_TIME               = 2008-09-16T04:38:00.065603
+TM_CORRECTED_SAMPLING_INTERVAL       = 12.999991 <ms>
+TM_LINES                             = 1080
+TM_LINE_SAMPLES                      = 962
+TM_FIRST_PIXEL_NUMBER                = 1
+TM_LAST_PIXEL_NUMBER                 = 962
+TM_UPPER_LEFT_LATITUDE               = 18.421631 <deg>
+TM_UPPER_LEFT_LONGITUDE              = 5.692915 <deg>
+TM_UPPER_RIGHT_LATITUDE              = 18.412143 <deg>
+TM_UPPER_RIGHT_LONGITUDE             = 4.888181 <deg>
+TM_LOWER_LEFT_LATITUDE               = 19.121352 <deg>
+TM_LOWER_LEFT_LONGITUDE              = 5.683773 <deg>
+TM_LOWER_RIGHT_LATITUDE              = 19.111845 <deg>
+TM_LOWER_RIGHT_LONGITUDE             = 4.876056 <deg>
+TM_SATURATED_PIXEL_PERCENTAGE        = 0
+TM_DEAD_PIXEL_PERCENTAGE             = 0
+TM_SHADOWED_AREA_PIXEL_PERCENT       = 0
+HIGH_SP_POINT_NUM                    = 0
+NORMAL_SP_POINT_NUM                  = 38
+UPPER_MARGIN_POINT_NUM               = "N/A"
+LOWER_MARGIN_POINT_NUM               = "N/A"
+CAL_LAMP_INFO                        = "N/A"
+MATCHING_ACCURACY_INFO               = "1001"
+
+/*** DESCRIPTION OF OBJECTS CONTAINED IN THE FILE ***/
+OBJECT                               = ANCILLARY_AND_SUPPLEMENT_DATA
+    INTERCHANGE_FORMAT               = "BINARY"
+    ROWS                             = 38
+    COLUMNS                          = 43
+    ROW_BYTES                        = 166
+
+    OBJECT                           = COLUMN
+        NAME                         = "SPACECRAFT_CLOCK_COUNT"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "sec"
+        START_BYTE                   = 1
+        BYTES                        = 8
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "VIS_FOCAL_PLANE_TEMPERATURE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "degC"
+        START_BYTE                   = 9
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "NIR1_FOCAL_PLANE_TEMPERATURE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "degC"
+        START_BYTE                   = 13
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "NIR2_FOCAL_PLANE_TEMPERATURE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "K"
+        START_BYTE                   = 17
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SPECTROMETER_TEMPERATURE_1"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "degC"
+        START_BYTE                   = 21
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SPECTROMETER_TEMPERATURE_2"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "degC"
+        START_BYTE                   = 25
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SPECTROMETER_TEMPERATURE_3"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "degC"
+        START_BYTE                   = 29
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SPECTROMETER_TEMPERATURE_4"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "degC"
+        START_BYTE                   = 33
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "HALOGEN_BULB_RADIANCE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "V"
+        START_BYTE                   = 37
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "HALOGEN_BULB_VOLTAGE1"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "V"
+        START_BYTE                   = 41
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "HALOGEN_BULB_VOLTAGE2"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "V"
+        START_BYTE                   = 45
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "HALOGEN_BULB_TEMPERATURE1"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "degC"
+        START_BYTE                   = 49
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "HALOGEN_BULB_TEMPERATURE2"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "degC"
+        START_BYTE                   = 53
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SPACECRAFT_ALTITUDE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "km"
+        START_BYTE                   = 57
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SPACECRAFT_GROUND_SPEED"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "km/sec"
+        START_BYTE                   = 61
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SUB_SPACECRAFT_LATITUDE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "deg"
+        START_BYTE                   = 65
+        BYTES                        = 8
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SUB_SPACECRAFT_LONGITUDE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "deg"
+        START_BYTE                   = 73
+        BYTES                        = 8
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "CENTER_LATITUDE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "deg"
+        START_BYTE                   = 81
+        BYTES                        = 8
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "CENTER_LONGITUDE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "deg"
+        START_BYTE                   = 89
+        BYTES                        = 8
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "EMISSION_ANGLE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "deg"
+        START_BYTE                   = 97
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SPACECRAFT_AZIMUTH"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "deg"
+        START_BYTE                   = 101
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "INCIDENCE_ANGLE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "deg"
+        START_BYTE                   = 105
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SOLAR_AZIMUTH_ANGLE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "deg"
+        START_BYTE                   = 109
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "PHASE_ANGLE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "deg"
+        START_BYTE                   = 113
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SP_TEMPERATURE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "degC"
+        START_BYTE                   = 117
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SP_PELTIER_HOT_TEMPERATURE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "degC"
+        START_BYTE                   = 121
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SP_N2_RADIATOR_TEMPERATURE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "degC"
+        START_BYTE                   = 125
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SP_CAL_VIS_TEMPERATURE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "degC"
+        START_BYTE                   = 129
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SP_CAL_NIR_TEMPERATURE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "degC"
+        START_BYTE                   = 133
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "DPU_TEMPERATURE"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "degC"
+        START_BYTE                   = 137
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SP_POWER_P5V"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "V"
+        START_BYTE                   = 141
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SP_POWER_M15V"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "V"
+        START_BYTE                   = 145
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SP_POWER_P15V"
+        DATA_TYPE                    = IEEE_REAL
+        UNIT                         = "V"
+        START_BYTE                   = 149
+        BYTES                        = 4
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "CALIBRATION"
+        DATA_TYPE                    = MSB_INTEGER
+        UNIT                         = "N/A"
+        START_BYTE                   = 153
+        BYTES                        = 1
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SP_PELTIER"
+        DATA_TYPE                    = MSB_INTEGER
+        UNIT                         = "N/A"
+        START_BYTE                   = 154
+        BYTES                        = 1
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "TC_MI_STATUS"
+        DATA_TYPE                    = MSB_INTEGER
+        UNIT                         = "N/A"
+        START_BYTE                   = 155
+        BYTES                        = 1
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "CLOCK_COUNT_ERR_FLAG"
+        DATA_TYPE                    = MSB_INTEGER
+        UNIT                         = "N/A"
+        START_BYTE                   = 156
+        BYTES                        = 1
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SPATIAL_RESOLUTION_FLAG"
+        DATA_TYPE                    = MSB_UNSIGNED_INTEGER
+        UNIT                         = "N/A"
+        START_BYTE                   = 157
+        BYTES                        = 1
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "GEOMETRIC_INFO_RECAL_FLAG"
+        DATA_TYPE                    = MSB_UNSIGNED_INTEGER
+        UNIT                         = "N/A"
+        START_BYTE                   = 158
+        BYTES                        = 1
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SUPPORT_IMAGE_LINE_POSITION"
+        DATA_TYPE                    = MSB_UNSIGNED_INTEGER
+        UNIT                         = "N/A"
+        START_BYTE                   = 159
+        BYTES                        = 2
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "SUPPORT_IMAGE_COLUMN_POSITION"
+        DATA_TYPE                    = MSB_UNSIGNED_INTEGER
+        UNIT                         = "N/A"
+        START_BYTE                   = 161
+        BYTES                        = 2
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "THUMBNAIL_LINE_POSITION"
+        DATA_TYPE                    = MSB_UNSIGNED_INTEGER
+        UNIT                         = "N/A"
+        START_BYTE                   = 163
+        BYTES                        = 2
+    END_OBJECT                       = COLUMN
+
+    OBJECT                           = COLUMN
+        NAME                         = "THUMBNAIL_COLUMN_POSITION"
+        DATA_TYPE                    = MSB_UNSIGNED_INTEGER
+        UNIT                         = "N/A"
+        START_BYTE                   = 165
+        BYTES                        = 2
+    END_OBJECT                       = COLUMN
+
+END_OBJECT                           = ANCILLARY_AND_SUPPLEMENT_DATA
+
+OBJECT                               = SP_SPECTRUM_WAV
+    LINES                            = 1
+    LINE_SAMPLES                     = 296
+    SAMPLE_TYPE                      = MSB_UNSIGNED_INTEGER
+    SAMPLE_BITS                      = 16
+    IMAGE_VALUE_TYPE                 = "WAVELENGTH"
+    UNIT                             = "nm"
+    SCALING_FACTOR                   = 0.100000
+    OFFSET                           = 0.000000
+END_OBJECT                           = SP_SPECTRUM_WAV
+
+OBJECT                               = SP_SPECTRUM_RAW
+    LINES                            = 38
+    LINE_SAMPLES                     = 296
+    SAMPLE_TYPE                      = MSB_UNSIGNED_INTEGER
+    SAMPLE_BITS                      = 16
+    IMAGE_VALUE_TYPE                 = "RAW_DN"
+    UNIT                             = "ND"
+    SCALING_FACTOR                   = "N/A"
+    OFFSET                           = "N/A"
+END_OBJECT                           = SP_SPECTRUM_RAW
+
+OBJECT                               = SP_SPECTRUM_REF2
+    LINES                            = 38
+    LINE_SAMPLES                     = 296
+    SAMPLE_TYPE                      = MSB_UNSIGNED_INTEGER
+    SAMPLE_BITS                      = 16
+    IMAGE_VALUE_TYPE                 = "REFLECTANCE"
+    UNIT                             = "ND"
+    SCALING_FACTOR                   = 0.000100
+    OFFSET                           = 0.000000
+END_OBJECT                           = SP_SPECTRUM_REF2
+
+OBJECT                               = SP_SPECTRUM_RAD
+    LINES                            = 38
+    LINE_SAMPLES                     = 296
+    SAMPLE_TYPE                      = MSB_UNSIGNED_INTEGER
+    SAMPLE_BITS                      = 16
+    IMAGE_VALUE_TYPE                 = "RADIANCE"
+    UNIT                             = "W/m**2/micron/sr"
+    SCALING_FACTOR                   = 0.010000
+    OFFSET                           = 0.000000
+END_OBJECT                           = SP_SPECTRUM_RAD
+
+OBJECT                               = SP_SPECTRUM_REF1
+    LINES                            = 38
+    LINE_SAMPLES                     = 296
+    SAMPLE_TYPE                      = MSB_UNSIGNED_INTEGER
+    SAMPLE_BITS                      = 16
+    IMAGE_VALUE_TYPE                 = "REFLECTANCE"
+    UNIT                             = "ND"
+    SCALING_FACTOR                   = 0.000100
+    OFFSET                           = 0.000000
+END_OBJECT                           = SP_SPECTRUM_REF1
+
+OBJECT                               = SP_SPECTRUM_QA
+    LINES                            = 38
+    LINE_SAMPLES                     = 296
+    SAMPLE_TYPE                      = MSB_UNSIGNED_INTEGER
+    SAMPLE_BITS                      = 16
+    IMAGE_VALUE_TYPE                 = "QUALITY"
+    UNIT                             = "N/A"
+    SCALING_FACTOR                   = 1.000000
+    OFFSET                           = 0.000000
+END_OBJECT                           = SP_SPECTRUM_QA
+
+OBJECT                               = L2D_RESULT_ARRAY
+    LINES                            = 0
+    LINE_SAMPLES                     = 0
+    SAMPLE_TYPE                      = "N/A"
+    SAMPLE_BITS                      = NULL
+    IMAGE_VALUE_TYPE                 = "N/A"
+    UNIT                             = "N/A"
+    SCALING_FACTOR                   = "N/A"
+    OFFSET                           = "N/A"
+    AXES                             = NULL 
+    AXIS_ITEMS                       = NULL  
+    NAME                             = NULL 
+END_OBJECT                           = L2D_RESULT_ARRAY
+END

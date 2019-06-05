@@ -1,6 +1,6 @@
 import json
 import numpy as np
-
+import datetime
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -9,7 +9,7 @@ class NumpyEncoder(json.JSONEncoder):
         elif isinstance(obj, datetime.date):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
-
+ 
 def read_json(inputfile):
     """
     Read the input json file into a python dictionary.

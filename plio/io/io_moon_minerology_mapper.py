@@ -2,6 +2,15 @@ import os
 import numpy as np
 from .io_gdal import GeoDataset
 from .hcube import HCube
+
+try:
+    from libpyhat.derived import m3
+    from libpyhat.derived.utils import get_derived_funcs
+    libpyhat_enabled = True
+except:
+    print('No libpyhat module. Unable to attach derived product functions')
+    libpyhat_enabled = False
+
 import gdal
 
 
@@ -9,6 +18,26 @@ class M3(GeoDataset, HCube):
     """
     An M3 specific reader with the spectral mixin.
     """
+    def __init__(self, file_name):
+
+        GeoDataset.__init__(self, file_name)
+        HCube.__init__(self)
+
+        self.derived_funcs = {}
+
+        if libpyhat_enabled:
+            self.derived_funcs = get_derived_funcs(m3)
+
+    def __getattr__(self, name):
+        try:
+            func = self.derived_funcs[name]
+
+            setattr(self, name, func.__get__(self))
+            return getattr(self, name)
+
+        except KeyError as keyerr:
+            raise AttributeError("'M3' object has no attribute '{}'".format(name)) from None
+
     @property
     def wavelengths(self):
         if not hasattr(self, '_wavelengths'):

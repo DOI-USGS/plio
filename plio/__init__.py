@@ -9,10 +9,9 @@ try:
     if not here.startswith(os.path.join(dist_loc, 'plio')):
         # not installed, but there is another version that *is*
         raise DistributionNotFound
+    __version__ = _dist.version
 except DistributionNotFound:
     __version__ = 'Please install this project with setup.py'
-else:
-    __version__ = _dist.version
 
 # Submodule imports
 from . import io
@@ -21,4 +20,3 @@ from . import data
 from . import examples
 from . import geofuncs
 from . import utils
-from . import spatial
