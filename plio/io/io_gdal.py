@@ -306,6 +306,28 @@ class GeoDataset(object):
         return self._footprint
 
     @property
+    def image_boundary(self, npoints=10):
+        '''
+        Generates a bounding box given a camera model
+
+        Parameters
+        ----------
+        npoints : int
+                Number of points to generate between the corners of the bounding
+                box per side.
+        Returns
+        -------
+        boundary : list
+                List of full bounding box
+        '''
+        xsize, ysize = self.raster_size
+        x = np.linspace(0, xsize, npoints)
+        y = np.linspace(0, ysize, npoints)
+        boundary = [(i,0.) for i in x] + [(xsize, i) for i in y[1:]] +\
+                [(i, isize[1]) for i in x[::-1][1:]] + [(0.,i) for i in y[::-1][1:]]
+        return boundary
+
+    @property
     def xy_corners(self):
         return [(0, 0),
                 (0, self.dataset.RasterYSize),
