@@ -32,7 +32,7 @@ def setup_logging(path=get_path('logging.json'),
                 config = json.load(f)
             elif logtype == '.yaml':
                 import yaml
-                config = yaml.load(f.read())
+                config = yaml.safe_load(f.read())
         logging.config.dictConfig(config)
     else:
         logging.basicConfig(level=level)
