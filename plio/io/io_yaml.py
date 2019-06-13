@@ -17,7 +17,7 @@ def read_yaml(inputfile):
     """
     try:
         with open(inputfile, 'r') as f:
-            ydict = yaml.load(f)
+            ydict = yaml.safe_load(f)
     except:  # pragma: no cover
         raise IOError('Unable to load YAML file.')
     return ydict
