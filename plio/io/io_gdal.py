@@ -191,6 +191,7 @@ class GeoDataset(object):
 
     @property
     def forward_affine(self):
+        print(self.geotransform)
         self._fa = affine.Affine.from_gdal(*self.geotransform)
         return self._fa
 
@@ -460,6 +461,7 @@ class GeoDataset(object):
                    (Latitude, Longitude) corresponding to the given (x,y).
 
         """
+
         lon, lat = self.forward_affine * (x,y)
         lon, lat, _ = self.coordinate_transformation.TransformPoint(lon, lat)
         return lat, lon
