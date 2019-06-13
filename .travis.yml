@@ -12,8 +12,8 @@ os:
 env:
   - PYTHON_VERSION=3.5 HAS_GDAL=true
   - PYTHON_VERSION=3.6 HAS_GDAL=true
-  - PYTHON_VERSION=3.5 HAS_GDAL=false
   - PYTHON_VERSION=3.6 HAS_GDAL=false
+  - PYTHON_VERSION=3.7 HAS_GDAL=true
 
 before_install:
   # We do this conditionally because it saves us some downloading if the
