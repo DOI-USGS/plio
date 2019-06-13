@@ -16,7 +16,6 @@ DEFAULTUSERNAME = 'None'
 def write_filelist(lst, path="fromlist.lis"):
     """
     Writes a filelist to a file so it can be used in ISIS3.
-
     Parameters
     ----------
     lst : list
@@ -53,58 +52,6 @@ def to_isis(path, obj, serials, mode='wb', version=2,
             description='None', username=DEFAULTUSERNAME,
             creation_date=None, modified_date=None,
             pointid_prefix=None, pointid_suffix=None):
-    """
-
-    Write an AutoCNET Candidate graph object to an ISIS3 compatible control
-    network.
-
-    Parameters
-    ----------
-    path : str
-           Input path where the file is to be written
-
-    network : dict
-              A dict of lists keyed with a
-
-    mode : {'a', 'w', 'r', 'r+'}
-
-        ``'r'``
-            Read-only; no data can be modified.
-        ``'w'``
-            Write; a new file is created (an existing file with the same
-            name would be deleted).
-        ``'a'``
-            Append; an existing file is opened for reading and writing,
-            and if the file does not exist it is created.
-        ``'r+'``
-            It is similar to ``'a'``, but the file must already exist.
-
-    version : int
-          The current ISIS version to write, defaults to 2
-
-    headerstartbyte : int
-                      The seek offset that the protocol buffer header starts at
-
-    networkid : str
-                The name of the network
-
-    targetname : str
-                 The name of the target, e.g. Moon
-
-    description : str
-                  A description for the network.
-
-    username : str
-               The name of the user / application that created the control network
-
-    pointid_prefix : str
-                     Prefix to be added to the pointid.  If the prefix is 'foo_', pointids
-                     will be in the form 'foo_1, foo_2, ..., foo_n'
-
-    pointid_suffix : str
-                     Suffix to tbe added to the point id.  If the suffix is '_bar', pointids
-                     will be in the form '1_bar, 2_bar, ..., n_bar'.
-    """
     with IsisStore(path, mode) as store:
         if not creation_date:
             creation_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
@@ -136,7 +83,6 @@ def to_isis(path, obj, serials, mode='wb', version=2,
 class IsisStore(object):
     """
     Class to manage IO of an ISIS control network (version 2).
-
     Attributes
     ----------
     pointid : int
@@ -247,7 +193,6 @@ class IsisStore(object):
         ----------
         data : str
                to be written to the file
-
         offset : int
                  The byte offset into the output binary
         """
@@ -257,19 +202,16 @@ class IsisStore(object):
     def create_points(self, df, serials, pointid_prefix, pointid_suffix):
         """
         Step through a control network (C) and return protocol buffer point objects
-
         Parameters
         ----------
         df : DataFrame
               with the appropriate attributes: point_id, point_type, serial,
               measure_type, x, y required.
               The entries in the list must support grouping by the point_id attribute.
-
         Returns
         -------
         point_messages : list
                          of serialized points buffers
-
         point_sizes : list
                       of integer point sizes
         """
@@ -314,7 +256,8 @@ class IsisStore(object):
                 for attr, attrtype in self.measure_attrs:
                     if attr in g.columns:
                         setattr(measure_spec, attr, attrtype(m[attr]))
-                measure_spec.serialnumber = serials[m.image_index]
+
+                measure_spec.serialnumber = serials[node_id]
                 measure_spec.sample = m.x
                 measure_spec.line = m.y
                 measure_spec.type = 2
@@ -336,29 +279,22 @@ class IsisStore(object):
         """
         Create the Google Protocol Buffer header using the
         protobuf spec.
-
         Parameters
         ----------
         networkid : str
                     The user defined identifier of this control network
-
         targetname : str
                  The name of the target, e.g. Moon
-
         description : str
                   A description for the network.
-
         username : str
                The name of the user / application that created the control network
-
         point_sizes : list
                       of the point sizes for each point message
-
         Returns
         -------
         header_message : str
                   The serialized message to write
-
         header_message_size : int
                               The size of the serialized header, in bytes
         """
@@ -382,38 +318,28 @@ class IsisStore(object):
                           creation_date, modified_date):
         """
         Create the PVL header object
-
         Parameters
         ----------
         version : int
               The current ISIS version to write, defaults to 2
-
         headerstartbyte : int
                           The seek offset that the protocol buffer header starts at
-
         networkid : str
                     The name of the network
-
         targetname : str
                      The name of the target, e.g. Moon
-
         description : str
                       A description for the network.
-
         username : str
                    The name of the user / application that created the control network
-
         buffer_header_size : int
                              Total size of the header in bytes
-
         points_bytes : int
                        The total number of bytes all points require
-
         Returns
         -------
          : object
            An ISIS compliant PVL header object
-
         """
 
         encoder = pvl.encoder.IsisCubeLabelEncoder
