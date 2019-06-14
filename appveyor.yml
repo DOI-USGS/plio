@@ -47,7 +47,7 @@ build_script:
   - cmd: python setup.py install
 
 test_script:
-  - cmd: pytest libpyhat/
+  - cmd: pytest plio/
 
 on_success:
   - cmd: deactivate
