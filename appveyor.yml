@@ -49,8 +49,8 @@ build_script:
 test_script:
   - cmd: pytest plio/
 
-on_success:
-  - cmd: conda deactivate
-  - cmd: conda install conda-build anaconda-client
-  - cmd: conda config --set anaconda_upload yes
-  - cmd: conda build --token %CONDA_UPLOAD_TOKEN% .
+    #on_success:
+    #- cmd: conda deactivate
+    #- cmd: conda install conda-build anaconda-client
+    #- cmd: conda config --set anaconda_upload yes
+    # - cmd: conda build --token %CONDA_UPLOAD_TOKEN% .
