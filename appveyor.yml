@@ -2,11 +2,10 @@ branches:
   only:
   - master
 
-version: '0.1.0.{build}'
+version: 1.2.0.{build}'
 
 platform:
   - x64
-  - x86
 
 environment:
   matrix:
@@ -14,22 +13,7 @@ environment:
       PYTHON_VERSION: 3.6
     - PYTHON: "C:\\Miniconda37-x64\\Scripts\\activate.bat"
       PYTHON_VERSION: 3.7
-    - PYTHON: "C:\\Miniconda36\\Scripts\\activate.bat"
-      PYTHON_VERSION: 3.6
-    - PYTHON: "C:\\Miniconda37\\Scripts\\activate.bat"
-      PYTHON_VERSION: 3.7    
 
-matrix:
-  exclude:
-    - PYTHON: "C:\\Miniconda36-x64\\Scripts\\activate.bat"
-      platform: x86
-    - PYTHON: "C:\\Miniconda37-x64\\Scripts\\activate.bat"
-      platform: x86
-    - PYTHON: "C:\\Miniconda36\\Scripts\\activate.bat"
-      platform: x64
-    - PYTHON: "C:\\Miniconda37\\Scripts\\activate.bat"
-      platform: x64
-      
 configuration:
   - Release
 
