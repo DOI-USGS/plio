@@ -191,7 +191,6 @@ class GeoDataset(object):
 
     @property
     def forward_affine(self):
-        print(self.geotransform)
         self._fa = affine.Affine.from_gdal(*self.geotransform)
         return self._fa
 
