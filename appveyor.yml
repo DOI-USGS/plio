@@ -43,8 +43,11 @@ install:
   - cmd: conda env update -n test -f environment.yml
   - cmd: activate test
 
+build_script:
+  - cmd: python setup.py install
+
 test_script:
-  - cmd: pytest plio/
+  - cmd: pytest libpyhat/
 
 on_success:
   - cmd: deactivate
