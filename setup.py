@@ -1,26 +1,14 @@
 import os
 from setuptools import setup, find_packages
-import plio
-from plio.examples import available
+
 #Grab the README.md for the long description
-with open('README.rst', 'r') as f:
+with open('README.md', 'r') as f:
     long_description = f.read()
 
 def setup_package():
-    examples = set()
-    for i in available():
-        if not os.path.isdir('plio/examples/' + i):
-            if '.' in i:
-                glob_name = 'examples/*.' + i.split('.')[-1]
-            else:
-                glob_name = 'examples/' + i
-        else:
-            glob_name = 'examples/' + i + '/*'
-        examples.add(glob_name)
-
     setup(
         name = "plio",
-        version = '0.1.4',
+        version = '1.2.0',
         author = "Jay Laura",
         author_email = "jlaura@usgs.gov",
         description = ("I/O API to support planetary data formats."),
@@ -30,13 +18,14 @@ def setup_package():
         url = "http://packages.python.org/plio",
         packages=find_packages(),
         include_package_data=True,
-        package_data={'plio' : list(examples) + ['data/*.db', 'data/*.py'] +\
-                ['sqlalchemy_json/*.py', 'sqlalchemy_json/LICENSE']},
-        zip_safe=False,
+        package_data={'plio' : ['sqlalchemy_json/*.py', 'sqlalchemy_json/LICENSE']},
+        zip_safe=True,
         scripts=['bin/socetnet2isis', 'bin/isisnet2socet'],
         install_requires=[
             'gdal',
             'numpy',
+            'pyproj',
+            'jinja2',
             'pvl',
             'protobuf',
             'h5py',

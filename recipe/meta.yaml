@@ -1,12 +1,15 @@
+{% set data = load_setup_py_data() %}
+
 package:
   name: plio
-  version: 0.1.4
+  version: {{ data.get('version') }}
 
 source:
   git_url: https://github.com/USGS-Astrogeology/plio
 
 build:
-  number: 1
+  number: {{ GIT_DESCRIBE_NUMBER }}
+  string: dev
 
 extra:
   channels:
@@ -47,9 +50,8 @@ requirements:
     - scipy
     - certifi
     - pyproj
-    - csmapi
-    - usgscam
     - jinja2
+
 
 test:
   imports:

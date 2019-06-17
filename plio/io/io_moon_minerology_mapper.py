@@ -4,12 +4,12 @@ from .io_gdal import GeoDataset
 from .hcube import HCube
 
 try:
-    from libpysat.derived import m3, crism
-    from libpysat.derived.utils import add_derived_funcs
-    libpysat_enabled = True
+    from libpyhat.derived import m3
+    from libpyhat.derived.utils import get_derived_funcs
+    libpyhat_enabled = True
 except:
-    print('No libpysat module. Unable to attached derived product functions')
-    libpysat_enabled = False
+    print('No libpyhat module. Unable to attach derived product functions')
+    libpyhat_enabled = False
 
 import gdal
 
@@ -23,8 +23,10 @@ class M3(GeoDataset, HCube):
         GeoDataset.__init__(self, file_name)
         HCube.__init__(self)
 
-        if libpysat_enabled:
-            self.derived_funcs = add_derived_funcs(m3)
+        self.derived_funcs = {}
+
+        if libpyhat_enabled:
+            self.derived_funcs = get_derived_funcs(m3)
 
     def __getattr__(self, name):
         try:
@@ -33,8 +35,8 @@ class M3(GeoDataset, HCube):
             setattr(self, name, func.__get__(self))
             return getattr(self, name)
 
-        except:
-            raise AttributeError()
+        except KeyError as keyerr:
+            raise AttributeError("'M3' object has no attribute '{}'".format(name)) from None
 
     @property
     def wavelengths(self):

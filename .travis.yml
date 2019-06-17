@@ -10,11 +10,10 @@ os:
   - osx
 
 env:
-  - PYTHON_VERSION=3.5 HAS_GDAL=true
   - PYTHON_VERSION=3.6 HAS_GDAL=true
-  - PYTHON_VERSION=3.5 HAS_GDAL=false
   - PYTHON_VERSION=3.6 HAS_GDAL=false
-
+  - PYTHON_VERSION=3.7 HAS_GDAL=true
+  - PYTHON_VERSION=3.7 HAS_GDAL=false
 before_install:
   # We do this conditionally because it saves us some downloading if the
   # version is the same.
@@ -40,9 +39,9 @@ install:
   - conda config --add channels usgs-astrogeology
   - conda config --add channels conda-forge
   - if $HAS_GDAL; then
-      conda install libgdal gdal numpy pyproj h5py pvl scipy protobuf affine jinja2 networkx pandas sqlalchemy pyyaml ncurses pytest pytest-cov sh coveralls nbsphinx;
+      conda env update -n test -f environment.yml;
     else
-      conda install numpy pyproj h5py pvl scipy protobuf affine jinja2 networkx pandas sqlalchemy pyyaml ncurses pytest pytest-cov sh coveralls nbsphinx;
+      conda env update -n test -f environment_noGDAL.yml;
     fi
 
 script:
@@ -53,8 +52,13 @@ after_success:
   # Need to do the build in the root
   - source deactivate
   - conda install -q conda-build anaconda-client
-  - conda config --set anaconda_upload yes
-  - conda build --token $CONDA_UPLOAD_TOKEN --python $PYTHON_VERSION recipe -q
+  - conda config --set anaconda_upload no
+  - conda build recipe -q
+  - builddir=(`conda build recipe --output`)
+  - |
+    if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+      anaconda -t="$CONDA_UPLOAD_TOKEN" upload $builddir --force;
+    fi
 
   # Docs to gh-pages
   - source activate test  # Reactivate the env to have all deps installed.

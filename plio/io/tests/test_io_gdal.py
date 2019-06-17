@@ -62,7 +62,9 @@ class TestMercator(unittest.TestCase):
     def test_spheroid(self):
         sphere = self.dataset.spheroid
         self.assertAlmostEqual(sphere[0], 3396190.0, 6)
-        self.assertEqual(self.dataset.spheroid, (3396190.0, 3376200.0, 169.8944472236118))
+        self.assertAlmostEqual(self.dataset.spheroid[0], 3396190.0)
+        self.assertAlmostEqual(self.dataset.spheroid[1], 3376200.0)
+        self.assertAlmostEqual(self.dataset.spheroid[2], 169.8944472236118)
         self.assertAlmostEqual(sphere[1], 3376200.0, 6)
         self.assertAlmostEqual(sphere[2], 169.8944472236118, 6)
 
@@ -97,12 +99,13 @@ class TestMercator(unittest.TestCase):
     def test_read_array(self):
         arr = self.dataset.read_array()
         self.assertEqual(arr.shape, (1694, 2304))
-        self.assertEqual(arr.dtype, np.float32)
+        self.assertEqual(arr.dtype, np.int8)
 
     def test_read_array_set_dtype(self):
-        arr = self.dataset.read_array(dtype='int8')
-        self.assertEqual(arr.dtype, np.int8)
-        self.assertAlmostEqual(np.mean(arr), 10.10353227, 6)
+        arr = self.dataset.read_array(dtype="float32")
+        self.assertEqual(arr.dtype, np.float32)
+        self.assertEqual(np.min(arr), 0)
+        self.assertEqual(np.max(arr), 255)
 
 @pytest.mark.skipif(gdal is None, reason="GDAL not installed")
 class TestLambert(unittest.TestCase):
@@ -224,17 +227,17 @@ class TestWriter(unittest.TestCase):
             UNIT["Meter",1.0]]"""
         io_gdal.array_to_raster(self.arr, 'test.tif', projection=wktsrs)
         expected_srs = """PROJCS["Moon2000_Mercator180",
-            GEOGCS["GCS_Moon_2000",
-                DATUM["Moon_2000",
-                    SPHEROID["Moon_2000_IAU_IAG",1737400,0]],
-                PRIMEM["Reference_Meridian",0],
-                UNIT["Degree",0.017453292519943295]],
-            PROJECTION["Mercator_2SP"],
-            PARAMETER["central_meridian",180],
-            PARAMETER["false_easting",0],
-            PARAMETER["false_northing",0],
-            PARAMETER["standard_parallel_1",0],
-            UNIT["Meter",1]]"""
+    GEOGCS["GCS_Moon_2000",
+        DATUM["Moon_2000",
+            SPHEROID["Moon_2000_IAU_IAG",1737400,0]],
+        PRIMEM["Reference_Meridian",0],
+        UNIT["Degree",0.017453292519943295]],
+    PROJECTION["Mercator_2SP"],
+    PARAMETER["central_meridian",180],
+    PARAMETER["false_easting",0],
+    PARAMETER["false_northing",0],
+    PARAMETER["standard_parallel_1",0],
+    UNIT["Meter",1]]"""
         dataset = io_gdal.GeoDataset('test.tif')
         test_srs = dataset.spatial_reference.__str__()
         self.assertEqual(test_srs.split(), expected_srs.split())

@@ -14,15 +14,13 @@ from plio.examples import get_path
 
 import pytest
 
-@pytest.fixture
-def apollo_cnet():
-    return get_path('apollo_out.net')
-
 sys.path.insert(0, os.path.abspath('..'))
 
-
-def test_cnet_read(apollo_cnet):
-    df = io_controlnetwork.from_isis(apollo_cnet)
+@pytest.mark.parametrize('cnet_file',
+                         (get_path('apollo_out.net'), get_path('apollo_out_v5.net'))
+)
+def test_cnet_read(cnet_file):
+    df = io_controlnetwork.from_isis(cnet_file)
     assert len(df) == find_in_dict(df.header, 'NumberOfMeasures')
     assert isinstance(df, io_controlnetwork.IsisControlNetwork)
     assert len(df.groupby('id')) == find_in_dict(df.header, 'NumberOfPoints')
@@ -35,9 +33,7 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
         serial_times = {295: '1971-07-31T01:24:11.754',
                         296: '1971-07-31T01:24:36.970'}
         cls.serials = {i:'APOLLO15/METRIC/{}'.format(j) for i, j in enumerate(serial_times.values())}
-        columns = ['point_id', 'point_type', 'serialnumber', 'measure_type', 'x', 'y', 'image_index']
-
-
+        columns = ['point_id', 'type', 'serialnumber', 'measure_type', 'x', 'y', 'image_index']
 
         data = []
         for i in range(cls.npts):
@@ -48,7 +44,7 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
 
         cls.creation_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
         cls.modified_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-        io_controlnetwork.to_isis('test.net', df, cls.serials, mode='wb', targetname='Moon')
+        io_controlnetwork.to_isis(df, 'test.net', mode='wb', targetname='Moon')
 
         cls.header_message_size = 78
         cls.point_start_byte = 65614 # 66949
@@ -58,7 +54,7 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
         serial_times = {295: '1971-07-31T01:24:11.754',
                         296: '1971-07-31T01:24:36.970'}
         serials = {i:'APOLLO15/METRIC/{}'.format(j) for i, j in enumerate(serial_times.values())}
-        columns = ['point_id', 'point_type', 'serialnumber', 'measure_type', 'x', 'y', 'image_index']
+        columns = ['point_id', 'type', 'serialnumber', 'measure_type', 'x', 'y', 'image_index']
 
         data = []
         for i in range(self.npts):
@@ -69,7 +65,7 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
 
         self.creation_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
         self.modified_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-        io_controlnetwork.to_isis('test.net', df, serials, mode='wb', targetname='Moon')
+        io_controlnetwork.to_isis(df, 'test.net', mode='wb', targetname='Moon')
 
         self.header_message_size = 78
         self.point_start_byte = 65614 # 66949
