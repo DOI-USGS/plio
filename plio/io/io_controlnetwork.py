@@ -259,7 +259,7 @@ class IsisStore(object):
                 measure_spec.serialnumber = m.serialnumber
                 measure_spec.sample = m.x
                 measure_spec.line = m.y
-                measure_spec.type = m.measure_type
+                measure_spec.type = m.measuretype
                 measure_iterable.append(measure_spec)
                 self.nmeasures += 1
 
