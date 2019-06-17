@@ -180,6 +180,8 @@ class IsisStore(object):
                     pts.append(meas)
 
                 byte_count += 4 + message_size
+        self.point_attrs = [i if i != 'jigsawRejected' else 'pointJigsawRejected' for i in self.point_attrs]
+        cols = self.point_attrs + self.measure_attrs
 
         cols = self.point_attrs + self.measure_attrs
         df = IsisControlNetwork(pts, columns=cols)
@@ -370,4 +372,3 @@ class IsisStore(object):
         ])
 
         return pvl.dumps(header, cls=encoder)
-
