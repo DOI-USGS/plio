@@ -204,7 +204,6 @@ class IsisStore(object):
         point_cols = [self.point_field_map[attr] if attr in self.point_field_map else attr for attr in self.point_attrs]
         measure_cols = [self.measure_field_map[attr] if attr in self.measure_field_map else attr for attr in self.measure_attrs]
         cols = point_cols + measure_cols
-        print(cols)
         df = IsisControlNetwork(pts, columns=cols)
         df.header = pvl_header
         return df
