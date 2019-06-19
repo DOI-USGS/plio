@@ -143,6 +143,25 @@ class IsisStore(object):
               The current index to be assigned to newly added points
     """
 
+    point_field_map = {
+        'type' : 'pointType',
+        'choosername' : 'pointChoosername',
+        'datetime' : 'pointDatetime',
+        'editLock' : 'pointEditLock',
+        'ignore' : 'pointIgnore',
+        'jigsawRejected' : 'pointJigsawRejected',
+        'log' : 'pointLog'
+    }
+    measure_field_map = {
+        'type' : 'measureType',
+        'choosername' : 'measureChoosername',
+        'datetime' : 'measureDatetime',
+        'editLock' : 'measureEditLock',
+        'ignore' : 'measureIgnore',
+        'jigsawRejected' : 'measureJigsawRejected',
+        'log' : 'measureLog'
+    }
+
     def __init__(self, path, mode=None, **kwargs):
         self.nmeasures = 0
         self.npoints = 0
@@ -235,7 +254,11 @@ class IsisStore(object):
 
                 byte_count += 4 + message_size
 
-        cols = self.point_attrs + self.measure_attrs
+        # Some point and measure fields have the same name, so mangle them as point_ and measure_
+        point_cols = [self.point_field_map[attr] if attr in self.point_field_map else attr for attr in self.point_attrs]
+        measure_cols = [self.measure_field_map[attr] if attr in self.measure_field_map else attr for attr in self.measure_attrs]
+        cols = point_cols + measure_cols
+        print(cols)
         df = IsisControlNetwork(pts, columns=cols)
         df.header = pvl_header
         return df
@@ -302,7 +325,8 @@ class IsisStore(object):
                         point_spec.aprioriCovar.extend(arr)
                     else:
                         setattr(point_spec, attr, attrtype(g.iloc[0][attr]))
-            point_spec.type = 2  # Hardcoded to free this is bad
+                elif attr in self.point_field_map:
+                    setattr(point_spec, attr, attrtype(g.iloc[0][self.point_field_map[attr]]))
 
             # The reference index should always be the image with the lowest index
             point_spec.referenceIndex = 0
@@ -314,6 +338,8 @@ class IsisStore(object):
                 for attr, attrtype in self.measure_attrs:
                     if attr in g.columns:
                         setattr(measure_spec, attr, attrtype(m[attr]))
+                    elif attr in self.measure_field_map:
+                        setattr(measure_spec, attr, attrtype(m[self.measure_field_map[attr]]))
                 measure_spec.serialnumber = serials[m.image_index]
                 measure_spec.sample = m.x
                 measure_spec.line = m.y
