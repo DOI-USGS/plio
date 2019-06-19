@@ -3,8 +3,8 @@ channels:
   - conda-forge
   - usgs-astrogeology
 dependencies:
-  - libgdal 
-  - gdal 
+  - libgdal < 3 
+  - gdal < 3 
   - numpy 
   - pyproj 
   - h5py 
@@ -17,9 +17,7 @@ dependencies:
   - pandas 
   - sqlalchemy 
   - pyyaml 
-  - ncurses 
   - pytest 
   - pytest-cov 
-  - sh 
   - coveralls 
   - nbsphinx
