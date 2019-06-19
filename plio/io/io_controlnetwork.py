@@ -91,7 +91,7 @@ class IsisStore(object):
 
     point_field_map = {
         'type' : 'pointType',
-        'choosername' : 'pointChoosername',
+        'chooserName' : 'pointChoosername',
         'datetime' : 'pointDatetime',
         'editLock' : 'pointEditLock',
         'ignore' : 'pointIgnore',
