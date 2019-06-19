@@ -267,8 +267,6 @@ class IsisStore(object):
                         point_spec.aprioriCovar.extend(arr)
                     else:
                         setattr(point_spec, attr, attrtype(g.iloc[0][attr]))
-                elif attr in self.point_field_map:
-                    setattr(point_spec, attr, attrtype(g.iloc[0][self.point_field_map[attr]]))
 
             # The reference index should always be the image with the lowest index
             point_spec.referenceIndex = 0
@@ -280,8 +278,6 @@ class IsisStore(object):
                 for attr, attrtype in self.measure_attrs:
                     if attr in g.columns:
                         setattr(measure_spec, attr, attrtype(m[attr]))
-                    elif attr in self.measure_field_map:
-                        setattr(measure_spec, attr, attrtype(m[self.measure_field_map[attr]]))
                 measure_spec.sample = m.x
                 measure_spec.line = m.y
                 measure_spec.type = m.measuretype
