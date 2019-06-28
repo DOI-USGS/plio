@@ -169,7 +169,7 @@ class IsisStore(object):
             self._handle.seek(point_start_byte)
             cp = cnp5.ControlPointFileEntryV0005()
             pts = []
-            byte_count = 0;
+            byte_count = 0
             while byte_count < find_in_dict(pvl_header, 'PointsBytes'):
                 message_size = struct.unpack('I', self._handle.read(4))[0]
                 cp.ParseFromString(self._handle.read(message_size))
@@ -185,6 +185,9 @@ class IsisStore(object):
 
         cols = self.point_attrs + self.measure_attrs
         df = IsisControlNetwork(pts, columns=cols)
+        # Convert the (0.5, 0.5) origin pixels back to (0,0) pixels
+        df['line'] -= 0.5
+        df['sample'] -= 0.5
         df.header = pvl_header
         return df
 
