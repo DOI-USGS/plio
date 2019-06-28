@@ -259,8 +259,9 @@ class IsisStore(object):
                     if attr in g.columns:
                         setattr(measure_spec, attr, attrtype(m[attr]))
                 measure_spec.serialnumber = m.serialnumber
-                measure_spec.sample = m.x
-                measure_spec.line = m.y
+                # ISIS pixels are centered on (0.5, 0.5). NDArrays are (0,0) based.
+                measure_spec.sample = m.x + 0.5 
+                measure_spec.line = m.y + 0.5
                 measure_spec.type = m.measuretype
                 measure_iterable.append(measure_spec)
                 self.nmeasures += 1
