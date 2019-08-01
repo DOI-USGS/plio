@@ -188,7 +188,7 @@ class IsisStore(object):
             self._handle.seek(point_start_byte)
             cp = cnp5.ControlPointFileEntryV0005()
             pts = []
-            byte_count = 0;
+            byte_count = 0
             while byte_count < find_in_dict(pvl_header, 'PointsBytes'):
                 message_size = struct.unpack('I', self._handle.read(4))[0]
                 cp.ParseFromString(self._handle.read(message_size))
@@ -205,6 +205,9 @@ class IsisStore(object):
         measure_cols = [self.measure_field_map[attr] if attr in self.measure_field_map else attr for attr in self.measure_attrs]
         cols = point_cols + measure_cols
         df = IsisControlNetwork(pts, columns=cols)
+        # Convert the (0.5, 0.5) origin pixels back to (0,0) pixels
+        df['line'] -= 0.5
+        df['sample'] -= 0.5
         df.header = pvl_header
         return df
 
@@ -277,9 +280,11 @@ class IsisStore(object):
                 for attr, attrtype in self.measure_attrs:
                     if attr in g.columns:
                         setattr(measure_spec, attr, attrtype(m[attr]))
-                measure_spec.sample = m.x
-                measure_spec.line = m.y
-                measure_spec.type = m.measuretype
+                measure_spec.serialnumber = m.serialnumber
+                # ISIS pixels are centered on (0.5, 0.5). NDArrays are (0,0) based.
+                measure_spec.sample = m.x + 0.5 
+                measure_spec.line = m.y + 0.5
+                measure_spec.type = m.measure_type
                 measure_iterable.append(measure_spec)
                 self.nmeasures += 1
 
