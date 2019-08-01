@@ -24,6 +24,12 @@ def test_cnet_read(cnet_file):
     assert len(df) == find_in_dict(df.header, 'NumberOfMeasures')
     assert isinstance(df, io_controlnetwork.IsisControlNetwork)
     assert len(df.groupby('id')) == find_in_dict(df.header, 'NumberOfPoints')
+    for proto_field, mangled_field in io_controlnetwork.IsisStore.point_field_map.items():
+        assert proto_field not in df.columns
+        assert mangled_field in df.columns
+    for proto_field, mangled_field in io_controlnetwork.IsisStore.measure_field_map.items():
+        assert proto_field not in df.columns
+        assert mangled_field in df.columns
 
 class TestWriteIsisControlNetwork(unittest.TestCase):
 
