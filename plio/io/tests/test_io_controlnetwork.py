@@ -39,7 +39,7 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
         serial_times = {295: '1971-07-31T01:24:11.754',
                         296: '1971-07-31T01:24:36.970'}
         cls.serials = {i:'APOLLO15/METRIC/{}'.format(j) for i, j in enumerate(serial_times.values())}
-        columns = ['point_id', 'type', 'serialnumber', 'measuretype', 'x', 'y', 'image_index']
+        columns = ['id', 'pointType', 'serialnumber', 'measureType', 'sample', 'line', 'image_index']
 
         data = []
         for i in range(cls.npts):
@@ -60,7 +60,7 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
         serial_times = {295: '1971-07-31T01:24:11.754',
                         296: '1971-07-31T01:24:36.970'}
         serials = {i:'APOLLO15/METRIC/{}'.format(j) for i, j in enumerate(serial_times.values())}
-        columns = ['point_id', 'type', 'serialnumber', 'measuretype', 'x', 'y', 'image_index']
+        columns = ['id', 'pointType', 'serialnumber', 'measureType', 'sample', 'line', 'image_index']
 
         data = []
         for i in range(self.npts):
