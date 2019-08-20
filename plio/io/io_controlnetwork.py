@@ -89,6 +89,25 @@ class IsisStore(object):
               The current index to be assigned to newly added points
     """
 
+    point_field_map = {
+        'type' : 'pointType',
+        'chooserName' : 'pointChoosername',
+        'datetime' : 'pointDatetime',
+        'editLock' : 'pointEditLock',
+        'ignore' : 'pointIgnore',
+        'jigsawRejected' : 'pointJigsawRejected',
+        'log' : 'pointLog'
+    }
+    measure_field_map = {
+        'type' : 'measureType',
+        'choosername' : 'measureChoosername',
+        'datetime' : 'measureDatetime',
+        'editLock' : 'measureEditLock',
+        'ignore' : 'measureIgnore',
+        'jigsawRejected' : 'measureJigsawRejected',
+        'log' : 'measureLog'
+    }
+
     def __init__(self, path, mode=None, **kwargs):
         self.nmeasures = 0
         self.npoints = 0
@@ -169,7 +188,7 @@ class IsisStore(object):
             self._handle.seek(point_start_byte)
             cp = cnp5.ControlPointFileEntryV0005()
             pts = []
-            byte_count = 0;
+            byte_count = 0
             while byte_count < find_in_dict(pvl_header, 'PointsBytes'):
                 message_size = struct.unpack('I', self._handle.read(4))[0]
                 cp.ParseFromString(self._handle.read(message_size))
@@ -180,11 +199,15 @@ class IsisStore(object):
                     pts.append(meas)
 
                 byte_count += 4 + message_size
-        self.point_attrs = [i if i != 'jigsawRejected' else 'pointJigsawRejected' for i in self.point_attrs]
-        cols = self.point_attrs + self.measure_attrs
 
-        cols = self.point_attrs + self.measure_attrs
+        # Some point and measure fields have the same name, so mangle them as point_ and measure_
+        point_cols = [self.point_field_map[attr] if attr in self.point_field_map else attr for attr in self.point_attrs]
+        measure_cols = [self.measure_field_map[attr] if attr in self.measure_field_map else attr for attr in self.measure_attrs]
+        cols = point_cols + measure_cols
         df = IsisControlNetwork(pts, columns=cols)
+        # Convert the (0.5, 0.5) origin pixels back to (0,0) pixels
+        df['line'] -= 0.5
+        df['sample'] -= 0.5
         df.header = pvl_header
         return df
 
@@ -247,7 +270,6 @@ class IsisStore(object):
                         point_spec.aprioriCovar.extend(arr)
                     else:
                         setattr(point_spec, attr, attrtype(g.iloc[0][attr]))
-            # point_spec.type = 2  # Hardcoded to free this is bad
 
             # The reference index should always be the image with the lowest index
             point_spec.referenceIndex = 0
