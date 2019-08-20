@@ -260,16 +260,10 @@ class IsisStore(object):
                     if attr in g.columns:
                         setattr(measure_spec, attr, attrtype(m[attr]))
                 measure_spec.serialnumber = m.serialnumber
-<<<<<<< HEAD
-                measure_spec.sample = m.x
-                measure_spec.line = m.y
-                measure_spec.type = m.measuretype
-=======
                 # ISIS pixels are centered on (0.5, 0.5). NDArrays are (0,0) based.
                 measure_spec.sample = m['sample'] + 0.5
                 measure_spec.line = m['line'] + 0.5
                 measure_spec.type = m.measureType
->>>>>>> 9a9cbb7... Fixing to_isis / from_isis process
                 measure_iterable.append(measure_spec)
                 self.nmeasures += 1
 
