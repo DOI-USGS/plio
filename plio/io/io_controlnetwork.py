@@ -264,8 +264,8 @@ class IsisStore(object):
                 df_attr = self.point_field_map.get(attr, attr)
                 if df_attr in g.columns:
                     # As per protobuf docs for assigning to a repeated field.
-                    if attr == 'aprioriCovar' or attr == 'adjustedCovar':
-                        arr = g.iloc[0][attr]
+                    if df_attr == 'aprioriCovar' or df_attr == 'adjustedCovar':
+                        arr = g.iloc[0][df_attr]
                         if isinstance(arr, np.ndarray):
                             arr = arr.ravel().tolist()
 
