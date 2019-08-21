@@ -248,7 +248,7 @@ class IsisStore(object):
         # TODO: Rewrite using apply syntax for performance
         point_sizes = []
         point_messages = []
-        for i, g in df.groupby('point_id'):
+        for i, g in df.groupby('id'):
 
             # Get the point specification from the protobuf
             point_spec = cnf.ControlPointFileEntryV0002()
@@ -258,11 +258,12 @@ class IsisStore(object):
             # set with the correct type
             #point_spec.id = _set_pid(i)
             point_spec.id = _set_pid(i)
+            point_spec.type = g.iloc[0].pointType
             for attr, attrtype in self.point_attrs:
                 if attr in g.columns:
                     # As per protobuf docs for assigning to a repeated field.
-                    if attr == 'aprioriCovar':
-                        arr = g.iloc[0]['aprioriCovar']
+                    if attr == 'aprioriCovar' or attr == 'adjustedCovar':
+                        arr = g.iloc[0][attr]
                         if isinstance(arr, np.ndarray):
                             arr = arr.ravel().tolist()
 
@@ -282,9 +283,9 @@ class IsisStore(object):
                         setattr(measure_spec, attr, attrtype(m[attr]))
                 measure_spec.serialnumber = m.serialnumber
                 # ISIS pixels are centered on (0.5, 0.5). NDArrays are (0,0) based.
-                measure_spec.sample = m.x + 0.5 
-                measure_spec.line = m.y + 0.5
-                measure_spec.type = m.measure_type
+                measure_spec.sample = m['sample'] + 0.5
+                measure_spec.line = m['line'] + 0.5
+                measure_spec.type = m.measureType
                 measure_iterable.append(measure_spec)
                 self.nmeasures += 1
 
