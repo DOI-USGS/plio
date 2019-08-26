@@ -260,16 +260,18 @@ class IsisStore(object):
             point_spec.id = _set_pid(i)
             point_spec.type = g.iloc[0].pointType
             for attr, attrtype in self.point_attrs:
-                if attr in g.columns:
+                # Un-mangle common attribute names between points and measures
+                df_attr = self.point_field_map.get(attr, attr)
+                if df_attr in g.columns:
                     # As per protobuf docs for assigning to a repeated field.
-                    if attr == 'aprioriCovar' or attr == 'adjustedCovar':
-                        arr = g.iloc[0][attr]
+                    if df_attr == 'aprioriCovar' or df_attr == 'adjustedCovar':
+                        arr = g.iloc[0][df_attr]
                         if isinstance(arr, np.ndarray):
                             arr = arr.ravel().tolist()
 
                         point_spec.aprioriCovar.extend(arr)
                     else:
-                        setattr(point_spec, attr, attrtype(g.iloc[0][attr]))
+                        setattr(point_spec, attr, attrtype(g.iloc[0][df_attr]))
 
             # The reference index should always be the image with the lowest index
             point_spec.referenceIndex = 0
@@ -279,13 +281,13 @@ class IsisStore(object):
                 measure_spec = point_spec.Measure()
                 # For all of the attributes, set if they are an dict accessible attr of the obj.
                 for attr, attrtype in self.measure_attrs:
-                    if attr in g.columns:
-                        setattr(measure_spec, attr, attrtype(m[attr]))
-                measure_spec.serialnumber = m.serialnumber
+                    # Un-mangle common attribute names between points and measures
+                    df_attr = self.measure_field_map.get(attr, attr)
+                    if df_attr in g.columns:
+                        setattr(measure_spec, attr, attrtype(m[df_attr]))
                 # ISIS pixels are centered on (0.5, 0.5). NDArrays are (0,0) based.
                 measure_spec.sample = m['sample'] + 0.5
                 measure_spec.line = m['line'] + 0.5
-                measure_spec.type = m.measureType
                 measure_iterable.append(measure_spec)
                 self.nmeasures += 1
 
