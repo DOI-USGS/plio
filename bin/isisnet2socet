@@ -18,13 +18,13 @@ from plio.utils.utils import find_in_dict, split_all_ext
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('cnet_file', help='Path to an isis control network.')
+    parser.add_argument('cnet_file', help='Path to an ISIS control network.')
     parser.add_argument('e_radius', type=float, help='The semimajor radius of a given target.')
     parser.add_argument('eccentricity', type=float, help='The eccentricity of a given target.')
     parser.add_argument('cub_list', help='Path to a list file of all cubes being used. This \
-                                                                 includes file paths an extnsions.')
+                                                                 includes file paths and extensions.')
     parser.add_argument('out_gpf', help='Path to save location of gpf file and new ipf files.')
-    parser.add_argument('--adjusted', help='Flag for saving apriori values or adjusted values',
+    parser.add_argument('--adjusted', help='Flag to save adjusted values instead of a priori values.',
                                       default=False, required = False)
 
     return parser.parse_args()
@@ -123,8 +123,8 @@ def fix_sample_line(record, serial_dict, cub_dict):
     line_size = find_in_dict(cube, 'Lines')
     sample_size = find_in_dict(cube, 'Samples')
 
-    new_line = record['l.'] - (int(line_size / 2.0)) - 1
-    new_sample = record['s.'] - (int(sample_size / 2.0)) - 1
+    new_line = record['l.'] - (int(line_size / 2.0)) - 0.5
+    new_sample = record['s.'] - (int(sample_size / 2.0)) - 0.5
 
     return new_line, new_sample
 
