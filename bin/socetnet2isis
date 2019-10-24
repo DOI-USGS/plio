@@ -63,8 +63,8 @@ def line_sample_size(record, path):
                 break
 
 
-        line_size = int(line_size)/2.0 + record['l.'] + 1
-        sample_size = int(sample_size)/2.0 + record['s.'] + 1
+        line_size = int(line_size)/2.0 + record['l.'] + 0.5
+        sample_size = int(sample_size)/2.0 + record['s.'] + 0.5
         return sample_size, line_size, img_index
 
 def get_axis(file):
