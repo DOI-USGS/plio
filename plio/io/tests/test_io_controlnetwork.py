@@ -39,12 +39,12 @@ class TestWriteIsisControlNetwork(unittest.TestCase):
         serial_times = {295: '1971-07-31T01:24:11.754',
                         296: '1971-07-31T01:24:36.970'}
         cls.serials = {i:'APOLLO15/METRIC/{}'.format(j) for i, j in enumerate(serial_times.values())}
-        columns = ['id', 'pointType', 'serialnumber', 'measureType', 'sample', 'line', 'image_index']
+        columns = ['id', 'pointType', 'serialnumber', 'measureType', 'sample', 'line', 'image_index', 'pointLog', 'measureLog']
 
         data = []
         for i in range(cls.npts):
-            data.append((i, 2, cls.serials[0], 2, 0, 0, 0))
-            data.append((i, 2, cls.serials[1], 2, 0, 0, 1))
+            data.append((i, 2, cls.serials[0], 2, 0, 0, 0, [], []))
+            data.append((i, 2, cls.serials[1], 2, 0, 0, 1, [], []))
 
         df = pd.DataFrame(data, columns=columns)
 
