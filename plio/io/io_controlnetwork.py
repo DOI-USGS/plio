@@ -270,6 +270,9 @@ class IsisStore(object):
                             arr = arr.ravel().tolist()
 
                         point_spec.aprioriCovar.extend(arr)
+                    # If field is repeated you must extend instead of assign
+                    elif cnf._CONTROLPOINTFILEENTRYV0002.fields_by_name[attr].label == 3:
+                        getattr(point_spec, attr).extend(g.iloc[0][df_attr])
                     else:
                         setattr(point_spec, attr, attrtype(g.iloc[0][df_attr]))
 
@@ -284,7 +287,11 @@ class IsisStore(object):
                     # Un-mangle common attribute names between points and measures
                     df_attr = self.measure_field_map.get(attr, attr)
                     if df_attr in g.columns:
-                        setattr(measure_spec, attr, attrtype(m[df_attr]))
+                        # If field is repeated you must extend instead of assign
+                        if cnf._CONTROLPOINTFILEENTRYV0002_MEASURE.fields_by_name[attr].label == 3:
+                            getattr(measure_spec, attr).extend(m[df_attr])
+                        else:
+                            setattr(measure_spec, attr, attrtype(m[df_attr]))
                 # ISIS pixels are centered on (0.5, 0.5). NDArrays are (0,0) based.
                 measure_spec.sample = m['sample'] + 0.5
                 measure_spec.line = m['line'] + 0.5
