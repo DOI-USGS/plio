@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-def compute_covariance(lat, lon, rad, latsigma=10., lonsigma=10., radsigma=15., semimajor_axis=1737400.0):
+def compute_covariance(lat, lon, rad, latsigma=10., lonsigma=10., radsigma=15., semimajor_axis=None):
     """
     Given geospatial coordinates, desired accuracy sigmas, and an equitorial radius, compute a 2x3
     sigma covariange matrix.
@@ -27,7 +27,8 @@ def compute_covariance(lat, lon, rad, latsigma=10., lonsigma=10., radsigma=15., 
                The desired radius accuracy in meters (Defualt: 15.0)
 
     semimajor_axis : float
-                     The semi-major or equitorial radius in meters (Default: 1737400.0 - Moon)
+                     The semi-major or equitorial radius in meters. If not entered,
+                     the local radius will be used.
 
     Returns
     -------
@@ -37,12 +38,15 @@ def compute_covariance(lat, lon, rad, latsigma=10., lonsigma=10., radsigma=15., 
     """
     lat = math.radians(lat)
     lon = math.radians(lon)
-    
+
+    if semimajor_axis is None:
+        semimajor_axis = rad
+
     # SetSphericalSigmasDistance
     scaled_lat_sigma = latsigma / semimajor_axis
 
     # This is specific to each lon.
-    scaled_lon_sigma = lonsigma * math.cos(lat) / semimajor_axis
+    scaled_lon_sigma = lonsigma / (math.cos(lat) * semimajor_axis)
 
     # SetSphericalSigmas
     cov = np.eye(3,3)
