@@ -208,6 +208,9 @@ class IsisStore(object):
         # Convert the (0.5, 0.5) origin pixels back to (0,0) pixels
         df['line'] -= 0.5
         df['sample'] -= 0.5
+        if 'aprioriline' in df.columns:
+            df['aprioriline'] -= 0.5
+            df['apriorisample'] -= 0.5
         df.header = pvl_header
         return df
 
@@ -295,6 +298,9 @@ class IsisStore(object):
                 # ISIS pixels are centered on (0.5, 0.5). NDArrays are (0,0) based.
                 measure_spec.sample = m['sample'] + 0.5
                 measure_spec.line = m['line'] + 0.5
+                if 'apriorisample' in g.columns:
+                    measure_spec.apriorisample = m['apriorisample'] + 0.5
+                    measure_spec.aprioriline = m['aprioriline'] + 0.5
                 measure_iterable.append(measure_spec)
                 self.nmeasures += 1
 
