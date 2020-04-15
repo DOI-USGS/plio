@@ -1,3 +1,4 @@
+from enum import IntEnum
 from time import gmtime, strftime
 
 import pandas as pd
@@ -12,6 +13,7 @@ from plio.utils.utils import xstr, find_in_dict
 
 HEADERSTARTBYTE = 65536
 DEFAULTUSERNAME = 'None'
+
 
 def write_filelist(lst, path="fromlist.lis"):
     """
@@ -28,6 +30,67 @@ def write_filelist(lst, path="fromlist.lis"):
         handle.write(filename)
         handle.write('\n')
     return
+
+
+class MessageType(IntEnum):
+    GoodnessOfFit = 2
+    MinimumPixelZScore = 3
+    MaximumPixelZScore = 4
+    PixelShift = 5
+    WholePixelCorrelation = 6
+    SubPixelCorrelation = 7 
+
+class Log():
+    
+    def __init__(self, messagetype, value):
+        """
+        A protobuf compliant log object.
+        
+        Parameters
+        ----------
+        messagetype : int or str
+                      Either the integer or string representation from the MessageType enum
+                      
+        value : int or float
+                The value to be stored in the message log
+        """
+        if isinstance(messagetype, int):
+            # by value
+            self.messagetype = MessageType(messagetype)
+        else:
+            # by name
+            self.messagetype = MessageType[messagetype]
+        
+        if not isinstance(value, (float, int)):
+            raise TypeError(f'{x} is not a numeric type')
+        self.value = value
+        
+    def __repr__(self):
+        return f'{self.messagetype.name}: {self.value}'
+        
+    def to_protobuf(self):
+        """
+        Return protobuf compliant measure log object representation
+        of this class.
+        
+        Returns
+        -------
+        log_message : obj
+                      MeasureLogData object suitable to append to a MeasureLog
+                      repeated field.
+        """
+        # I do not see a better way to get to the inner MeasureLogData obj than this
+        # imports were not working because it looks like these need to instantiate off
+        # an object
+        log_message = cnf.ControlPointFileEntryV0005().point_spec.Measure().MeasureLogData()
+        log_message.doubleDataValue = self.value
+        log_message.doubleDataType = self.messagetype
+        return log_message
+
+    @classmethod
+    def from_protobuf(cls, protobuf):
+        return cls(protobuf.doubleDataType, protobuf.doubleDataValue)
+
 
 class IsisControlNetwork(pd.DataFrame):
 
@@ -171,7 +234,6 @@ class IsisStore(object):
             for s in pbuf_header.pointMessageSizes:
                 cp.ParseFromString(self._handle.read(s))
                 pt = [getattr(cp, i) for i in self.point_attrs if i != 'measures']
-
                 for measure in cp.measures:
                     meas = pt + [getattr(measure, j) for j in self.measure_attrs]
                     pts.append(meas)
@@ -211,6 +273,10 @@ class IsisStore(object):
         if 'aprioriline' in df.columns:
             df['aprioriline'] -= 0.5
             df['apriorisample'] -= 0.5
+
+        # Munge the MeasureLogData into Python objs
+        df['measureLog'] = df['measureLog'].apply(lambda x: [Log.from_protobuf(i) for i in x])
+        
         df.header = pvl_header
         return df
 
