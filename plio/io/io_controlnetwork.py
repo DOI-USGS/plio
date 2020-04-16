@@ -1,5 +1,6 @@
 from enum import IntEnum
 from time import gmtime, strftime
+import warnings
 
 import pandas as pd
 import numpy as np
@@ -82,7 +83,7 @@ class Log():
         # I do not see a better way to get to the inner MeasureLogData obj than this
         # imports were not working because it looks like these need to instantiate off
         # an object
-        log_message = cnf.ControlPointFileEntryV0005().point_spec.Measure().MeasureLogData()
+        log_message = cnf.ControlPointFileEntryV0002().Measure().MeasureLogData()
         log_message.doubleDataValue = self.value
         log_message.doubleDataType = self.messagetype
         return log_message
@@ -332,6 +333,10 @@ class IsisStore(object):
                 # Un-mangle common attribute names between points and measures
                 df_attr = self.point_field_map.get(attr, attr)
                 if df_attr in g.columns:
+                    if df_attr == 'pointLog':
+                        # Currently pointLog is not supported.
+                        warnings.warn('The pointLog field is currently unsupported. Any pointLog data will not be saved.')
+                        continue
                     # As per protobuf docs for assigning to a repeated field.
                     if df_attr == 'aprioriCovar' or df_attr == 'adjustedCovar':
                         arr = g.iloc[0][df_attr]
@@ -356,8 +361,10 @@ class IsisStore(object):
                     # Un-mangle common attribute names between points and measures
                     df_attr = self.measure_field_map.get(attr, attr)
                     if df_attr in g.columns:
+                        if df_attr == 'measureLog':
+                            [getattr(measure_spec, attr).extend([i.to_protobuf()]) for i in m[df_attr]]
                         # If field is repeated you must extend instead of assign
-                        if cnf._CONTROLPOINTFILEENTRYV0002_MEASURE.fields_by_name[attr].label == 3:
+                        elif cnf._CONTROLPOINTFILEENTRYV0002_MEASURE.fields_by_name[attr].label == 3:
                             getattr(measure_spec, attr).extend(m[df_attr])
                         else:
                             setattr(measure_spec, attr, attrtype(m[df_attr]))
