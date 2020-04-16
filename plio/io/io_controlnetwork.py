@@ -34,6 +34,9 @@ def write_filelist(lst, path="fromlist.lis"):
 
 
 class MessageType(IntEnum):
+    """
+    An enum to mirror the ISIS3 MeasureLogData enum.
+    """
     GoodnessOfFit = 2
     MinimumPixelZScore = 3
     MaximumPixelZScore = 4
@@ -60,10 +63,11 @@ class Log():
             self.messagetype = MessageType(messagetype)
         else:
             # by name
+            print(MessageType[messagetype])
             self.messagetype = MessageType[messagetype]
         
         if not isinstance(value, (float, int)):
-            raise TypeError(f'{x} is not a numeric type')
+            raise TypeError(f'{value} is not a numeric type')
         self.value = value
         
     def __repr__(self):
