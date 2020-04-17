@@ -63,7 +63,6 @@ class MeasureLog():
             self.messagetype = MeasureMessageType(messagetype)
         else:
             # by name
-            print(MeasureMessageType[messagetype])
             self.messagetype = MeasureMessageType[messagetype]
         
         if not isinstance(value, (float, int)):
@@ -73,7 +72,7 @@ class MeasureLog():
     def __repr__(self):
         return f'{self.messagetype.name}: {self.value}'
         
-    def to_protobuf(self):
+    def to_protobuf(self, version=2):
         """
         Return protobuf compliant measure log object representation
         of this class.
@@ -87,7 +86,10 @@ class MeasureLog():
         # I do not see a better way to get to the inner MeasureLogData obj than this
         # imports were not working because it looks like these need to instantiate off
         # an object
-        log_message = cnf.ControlPointFileEntryV0002().Measure().MeasureLogData()
+        if version == 2:
+            log_message = cnf.ControlPointFileEntryV0002().Measure().MeasureLogData()
+        elif version == 5:
+            log_message = cnp5.ControlPointFileEntryV0005().Measure().MeasureLogData()
         log_message.doubleDataValue = self.value
         log_message.doubleDataType = self.messagetype
         return log_message
