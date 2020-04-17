@@ -33,7 +33,7 @@ def write_filelist(lst, path="fromlist.lis"):
     return
 
 
-class MessageType(IntEnum):
+class MeasureMessageType(IntEnum):
     """
     An enum to mirror the ISIS3 MeasureLogData enum.
     """
@@ -44,27 +44,27 @@ class MessageType(IntEnum):
     WholePixelCorrelation = 6
     SubPixelCorrelation = 7 
 
-class Log():
+class MeasureLog():
     
     def __init__(self, messagetype, value):
         """
-        A protobuf compliant log object.
+        A protobuf compliant measure log object.
         
         Parameters
         ----------
         messagetype : int or str
-                      Either the integer or string representation from the MessageType enum
+                      Either the integer or string representation from the MeasureMessageType enum
                       
         value : int or float
                 The value to be stored in the message log
         """
         if isinstance(messagetype, int):
             # by value
-            self.messagetype = MessageType(messagetype)
+            self.messagetype = MeasureMessageType(messagetype)
         else:
             # by name
-            print(MessageType[messagetype])
-            self.messagetype = MessageType[messagetype]
+            print(MeasureMessageType[messagetype])
+            self.messagetype = MeasureMessageType[messagetype]
         
         if not isinstance(value, (float, int)):
             raise TypeError(f'{value} is not a numeric type')
@@ -280,7 +280,7 @@ class IsisStore(object):
             df['apriorisample'] -= 0.5
 
         # Munge the MeasureLogData into Python objs
-        df['measureLog'] = df['measureLog'].apply(lambda x: [Log.from_protobuf(i) for i in x])
+        df['measureLog'] = df['measureLog'].apply(lambda x: [MeasureLog.from_protobuf(i) for i in x])
         
         df.header = pvl_header
         return df

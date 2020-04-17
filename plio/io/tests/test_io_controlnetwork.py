@@ -41,24 +41,24 @@ def test_cnet_read(cnet_file):
                          ('GoodnessOfFit', 0.5),
                          ('MinimumPixelZScore', 0.25)
 ])
-def test_Log(messagetype, value):
-    l = io_controlnetwork.Log(messagetype, value)
+def test_MeasureLog(messagetype, value):
+    l = io_controlnetwork.MeasureLog(messagetype, value)
     if isinstance(messagetype, int):
-        assert l.messagetype == io_controlnetwork.MessageType(messagetype)
+        assert l.messagetype == io_controlnetwork.MeasureMessageType(messagetype)
     elif isinstance(messagetype, str):
-        assert l.messagetype == io_controlnetwork.MessageType[messagetype]
+        assert l.messagetype == io_controlnetwork.MeasureMessageType[messagetype]
         
     assert l.value == value
     assert isinstance(l.to_protobuf, object)
 
 def test_log_error():
     with pytest.raises(TypeError) as err:
-        io_controlnetwork.Log(2, 'foo')
+        io_controlnetwork.MeasureLog(2, 'foo')
 
 def test_to_protobuf():
     value = 1.25
     int_dtype = 2
-    log = io_controlnetwork.Log(int_dtype, value)
+    log = io_controlnetwork.MeasureLog(int_dtype, value)
     proto = log.to_protobuf()
     assert proto.doubleDataType == int_dtype
     assert proto.doubleDataValue == value
