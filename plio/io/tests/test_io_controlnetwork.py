@@ -31,97 +31,109 @@ def test_cnet_read(cnet_file):
         assert proto_field not in df.columns
         assert mangled_field in df.columns
 
-class TestWriteIsisControlNetwork(unittest.TestCase):
+@pytest.mark.parametrize('messagetype, value', [
+                         (2, 0.5),
+                         (3, 0.5),
+                         (4, -0.25),
+                         (5, 1e6),
+                         (6, 1),
+                         (7, -1e10),
+                         ('GoodnessOfFit', 0.5),
+                         ('MinimumPixelZScore', 0.25)
+])
+def test_MeasureLog(messagetype, value):
+    l = io_controlnetwork.MeasureLog(messagetype, value)
+    if isinstance(messagetype, int):
+        assert l.messagetype == io_controlnetwork.MeasureMessageType(messagetype)
+    elif isinstance(messagetype, str):
+        assert l.messagetype == io_controlnetwork.MeasureMessageType[messagetype]
+        
+    assert l.value == value
+    assert isinstance(l.to_protobuf, object)
 
-    @classmethod
-    def setUpClass(cls):
-        cls.npts = 5
-        serial_times = {295: '1971-07-31T01:24:11.754',
-                        296: '1971-07-31T01:24:36.970'}
-        cls.serials = {i:'APOLLO15/METRIC/{}'.format(j) for i, j in enumerate(serial_times.values())}
-        columns = ['id', 'pointType', 'serialnumber', 'measureType', 'sample', 'line', 'image_index', 'pointLog', 'measureLog']
+def test_log_error():
+    with pytest.raises(TypeError) as err:
+        io_controlnetwork.MeasureLog(2, 'foo')
 
-        data = []
-        for i in range(cls.npts):
-            data.append((i, 2, cls.serials[0], 2, 0, 0, 0, [], []))
-            data.append((i, 2, cls.serials[1], 2, 0, 0, 1, [], []))
+def test_to_protobuf():
+    value = 1.25
+    int_dtype = 2
+    log = io_controlnetwork.MeasureLog(int_dtype, value)
+    proto = log.to_protobuf()
+    assert proto.doubleDataType == int_dtype
+    assert proto.doubleDataValue == value
 
-        df = pd.DataFrame(data, columns=columns)
+@pytest.fixture
+def cnet_dataframe(tmpdir):
+    npts = 5
+    serial_times = {295: '1971-07-31T01:24:11.754',
+                    296: '1971-07-31T01:24:36.970'}
+    serials = {i:'APOLLO15/METRIC/{}'.format(j) for i, j in enumerate(serial_times.values())}
+    columns = ['id', 'pointType', 'serialnumber', 'measureType', 'sample', 'line', 'image_index', 'pointLog', 'measureLog']
 
-        cls.creation_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-        cls.modified_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-        io_controlnetwork.to_isis(df, 'test.net', mode='wb', targetname='Moon')
+    data = []
+    for i in range(npts):
+        data.append((i, 2, serials[0], 2, 0, 0, 0, [], []))
+        data.append((i, 2, serials[1], 2, 0, 0, 1, [], [io_controlnetwork.MeasureLog(2, 0.5)]))
 
-        cls.header_message_size = 78
-        cls.point_start_byte = 65614 # 66949
+    df = pd.DataFrame(data, columns=columns)
 
-    def test_create_buffer_header(self):
-        npts = 5
-        serial_times = {295: '1971-07-31T01:24:11.754',
-                        296: '1971-07-31T01:24:36.970'}
-        serials = {i:'APOLLO15/METRIC/{}'.format(j) for i, j in enumerate(serial_times.values())}
-        columns = ['id', 'pointType', 'serialnumber', 'measureType', 'sample', 'line', 'image_index']
+    df.creation_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+    df.modified_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+    io_controlnetwork.to_isis(df, tmpdir.join('test.net'), mode='wb', targetname='Moon')
 
-        data = []
-        for i in range(self.npts):
-            data.append((i, 2, serials[0], 2, 0, 0, 0))
-            data.append((i, 2, serials[1], 2, 0, 0, 1))
+    df.header_message_size = 78
+    df.point_start_byte = 65614 # 66949
+    df.npts = npts
+    df.measure_size = 149  # Size of each measure in bytes
+    df.serials = serials
+    return df
 
-        df = pd.DataFrame(data, columns=columns)
+def test_create_buffer_header(cnet_dataframe, tmpdir):
+    with open(tmpdir.join('test.net'), 'rb') as f:
+        
+        f.seek(io_controlnetwork.HEADERSTARTBYTE)
+        raw_header_message = f.read(cnet_dataframe.header_message_size)
+        header_protocol = cnf.ControlNetFileHeaderV0002()
+        header_protocol.ParseFromString(raw_header_message)
+        #Non-repeating
+        #self.assertEqual('None', header_protocol.networkId)
+        assert 'Moon' == header_protocol.targetName
+        assert io_controlnetwork.DEFAULTUSERNAME == header_protocol.userName
+        assert cnet_dataframe.creation_date == header_protocol.created
+        assert 'None' == header_protocol.description
+        assert cnet_dataframe.modified_date == header_protocol.lastModified
+        #Repeating
+        assert [cnet_dataframe.measure_size] * cnet_dataframe.npts == header_protocol.pointMessageSizes
 
-        self.creation_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-        self.modified_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-        io_controlnetwork.to_isis(df, 'test.net', mode='wb', targetname='Moon')
+def test_create_point(cnet_dataframe, tmpdir):
+    with open(tmpdir.join('test.net'), 'rb') as f:
+        f.seek(cnet_dataframe.point_start_byte)
+        for i, length in enumerate([cnet_dataframe.measure_size] * cnet_dataframe.npts):
+            point_protocol = cnf.ControlPointFileEntryV0002()
+            raw_point = f.read(length)
+            point_protocol.ParseFromString(raw_point)
+            assert str(i) == point_protocol.id
+            assert 2 == point_protocol.type
+            print(len(point_protocol.measures))
+            for i, m in enumerate(point_protocol.measures):
+                assert m.serialnumber in cnet_dataframe.serials.values()
+                assert 2 == m.type
+                assert len(m.log) == i
 
-        self.header_message_size = 78
-        self.point_start_byte = 65614 # 66949
+def test_create_pvl_header(cnet_dataframe, tmpdir):
+    with open(tmpdir.join('test.net'), 'rb') as f:
+        pvl_header = pvl.load(f)
 
-        with open('test.net', 'rb') as f:
-            f.seek(io_controlnetwork.HEADERSTARTBYTE)
-            raw_header_message = f.read(self.header_message_size)
-            header_protocol = cnf.ControlNetFileHeaderV0002()
-            header_protocol.ParseFromString(raw_header_message)
-            #Non-repeating
-            #self.assertEqual('None', header_protocol.networkId)
-            self.assertEqual('Moon', header_protocol.targetName)
-            self.assertEqual(io_controlnetwork.DEFAULTUSERNAME,
-                             header_protocol.userName)
-            self.assertEqual(self.creation_date,
-                             header_protocol.created)
-            self.assertEqual('None', header_protocol.description)
-            self.assertEqual(self.modified_date, header_protocol.lastModified)
-            #Repeating
-            self.assertEqual([135] * self.npts, header_protocol.pointMessageSizes)
+    npoints = find_in_dict(pvl_header, 'NumberOfPoints')
+    assert 5 == npoints
 
-    def test_create_point(self):
+    mpoints = find_in_dict(pvl_header, 'NumberOfMeasures')
+    assert 10 == mpoints
 
-        with open('test.net', 'rb') as f:
-            f.seek(self.point_start_byte)
-            for i, length in enumerate([135] * self.npts):
-                point_protocol = cnf.ControlPointFileEntryV0002()
-                raw_point = f.read(length)
-                point_protocol.ParseFromString(raw_point)
-                self.assertEqual(str(i), point_protocol.id)
-                self.assertEqual(2, point_protocol.type)
-                for m in point_protocol.measures:
-                    self.assertTrue(m.serialnumber in self.serials.values())
-                    self.assertEqual(2, m.type)
+    points_bytes = find_in_dict(pvl_header, 'PointsBytes')
+    assert 745 == points_bytes
 
-    def test_create_pvl_header(self):
-        pvl_header = pvl.load('test.net')
+    points_start_byte = find_in_dict(pvl_header, 'PointsStartByte')
+    assert cnet_dataframe.point_start_byte == points_start_byte
 
-        npoints = find_in_dict(pvl_header, 'NumberOfPoints')
-        self.assertEqual(5, npoints)
-
-        mpoints = find_in_dict(pvl_header, 'NumberOfMeasures')
-        self.assertEqual(10, mpoints)
-
-        points_bytes = find_in_dict(pvl_header, 'PointsBytes')
-        self.assertEqual(675, points_bytes)
-
-        points_start_byte = find_in_dict(pvl_header, 'PointsStartByte')
-        self.assertEqual(self.point_start_byte, points_start_byte)
-
-    @classmethod
-    def tearDownClass(cls):
-        os.remove('test.net')
