@@ -348,8 +348,8 @@ class IsisStore(object):
                         arr = g.iloc[0][df_attr]
                         if isinstance(arr, np.ndarray):
                             arr = arr.ravel().tolist()
-
-                        point_spec.aprioriCovar.extend(arr)
+                        if arr:
+                            point_spec.aprioriCovar.extend(arr)
                     # If field is repeated you must extend instead of assign
                     elif cnf._CONTROLPOINTFILEENTRYV0002.fields_by_name[attr].label == 3:
                         getattr(point_spec, attr).extend(g.iloc[0][df_attr])
