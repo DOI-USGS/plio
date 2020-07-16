@@ -8,7 +8,7 @@ with open('README.md', 'r') as f:
 def setup_package():
     setup(
         name = "plio",
-        version = '1.2.2',
+        version = '1.2.4',
         author = "Jay Laura",
         author_email = "jlaura@usgs.gov",
         description = ("I/O API to support planetary data formats."),
@@ -39,11 +39,9 @@ def setup_package():
             "Development Status :: 3 - Alpha",
             "Topic :: Utilities",
             "License :: Public Domain",
-            'Programming Language :: Python :: 2.7',
-            'Programming Language :: Python :: 3',
-            'Programming Language :: Python :: 3.3',
-            'Programming Language :: Python :: 3.4',
-            'Programming Language :: Python :: 3.5',
+            'Programming Language :: Python :: 3.6',
+            'Programming Language :: Python :: 3.7',
+            'Programming Language :: Python :: 3.8',
         ],
     )
 
