@@ -9,9 +9,9 @@ platform:
 
 environment:
   matrix:
-    - PYTHON: "C:\\Miniconda36-x64\\Scripts\\activate.bat"
+    - PYTHON: "C:\\Miniconda3-x64\\Scripts\\activate.bat"
       PYTHON_VERSION: 3.6
-    - PYTHON: "C:\\Miniconda37-x64\\Scripts\\activate.bat"
+    - PYTHON: "C:\\Miniconda3-x64\\Scripts\\activate.bat"
       PYTHON_VERSION: 3.7
     - PYTHON: "C:\\Miniconda3-x64\\Scripts\\activate.bat"
       PYTHON_VERSION: 3.8
