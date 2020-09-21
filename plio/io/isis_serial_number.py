@@ -1,7 +1,7 @@
 import warnings
 
 import pvl
-from pvl._collections import PVLModule
+from pvl.collections import PVLModule
 
 import plio
 from plio.data import get_data
