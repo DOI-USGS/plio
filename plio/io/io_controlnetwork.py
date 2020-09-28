@@ -42,19 +42,19 @@ class MeasureMessageType(IntEnum):
     MaximumPixelZScore = 4
     PixelShift = 5
     WholePixelCorrelation = 6
-    SubPixelCorrelation = 7 
+    SubPixelCorrelation = 7
 
 class MeasureLog():
-    
+
     def __init__(self, messagetype, value):
         """
         A protobuf compliant measure log object.
-        
+
         Parameters
         ----------
         messagetype : int or str
                       Either the integer or string representation from the MeasureMessageType enum
-                      
+
         value : int or float
                 The value to be stored in the message log
         """
@@ -64,19 +64,19 @@ class MeasureLog():
         else:
             # by name
             self.messagetype = MeasureMessageType[messagetype]
-        
+
         if not isinstance(value, (float, int)):
             raise TypeError(f'{value} is not a numeric type')
         self.value = value
-        
+
     def __repr__(self):
         return f'{self.messagetype.name}: {self.value}'
-        
+
     def to_protobuf(self, version=2):
         """
         Return protobuf compliant measure log object representation
         of this class.
-        
+
         Returns
         -------
         log_message : obj
@@ -148,7 +148,7 @@ def to_isis(obj, path, mode='wb', version=2,
                                          buffer_header_size, points_bytes,
                                          creation_date, modified_date)
 
-        store.write(header)
+        store.write(header.encode('utf-8'))
 
 class IsisStore(object):
     """
@@ -283,7 +283,7 @@ class IsisStore(object):
 
         # Munge the MeasureLogData into Python objs
         df['measureLog'] = df['measureLog'].apply(lambda x: [MeasureLog.from_protobuf(i) for i in x])
-        
+
         df.header = pvl_header
         return df
 
@@ -292,8 +292,8 @@ class IsisStore(object):
         """
         Parameters
         ----------
-        data : str
-               to be written to the file
+        data : bytes
+               Encoded header to be written to the file
         offset : int
                  The byte offset into the output binary
         """
@@ -461,7 +461,7 @@ class IsisStore(object):
            An ISIS compliant PVL header object
         """
 
-        encoder = pvl.encoder.IsisCubeLabelEncoder
+        encoder = pvl.encoder.ISISEncoder(end_delimiter=False)
 
         header_bytes = buffer_header_size
         points_start_byte = HEADERSTARTBYTE + buffer_header_size
@@ -489,4 +489,4 @@ class IsisStore(object):
                  )
         ])
 
-        return pvl.dumps(header, cls=encoder)
+        return pvl.dumps(header, encoder=encoder)
