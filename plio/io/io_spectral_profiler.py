@@ -100,12 +100,12 @@ class Spectral_Profiler(object):
                          "^SP_SPECTRUM_REF1", "^SP_SPECTRUM_QA", "^L2D_RESULT_ARRAY",
                          "^SP_SPECTRUM_RAD"]:
                     continue
-                if isinstance(v, pvl._collections.Units):
+                if isinstance(v, pvl.collections.Quantity):
                     k = "{}_{}".format(k, v.units)
                     v = v.value
                 keys.append(k)
                 vals.append(v)
-            
+
             vals = [vals] * len(self.ancillary_data)
             new_anc = pd.DataFrame(vals, index=self.ancillary_data.index, columns=keys)
             self.ancillary_data = self.ancillary_data.join(new_anc, how='inner')

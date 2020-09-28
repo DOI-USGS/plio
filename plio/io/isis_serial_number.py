@@ -7,6 +7,7 @@ import plio
 from plio.data import get_data
 from plio.io.io_db import Translations, StringToMission, setup_db_session
 from plio.utils.utils import find_in_dict, find_nested_in_dict
+from datetime import datetime
 
 
 def get_isis_translation(label):
@@ -70,7 +71,7 @@ def generate_serial_number(label):
        The ISIS compatible serial number
     """
     if not isinstance(label, PVLModule):
-        label = pvl.load(label, cls=SerialNumberDecoder)
+        label = pvl.load(label, decoder=SerialNumberDecoder())
     # Get the translation information
     translation = get_isis_translation(label)
 
@@ -96,9 +97,16 @@ def generate_serial_number(label):
                 serial_entry = search_translation[serial_entry]
             elif '*' in search_translation.keys() and search_translation['*'] != '*':
                 serial_entry = search_translation['*']
+            try:
+                serial_entry = serial_entry.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
+            except:
+                pass
             serial_number.append(serial_entry)
         except:
             pass
+
+
+    print(serial_number)
     return '/'.join(serial_number)
 
 
@@ -108,7 +116,7 @@ class SerialNumberDecoder(pvl.decoder.PVLDecoder):
     serial number. Inherits from the PVLDecoder in planetarypy's pvl module.
     """
 
-    def cast_unquoated_string(self, value):
+    def cast_unquoted_string(self, value):
         """
         Overrides the parent class's method so that any un-quoted string type value found in the
         parsed pvl will just return the original value. This is needed so that keyword values

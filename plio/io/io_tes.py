@@ -239,7 +239,7 @@ class Tes(object):
             with open(var_file, "rb") as var:
                 buffer = var.read()
                 def process_rad(index):
-                    if index is -1:
+                    if index == -1:
                         return None
 
                     length = np.frombuffer(buffer[index:index+2], dtype='>u2')[0]
