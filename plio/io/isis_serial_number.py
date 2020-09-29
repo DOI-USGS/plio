@@ -8,7 +8,6 @@ import plio
 from plio.data import get_data
 from plio.io.io_db import Translations, StringToMission, setup_db_session
 from plio.utils.utils import find_in_dict, find_nested_in_dict
-from datetime import datetime
 
 
 def get_isis_translation(label):
