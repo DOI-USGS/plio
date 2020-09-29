@@ -105,8 +105,6 @@ def generate_serial_number(label):
         except:
             pass
 
-
-    print(serial_number)
     return '/'.join(serial_number)
 
 
