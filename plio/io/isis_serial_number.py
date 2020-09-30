@@ -2,6 +2,7 @@ import warnings
 
 import pvl
 from pvl.collections import PVLModule
+from itertools import chain
 
 import plio
 from plio.data import get_data
@@ -70,7 +71,7 @@ def generate_serial_number(label):
        The ISIS compatible serial number
     """
     if not isinstance(label, PVLModule):
-        label = pvl.load(label, cls=SerialNumberDecoder)
+        label = pvl.load(label, decoder=SerialNumberDecoder())
     # Get the translation information
     translation = get_isis_translation(label)
 
@@ -99,6 +100,7 @@ def generate_serial_number(label):
             serial_number.append(serial_entry)
         except:
             pass
+
     return '/'.join(serial_number)
 
 
@@ -108,13 +110,69 @@ class SerialNumberDecoder(pvl.decoder.PVLDecoder):
     serial number. Inherits from the PVLDecoder in planetarypy's pvl module.
     """
 
-    def cast_unquoated_string(self, value):
-        """
-        Overrides the parent class's method so that any un-quoted string type value found in the
-        parsed pvl will just return the original value. This is needed so that keyword values
-        are not re-formatted from what is originally in the ISIS cube label.
+    def decode_simple_value(self, value: str):
+        """Returns a Python object based on *value*, assuming
+        that *value* can be decoded as a PVL Simple Value::
 
-        Note: This affects value types that are recognized as null, boolean, number, datetime,
-        et at.
+         <Simple-Value> ::= (<Numeric> | <String>)
+
+         Modified from https://pvl.readthedocs.io/en/stable/_modules/pvl/decoder.html#PVLDecoder.decode_simple_value
+         Modification entails stripping datetime from list of functions.
         """
-        return value.decode('utf-8')
+        for d in (
+            self.decode_quoted_string,
+            self.decode_non_decimal,
+            self.decode_decimal,
+        ):
+            try:
+                return d(value)
+            except ValueError:
+                pass
+
+        if value.casefold() == self.grammar.none_keyword.casefold():
+            return None
+
+        if value.casefold() == self.grammar.true_keyword.casefold():
+            return True
+
+        if value.casefold() == self.grammar.false_keyword.casefold():
+            return False
+
+        return self.decode_unquoted_string(value)
+
+    def decode_unquoted_string(self, value: str) -> str:
+        """Returns a Python ``str`` if *value* can be decoded
+        as an unquoted string, based on this decoder's grammar.
+        Raises a ValueError otherwise.
+
+        Modified from: https://pvl.readthedocs.io/en/stable/_modules/pvl/decoder.html#PVLDecoder.decode_unquoted_string
+        Modification entails removal of decode_datetime call
+        """
+        for coll in (
+            ("a comment", chain.from_iterable(self.grammar.comments)),
+            ("some whitespace", self.grammar.whitespace),
+            ("a special character", self.grammar.reserved_characters),
+        ):
+            for item in coll[1]:
+                if item in value:
+                    raise ValueError(
+                        "Expected a Simple Value, but encountered "
+                        f'{coll[0]} in "{self}": "{item}".'
+                    )
+
+        agg_keywords = self.grammar.aggregation_keywords.items()
+        for kw in chain.from_iterable(agg_keywords):
+            if kw.casefold() == value.casefold():
+                raise ValueError(
+                    "Expected a Simple Value, but encountered "
+                    f'an aggregation keyword: "{value}".'
+                )
+
+        for es in self.grammar.end_statements:
+            if es.casefold() == value.casefold():
+                raise ValueError(
+                    "Expected a Simple Value, but encountered "
+                    f'an End-Statement: "{value}".'
+                )
+
+        return str(value)
