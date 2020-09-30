@@ -28,7 +28,7 @@ def is_number(s):
         return True
     except ValueError:
         return False
-    
+
 def convert_string_to_float(s):
     """
     Attempt to convert a string to a float.
@@ -44,7 +44,7 @@ def convert_string_to_float(s):
       If successful, the converted value, else the argument is passed back
       out.
     """
-    
+
     try:
         return float(s)
     except TypeError:
@@ -240,7 +240,7 @@ def split_all_ext(path):
     """
     base, ext = os.path.splitext(path)
 
-    while len(ext) is not 0:
+    while len(ext) != 0:
         base, ext = os.path.splitext(base)
 
     return base
