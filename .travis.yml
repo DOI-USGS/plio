@@ -55,7 +55,7 @@ after_success:
   - source deactivate
   - conda install -q conda-build anaconda-client
   - conda config --set anaconda_upload no
-  - conda build recipe
+  - travis_wait conda build recipe -q
   - builddir=(`conda build recipe --output`)
   - |
     if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
