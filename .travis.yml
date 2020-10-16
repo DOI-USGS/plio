@@ -59,7 +59,7 @@ after_success:
   - travis_wait builddir=(`conda build recipe --output`)
   - |
     if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-      anaconda -t="$CONDA_UPLOAD_TOKEN" upload $builddir --force;
+      anaconda -t="$CONDA_UPLOAD_TOKEN" upload -l dev --force $builddir;
     fi
 
   # Docs to gh-pages
