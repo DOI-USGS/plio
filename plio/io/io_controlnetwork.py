@@ -338,7 +338,7 @@ class IsisStore(object):
             try:
                 point_spec.referenceIndex = g.iloc[0].referenceIndex
             except:
-                warnings.warn('Unable to identify referenceIndex for points. Defaulting to index 0.')
+                warnings.warn(f'Unable to identify referenceIndex for point {point_spec.id}. Defaulting to index 0.')
                 point_spec.referenceIndex = 0
             for attr, attrtype in self.point_attrs:
                 # Un-mangle common attribute names between points and measures
