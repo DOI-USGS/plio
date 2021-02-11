@@ -335,6 +335,11 @@ class IsisStore(object):
             #point_spec.id = _set_pid(i)
             point_spec.id = _set_pid(i)
             point_spec.type = g.iloc[0].pointType
+            try:
+                point_spec.referenceIndex = g.iloc[0].referenceIndex
+            except:
+                warnings.warn('Unable to identify referenceIndex for points. Defaulting to index 0.')
+                point_spec.referenceIndex = 0
             for attr, attrtype in self.point_attrs:
                 # Un-mangle common attribute names between points and measures
                 df_attr = self.point_field_map.get(attr, attr)
@@ -356,8 +361,6 @@ class IsisStore(object):
                     else:
                         setattr(point_spec, attr, attrtype(g.iloc[0][df_attr]))
 
-            # The reference index should always be the image with the lowest index
-            point_spec.referenceIndex = 0
             # A single extend call is cheaper than many add calls to pack points
             measure_iterable = []
             for node_id, m in g.iterrows():
