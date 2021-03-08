@@ -10,6 +10,8 @@ Current build status
 [![OSX](https://img.shields.io/travis/conda-forge/plio-feedstock/master.svg?label=macOS)](https://travis-ci.org/conda-forge/plio-feedstock)
 [![Windows](https://img.shields.io/appveyor/ci/conda-forge/plio-feedstock/master.svg?label=Windows)](https://ci.appveyor.com/project/conda-forge/plio-feedstock/branch/master)
 
+[![Documentation Status](https://readthedocs.org/projects/plio/badge/?version=latest)](https://plio.readthedocs.io/en/latest/?badge=latest)
+
 Current release info
 ====================
 
@@ -47,7 +49,6 @@ We maintain a development branch of plio that is used as a staging area for our 
 
 [![Coverage Status](https://coveralls.io/repos/github/USGS-Astrogeology/plio/badge.svg?branch=master)](https://coveralls.io/github/USGS-Astrogeology/plio?branch=master)
 
-[![Documentation Status](https://readthedocs.org/projects/plio/badge/?version=latest)](https://plio.readthedocs.io/en/latest/?badge=latest)
 
 To install the development version: 
 
