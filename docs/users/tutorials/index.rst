@@ -1,5 +1,5 @@
-Getting Started with AutoCNet
-=============================
+Getting Started with Plio
+=========================
 
 .. toctree::
    :maxdepth: 1
