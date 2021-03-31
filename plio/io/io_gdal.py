@@ -11,7 +11,13 @@ import pvl
 from plio.io import extract_metadata, conditional_gdal
 from plio.geofuncs import geofuncs
 from plio.utils.utils import find_in_dict
-from plio.io import gdal, ogr, osr
+from plio.io import osgeo, ogr, osr
+
+if not gdal:
+    try:
+        from osgeo import gdal
+    except:
+        raise ImportError('No module name gdal in plio or osgeo.')
 
 NP2GDAL_CONVERSION = {
   "byte": 1,
@@ -146,8 +152,6 @@ class GeoDataset(object):
 
         """
         self.file_name = file_name
-        if not gdal:
-            raise ImportError('No module name gdal.')
         self.dataset = gdal.Open(file_name)
         if self.dataset is None:
           raise IOError('File not found :', file_name)
