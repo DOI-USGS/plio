@@ -17,7 +17,7 @@ if not gdal:
     try:
         from osgeo import gdal
     except:
-        raise ImportError('No module name gdal in plio or osgeo.')
+        print('No module name gdal in plio or osgeo.')
 
 NP2GDAL_CONVERSION = {
   "byte": 1,
