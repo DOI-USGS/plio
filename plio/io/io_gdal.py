@@ -11,7 +11,7 @@ import pvl
 from plio.io import extract_metadata, conditional_gdal
 from plio.geofuncs import geofuncs
 from plio.utils.utils import find_in_dict
-from plio.io import osgeo, ogr, osr
+from plio.io import gdal, ogr, osr
 
 if not gdal:
     try:
