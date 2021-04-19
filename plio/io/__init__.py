@@ -13,7 +13,11 @@ try:
     osr = osr.loader.load_module()
     gdal.UseExceptions() 
 except:
-    gdal = None
+    try:
+        gdal = importlib.util.find_spec('osgeo.gdal')
+        gdal = gdal.loader.load_module()
+    except:
+        gdal = None
     ogr = None
     osr = None
 
