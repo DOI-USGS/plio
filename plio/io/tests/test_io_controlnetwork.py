@@ -128,6 +128,10 @@ def test_create_point(cnet_dataframe, tmpdir):
                 assert 2 == m.type
                 assert len(m.log) == j  # Only the second measure has a message
 
+def test_create_point_reference_index(cnet_dataframe, tmpdir):
+    print(cnet_dataframe)
+    assert False
+
 def test_create_pvl_header(cnet_dataframe, tmpdir):
     with open(tmpdir.join('test.net'), 'rb') as f:
         pvl_header = pvl.load(f)
