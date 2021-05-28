@@ -129,8 +129,16 @@ def test_create_point(cnet_dataframe, tmpdir):
                 assert len(m.log) == j  # Only the second measure has a message
 
 def test_create_point_reference_index(cnet_dataframe, tmpdir):
-    print(cnet_dataframe)
-    assert False
+    # cnet_dataframe has 5 points. Set the reference on one of those to be 
+    # the second measure.
+    reference_idx = [0,0,1,1,0,0,0,0,0,0]
+    cnet_dataframe['referenceIndex'] = reference_idx
+    cnet_file = tmpdir.join('test_w_reference.net')
+    io_controlnetwork.to_isis(cnet_dataframe, cnet_file, mode='wb', targetname='Moon')
+
+    test_cnet = io_controlnetwork.from_isis(cnet_file)
+    
+    assert (test_cnet.referenceIndex == reference_idx).all()
 
 def test_create_pvl_header(cnet_dataframe, tmpdir):
     with open(tmpdir.join('test.net'), 'rb') as f:
