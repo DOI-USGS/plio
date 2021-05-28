@@ -72,15 +72,16 @@ def cnet_dataframe(tmpdir):
     serials = {i:'APOLLO15/METRIC/{}'.format(j) for i, j in enumerate(serial_times.values())}
     columns = ['id', 'pointType', 'serialnumber', 'measureType',
                'sample', 'line', 'image_index', 'pointLog', 'measureLog',
-               'aprioriCovar']
+               'aprioriCovar', 'referenceIndex']
 
     data = []
     for i in range(npts):
         aprioriCovar = None
         if i == npts - 1:
             aprioriCovar = np.ones((2,3))
-        data.append((i, 2, serials[0], 2, 0, 0, 0, [], [], aprioriCovar))
-        data.append((i, 2, serials[1], 2, 0, 0, 1, [], [io_controlnetwork.MeasureLog(2, 0.5)],aprioriCovar))
+        reference_idx = i % 2
+        data.append((i, 2, serials[0], 2, 0, 0, 0, [], [], aprioriCovar,reference_idx))
+        data.append((i, 2, serials[1], 2, 0, 0, 1, [], [io_controlnetwork.MeasureLog(2, 0.5)],aprioriCovar, reference_idx))
 
     df = pd.DataFrame(data, columns=columns)
     
@@ -121,6 +122,9 @@ def test_create_point(cnet_dataframe, tmpdir):
             point_protocol.ParseFromString(raw_point)
             assert str(i) == point_protocol.id
             assert 2 == point_protocol.type
+
+            assert i % 2 == point_protocol.referenceIndex
+
             if i == cnet_dataframe.npts - 1:
                 assert point_protocol.aprioriCovar == [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
             for j, m in enumerate(point_protocol.measures):
@@ -128,16 +132,19 @@ def test_create_point(cnet_dataframe, tmpdir):
                 assert 2 == m.type
                 assert len(m.log) == j  # Only the second measure has a message
 
-def test_create_point_reference_index(cnet_dataframe, tmpdir):
+def test_create_point_wo_reference_index(cnet_dataframe, tmpdir):
     # cnet_dataframe has 5 points. Set the reference on one of those to be 
     # the second measure.
-    reference_idx = [0,0,1,1,0,0,0,0,0,0]
-    cnet_dataframe['referenceIndex'] = reference_idx
+    reference_idx = [0,0,0,0,0,0,0,0,0,0]
+    new_cnet_dataframe = cnet_dataframe.drop(columns='referenceIndex')
     cnet_file = tmpdir.join('test_w_reference.net')
-    io_controlnetwork.to_isis(cnet_dataframe, cnet_file, mode='wb', targetname='Moon')
 
+    # Check that the warn is raised properly
+    with pytest.warns(UserWarning, match='Unable to identify referenceIndex (.*)'):
+        io_controlnetwork.to_isis(new_cnet_dataframe, cnet_file, mode='wb', targetname='Moon')
+        
+    # Check that nothing in == zeros out
     test_cnet = io_controlnetwork.from_isis(cnet_file)
-    
     assert (test_cnet.referenceIndex == reference_idx).all()
 
 def test_create_pvl_header(cnet_dataframe, tmpdir):
