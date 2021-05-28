@@ -8,7 +8,7 @@ dependencies:
   - numpy 
   - pyproj 
   - h5py 
-  - pvl 
+  - pvl >= 1.0 
   - scipy 
   - protobuf 
   - affine 
