@@ -8,8 +8,8 @@ with open('README.md', 'r') as f:
 def setup_package():
     setup(
         name = "plio",
-        version = '1.2.4',
-        author = "Jay Laura",
+        version = '1.3.0',
+        author = "USGS Astrogeology",
         author_email = "jlaura@usgs.gov",
         description = ("I/O API to support planetary data formats."),
         long_description = long_description,

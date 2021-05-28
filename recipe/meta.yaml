@@ -36,7 +36,7 @@ requirements:
     - python
     - setuptools
     - numpy
-    - pvl
+    - pvl >= 1.0
     - protobuf
     - gdal
     - icu
