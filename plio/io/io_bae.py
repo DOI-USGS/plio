@@ -193,7 +193,6 @@ def save_ipf(df, output_path):
         outIPF.close()
     return
 
-# insert read_gpf()
 def read_gpf(input_data,gxp=False):
     """
     Read a socet gpf file into a pandas data frame
