@@ -10,7 +10,7 @@ from plio.examples import get_path
 
 import pytest
 
-@pytest.fixture
+'''@pytest.fixture
 def insight_gpf():
     return get_path('InSightE08_XW.gpf')
 
@@ -21,7 +21,7 @@ def gxp_gpf():
 @pytest.fixture
 def example_str_id_gpf():
     return get_path('InSightE08_string_id.gpf')
-
+'''
 @pytest.fixture()
 def insight_expected_gpf():
     dtype_dict = {'point_id': 'str',
@@ -95,12 +95,12 @@ def test_read_ipf(ipf, expected):
     df = read_ipf(ipf)
     assert_frame_equal(df, expected)
 '''
-@pytest.mark.parametrize('gpf, expected', [(insight_gpf(),insight_expected_gpf())])
+@pytest.mark.parametrize('gpf, expected', [get_path('InSightE08_XW.gpf'),insight_expected_gpf()])
 def test_read_gpf(gpf, expected):
     df = read_gpf(gpf)
     assert_frame_equal(df, expected)
 
-@pytest.mark.parametrize('gpf, expected', [(gxp_gpf(),gxp_expected_gpf())])
+@pytest.mark.parametrize('gpf, expected', [get_path('GXP_example_gpf.gpf'),gxp_expected_gpf()])
 def test_read_gxp_gpf(gpf, expected):
     df = read_gpf(gpf,gxp=True)
     assert_frame_equal(df, expected)
@@ -201,7 +201,7 @@ def test_write_str_id_gpf(gpf, file):
     for i in range(3,len(fs),5):
         assert fs[i] == fl[i]
 '''
-@pytest.mark.parametrize('gpf', [(example_str_id_gpf())])
+@pytest.mark.parametrize('gpf', [get_path('InSightE08_string_id.gpf')])
 def test_gpf_dtypes(gpf):
     """
     This test makes sure that a GPF whose point IDs only contain numbers
