@@ -221,21 +221,6 @@ def read_gpf(input_data,gxp=False):
     cnt = getline(input_data, l)
     cnt = int(cnt)
     
-    if not gxp:
-        # Mixed types requires read as unicode - let pandas soft convert
-        d = np.genfromtxt(input_data, skip_header=(l+1), dtype='unicode')
-        d = d.reshape(-1, len(columns))
-    else:
-        # Read GXP-style GPF a block at a time
-        lmax=( (l+1) + ((cnt-1)*8) + 2 )
-        for x in range(l+1,lmax,8):
-            a = np.genfromtxt(input_data, skip_header=(x), max_rows=4, dtype='unicode')
-            b = np.genfromtxt(input_data, skip_header=(x+4), max_rows=3, dtype='unicode')
-            if x == (l+1):
-                d = np.hstack([np.hstack(a),np.hstack(b)])
-            else:
-                d = np.vstack(( d, np.hstack([np.hstack(a),np.hstack(b)])) )
-
     # Lists of column names and their data types
     if not gxp:
         columns = ['point_id','stat','known','lat_Y_North','long_X_East','ht','sig0','sig1','sig2','res0','res1','res2']
@@ -252,6 +237,22 @@ def read_gpf(input_data,gxp=False):
 
     # Build dict of column names and their data types
     dtype_dict = dict(zip(columns, col_dtype))
+
+    if not gxp:
+        # Mixed types requires read as unicode - let pandas soft convert
+        d = np.genfromtxt(input_data, skip_header=(l+1), dtype='unicode')
+        d = d.reshape(-1, len(columns))
+    else:
+        # Read GXP-style GPF a block at a time
+        lmax=( (l+1) + ((cnt-1)*8) + 2 )
+        for x in range(l+1,lmax,8):
+            a = np.genfromtxt(input_data, skip_header=(x), max_rows=4, dtype='unicode')
+            b = np.genfromtxt(input_data, skip_header=(x+4), max_rows=3, dtype='unicode')
+            if x == (l+1):
+                d = np.hstack([np.hstack(a),np.hstack(b)])
+            else:
+                d = np.vstack(( d, np.hstack([np.hstack(a),np.hstack(b)])) )
+
     df = pd.DataFrame(d, columns=columns)
 
     # Hard conversion of data types to ensure 'point_id' is treated as string and 'stat' and 'known' (GXP: 'use', 'point_type')
