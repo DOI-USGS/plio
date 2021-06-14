@@ -22,7 +22,7 @@ def gxp_gpf():
 def example_str_id_gpf():
     return get_path('InSightE08_string_id.gpf')
 '''
-@pytest.fixture()
+@pytest.fixture
 def insight_expected_gpf():
     dtype_dict = {'point_id': 'str',
                'stat': 'int32',
@@ -38,7 +38,7 @@ def insight_expected_gpf():
                'res2': 'float64'}
     return pd.read_csv(get_path('InSightE08_XW.csv'), dtype=dtype_dict)
 
-@pytest.fixture()
+@pytest.fixture
 def gxp_expected_gpf():
     dtype_dict = {'point_id': 'str',
                'use': 'int32',
@@ -95,12 +95,12 @@ def test_read_ipf(ipf, expected):
     df = read_ipf(ipf)
     assert_frame_equal(df, expected)
 '''
-@pytest.mark.parametrize('gpf, expected', [get_path('InSightE08_XW.gpf'),insight_expected_gpf()])
+@pytest.mark.parametrize('gpf, expected', [get_path('InSightE08_XW.gpf'),insight_expected_gpf])
 def test_read_gpf(gpf, expected):
     df = read_gpf(gpf)
     assert_frame_equal(df, expected)
 
-@pytest.mark.parametrize('gpf, expected', [get_path('GXP_example_gpf.gpf'),gxp_expected_gpf()])
+@pytest.mark.parametrize('gpf, expected', [get_path('GXP_example_gpf.gpf'),gxp_expected_gpf])
 def test_read_gxp_gpf(gpf, expected):
     df = read_gpf(gpf,gxp=True)
     assert_frame_equal(df, expected)
