@@ -1,4 +1,4 @@
-'''import json
+import json
 import os
 
 import numpy as np
@@ -13,6 +13,10 @@ import pytest
 @pytest.fixture
 def insight_gpf():
     return get_path('InSightE08_XW.gpf')
+
+@pytest.fixture
+def gxp_gpf():
+    return get_path('GXP_example_gpf.gpf')
 
 @pytest.fixture
 def example_str_id_gpf():
@@ -34,7 +38,35 @@ def insight_expected_gpf():
                'res2': 'float64'}
     return pd.read_csv(get_path('InSightE08_XW.csv'), dtype=dtype_dict)
 
-@pytest.fixture
+@pytest.fixture()
+def gxp_expected_gpf():
+    dtype_dict = {'point_id': 'str',
+               'use': 'int32',
+               'point_type': 'int32',
+               'lat_Y_North': 'float64',
+               'long_X_East': 'float64',
+               'ht': 'float64',
+               'sig0': 'float64',
+               'sig1': 'float64',
+               'sig2': 'float64',
+               'res0': 'float64',
+               'res1': 'float64',
+               'res2': 'float64',
+               'eigenval0': 'float64',
+               'eigenvec0_i': 'float64',
+               'eigenvec0_j': 'float64',
+               'eigenvec0_k': 'float64',
+               'eigenval1': 'float64',
+               'eigenvec1_i': 'float64',
+               'eigenvec1_j': 'float64',
+               'eigenvec1_k': 'float64',
+               'eigenval2': 'float64',
+               'eigenvec2_i': 'float64',
+               'eigenvec2_j': 'float64',
+               'eigenvec2_k': 'float64'}
+    return pd.read_csv(get_path('GXP_example_gpf.csv'), dtype=dtype_dict)
+
+'''@pytest.fixture
 def insight_ipf():
     return get_path('P20_008845_1894_XN_09N203W.ipf')
 
@@ -62,13 +94,18 @@ def insight_expected_ipf():
 def test_read_ipf(ipf, expected):
     df = read_ipf(ipf)
     assert_frame_equal(df, expected)
-
+'''
 @pytest.mark.parametrize('gpf, expected', [(insight_gpf(),insight_expected_gpf())])
 def test_read_gpf(gpf, expected):
     df = read_gpf(gpf)
     assert_frame_equal(df, expected)
 
-@pytest.mark.parametrize('ipf, file', [(insight_ipf(), 'plio/io/tests/temp')])
+@pytest.mark.parametrize('gpf, expected', [(gxp_gpf(),gxp_expected_gpf())])
+def test_read_gxp_gpf(gpf, expected):
+    df = read_gpf(gpf,gxp=True)
+    assert_frame_equal(df, expected)
+
+'''@pytest.mark.parametrize('ipf, file', [(insight_ipf(), 'plio/io/tests/temp')])
 def test_write_ipf(ipf, file):
     df = read_ipf(ipf)
     save_ipf(df, file)
@@ -163,7 +200,7 @@ def test_write_str_id_gpf(gpf, file):
     # Test that every 5th line (the lines containing the point ID and integer flags) matches
     for i in range(3,len(fs),5):
         assert fs[i] == fl[i]
-
+'''
 @pytest.mark.parametrize('gpf', [(example_str_id_gpf())])
 def test_gpf_dtypes(gpf):
     """
@@ -182,7 +219,7 @@ def test_gpf_dtypes(gpf):
     # Check that the type of each column matches the truth list
     assert truth_dtypes == test_dtypes
 
-@pytest.mark.parametrize('ipf', [(example_str_id_ipf())])
+'''@pytest.mark.parametrize('ipf', [(example_str_id_ipf())])
 def test_ipf_dtypes(ipf):
     """
     This test makes sure that a IPF whose point IDs only contain numbers

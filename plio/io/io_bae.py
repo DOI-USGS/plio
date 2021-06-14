@@ -3,7 +3,7 @@ import os
 import json
 from collections import defaultdict
 from functools import singledispatch
-
+from linecache import getline
 import numpy as np
 import pandas as pd
 
@@ -218,7 +218,7 @@ def read_gpf(input_data,gxp=False):
     else:
         l = 21
 
-    cnt = linecache.getline(input_data, l)
+    cnt = getline(input_data, l)
     cnt = int(cnt)
     
     if not gxp:
@@ -238,13 +238,13 @@ def read_gpf(input_data,gxp=False):
 
     # Lists of column names and their data types
     if not gxp:
-        columns = ['point_id','stat','known','lat_Y_North','long_X_East','ht','sig1','sig2','sig3','res1','res2','res3']
+        columns = ['point_id','stat','known','lat_Y_North','long_X_East','ht','sig0','sig1','sig2','res0','res1','res2']
         col_dtype = ['str','int32','int32','float64','float64','float64','float64','float64','float64','float64','float64','float64']
     else:
-        columns = ['point_id','use','point_type','lat_Y_North','long_X_East','ht','sig1','sig2','sig3','res1','res2','res3',
+        columns = ['point_id','use','point_type','lat_Y_North','long_X_East','ht','sig0','sig1','sig2','res0','res1','res2',
+                   'eigenval0','eigenvec0_i','eigenvec0_j', 'eigenvec0_k',
                    'eigenval1','eigenvec1_i','eigenvec1_j', 'eigenvec1_k',
-                   'eigenval2','eigenvec2_i','eigenvec2_j', 'eigenvec2_k',
-                   'eigenval3','eigenvec3_i','eigenvec3_j', 'eigenvec3_k']
+                   'eigenval2','eigenvec2_i','eigenvec2_j', 'eigenvec2_k']
         col_dtype = ['str','int32','int32','float64','float64','float64','float64','float64','float64','float64','float64','float64',
                      'float64','float64','float64','float64',
                      'float64','float64','float64','float64',
