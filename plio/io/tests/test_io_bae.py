@@ -95,12 +95,12 @@ def test_read_ipf(ipf, expected):
     df = read_ipf(ipf)
     assert_frame_equal(df, expected)
 '''
-@pytest.mark.parametrize('gpf, expected', [get_path('InSightE08_XW.gpf'),insight_expected_gpf])
+@pytest.mark.parametrize('gpf, expected', [ (get_path('InSightE08_XW.gpf'),insight_expected_gpf) ] )
 def test_read_gpf(gpf, expected):
     df = read_gpf(gpf)
     assert_frame_equal(df, expected)
 
-@pytest.mark.parametrize('gpf, expected', [get_path('GXP_example_gpf.gpf'),gxp_expected_gpf])
+@pytest.mark.parametrize('gpf, expected', [ (get_path('GXP_example_gpf.gpf'),gxp_expected_gpf) ] )
 def test_read_gxp_gpf(gpf, expected):
     df = read_gpf(gpf,gxp=True)
     assert_frame_equal(df, expected)
