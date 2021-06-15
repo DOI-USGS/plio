@@ -3,7 +3,7 @@ import os
 import json
 from collections import defaultdict
 from functools import singledispatch
-
+from linecache import getline
 import numpy as np
 import pandas as pd
 
@@ -193,14 +193,18 @@ def save_ipf(df, output_path):
         outIPF.close()
     return
 
-def read_gpf(input_data):
+def read_gpf(input_data,gxp=False):
     """
     Read a socet gpf file into a pandas data frame
 
     Parameters
     ----------
-    input_file : str
+    input_data : str
                  path to the input data file
+
+    gxp        : bool
+                 Flag to notify function if input_data follows Socet GXP format.
+                 Defaults is False (assume Socet Set format).
 
     Returns
     -------
@@ -208,46 +212,51 @@ def read_gpf(input_data):
          containing the gpf data with appropriate column names and indices
     """
 
-    # Check that the number of rows is matching the expected number
-    with open(input_data, 'r') as f:
-        for i, l in enumerate(f):
-            if i == 1:
-                cnt = int(l)
-            elif i == 2:
-                col = l
-                break
+    # line containing point count differs between Socet Set and Socet GXP gpf files
+    if not gxp:
+        l = 2
+    else:
+        l = 21
 
-    default_columns = np.genfromtxt(input_data, skip_header=2, dtype='unicode',
-                                    max_rows = 1, delimiter = ',')
-
-    columns = []
-
-    for column in default_columns:
-
-        if '(' in column and ')' in column:
-            column_name ,suffix = column.split('(')
-            num = int(suffix.split(')')[0])
-
-            for column_num in range(int(num)):
-                new_column = '{}{}'.format(column_name, column_num)
-                columns.append(new_column);
-
-        else:
-            columns.append(column)
-
-    # Mixed types requires read as unicode - let pandas soft convert
-    d = np.genfromtxt(input_data, skip_header=3, dtype='unicode')
-    d = d.reshape(-1, 12)
-
-    df = pd.DataFrame(d, columns=columns)
-
-    # List of data types for columns in Socet set GPF file
-    col_dtype = ['str','int32','int32','float64','float64','float64','float64','float64','float64','float64','float64','float64']
+    cnt = getline(input_data, l)
+    cnt = int(cnt)
+    
+    # Lists of column names and their data types
+    if not gxp:
+        columns = ['point_id','stat','known','lat_Y_North','long_X_East','ht','sig0','sig1','sig2','res0','res1','res2']
+        col_dtype = ['str','int32','int32','float64','float64','float64','float64','float64','float64','float64','float64','float64']
+    else:
+        columns = ['point_id','use','point_type','lat_Y_North','long_X_East','ht','sig0','sig1','sig2','res0','res1','res2',
+                   'eigenval0','eigenvec0_i','eigenvec0_j', 'eigenvec0_k',
+                   'eigenval1','eigenvec1_i','eigenvec1_j', 'eigenvec1_k',
+                   'eigenval2','eigenvec2_i','eigenvec2_j', 'eigenvec2_k']
+        col_dtype = ['str','int32','int32','float64','float64','float64','float64','float64','float64','float64','float64','float64',
+                     'float64','float64','float64','float64',
+                     'float64','float64','float64','float64',
+                     'float64','float64','float64','float64']
 
     # Build dict of column names and their data types
     dtype_dict = dict(zip(columns, col_dtype))
 
-    # Hard conversion of data types to ensure 'point_id' is treated as string and 'stat' and 'known' flags treated as int
+    if not gxp:
+        # Mixed types requires read as unicode - let pandas soft convert
+        d = np.genfromtxt(input_data, skip_header=(l+1), dtype='unicode')
+        d = d.reshape(-1, len(columns))
+    else:
+        # Read GXP-style GPF a block at a time
+        lmax=( (l+1) + ((cnt-1)*8) + 2 )
+        for x in range(l+1,lmax,8):
+            a = np.genfromtxt(input_data, skip_header=(x), max_rows=4, dtype='unicode')
+            b = np.genfromtxt(input_data, skip_header=(x+4), max_rows=3, dtype='unicode')
+            if x == (l+1):
+                d = np.hstack([np.hstack(a),np.hstack(b)])
+            else:
+                d = np.vstack(( d, np.hstack([np.hstack(a),np.hstack(b)])) )
+
+    df = pd.DataFrame(d, columns=columns)
+
+    # Hard conversion of data types to ensure 'point_id' is treated as string and 'stat' and 'known' (GXP: 'use', 'point_type')
+    #  flags treated as int
     df = df.astype(dtype_dict)
 
     # Validate the read data with the header point count
