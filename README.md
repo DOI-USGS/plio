@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/PLIO_Logo.svg" alt="PLIO" width=200> 
+</p>
+
 Planetary Input / Output [![Join the chat at https://gitter.im/USGS-Astrogeology/plio](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/USGS-Astrogeology/plio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ===============================
 
