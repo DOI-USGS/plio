@@ -50,7 +50,6 @@ requirements:
     - certifi
     - pyproj
 
-
 test:
   imports:
     - plio
