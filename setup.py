@@ -25,7 +25,6 @@ def setup_package():
             'gdal',
             'numpy',
             'pyproj',
-            'jinja2',
             'pvl',
             'protobuf',
             'h5py',
