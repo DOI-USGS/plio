@@ -56,6 +56,10 @@ def test_log_error():
     with pytest.raises(TypeError) as err:
         io_controlnetwork.MeasureLog(2, 'foo')
 
+def test_to_isis_wo_targetname(cnet_dataframe, tmpdir):
+    with pytest.warns(UserWarning, match="Users should provide a targetname"):
+        io_controlnetwork.to_isis(cnet_dataframe, tmpdir.join('test.net'), mode='wb', targetname='None') # 'None' is the default.  
+
 def test_to_protobuf():
     value = 1.25
     int_dtype = 2
@@ -87,7 +91,7 @@ def cnet_dataframe(tmpdir):
     
     df.creation_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
     df.modified_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-    io_controlnetwork.to_isis(df, tmpdir.join('test.net'), mode='wb', targetname='Moon')
+    #io_controlnetwork.to_isis(df, tmpdir.join('test.net'), mode='wb', targetname='Moon')
 
     df.header_message_size = 78
     df.point_start_byte = 65614 # 66949
@@ -97,6 +101,8 @@ def cnet_dataframe(tmpdir):
     return df 
 
 def test_create_buffer_header(cnet_dataframe, tmpdir):
+    # Write the cnet
+    io_controlnetwork.to_isis(cnet_dataframe, tmpdir.join('test.net'), mode='wb', targetname='Moon')
     with open(tmpdir.join('test.net'), 'rb') as f:
         
         f.seek(io_controlnetwork.HEADERSTARTBYTE)
@@ -114,6 +120,8 @@ def test_create_buffer_header(cnet_dataframe, tmpdir):
         assert cnet_dataframe.measure_size == header_protocol.pointMessageSizes
 
 def test_create_point(cnet_dataframe, tmpdir):
+    # Write the cnet
+    io_controlnetwork.to_isis(cnet_dataframe, tmpdir.join('test.net'), mode='wb', targetname='Moon')
     with open(tmpdir.join('test.net'), 'rb') as f:
         f.seek(cnet_dataframe.point_start_byte)
         for i, length in enumerate(cnet_dataframe.measure_size):
@@ -148,9 +156,10 @@ def test_create_point_wo_reference_index(cnet_dataframe, tmpdir):
     assert (test_cnet.referenceIndex == reference_idx).all()
 
 def test_create_pvl_header(cnet_dataframe, tmpdir):
-    with open(tmpdir.join('test.net'), 'rb') as f:
-        pvl_header = pvl.load(f)
-
+    # Write the cnet
+    io_controlnetwork.to_isis(cnet_dataframe, tmpdir.join('test.net'), mode='wb', targetname='Moon')
+    with open(tmpdir.join('test.net'), 'rb') as stream:
+        pvl_header = pvl.load(stream, grammar=pvl.grammar.ISISGrammar())
     npoints = find_in_dict(pvl_header, 'NumberOfPoints')
     assert 5 == npoints
 
