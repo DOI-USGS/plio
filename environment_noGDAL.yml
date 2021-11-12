@@ -10,7 +10,6 @@ dependencies:
   - scipy 
   - protobuf 
   - affine 
-  - jinja2 
   - networkx 
   - pandas 
   - sqlalchemy 

@@ -49,7 +49,6 @@ requirements:
     - scipy
     - certifi
     - pyproj
-    - jinja2
 
 
 test:
