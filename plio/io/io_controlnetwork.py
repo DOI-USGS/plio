@@ -122,6 +122,10 @@ def to_isis(obj, path, mode='wb', version=2,
             description='None', username=DEFAULTUSERNAME,
             creation_date=None, modified_date=None,
             pointid_prefix=None, pointid_suffix=None):
+
+    if targetname == 'None':
+        warnings.warn("Users should provide a targetname to this function such as 'Moon' or 'Mars' in order to generate a valid ISIS control network.")
+
     with IsisStore(path, mode) as store:
         if not creation_date:
             creation_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
@@ -220,7 +224,7 @@ class IsisStore(object):
         Given an ISIS store, read the underlying ISIS3 compatible control network and
         return an IsisControlNetwork dataframe.
         """
-        pvl_header = pvl.load(self._path)
+        pvl_header = pvl.load(self._path, grammar=pvl.grammar.ISISGrammar())
         header_start_byte = find_in_dict(pvl_header, 'HeaderStartByte')
         header_bytes = find_in_dict(pvl_header, 'HeaderBytes')
         point_start_byte = find_in_dict(pvl_header, 'PointsStartByte')
