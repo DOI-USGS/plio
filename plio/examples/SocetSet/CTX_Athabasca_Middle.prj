@@ -1,5 +1,5 @@
 PROJECT_FILE g
-DATA_PATH   
+DATA_PATH  data
 COORD_SYS          1
 XY_UNITS           3
 Z_UNITS            1

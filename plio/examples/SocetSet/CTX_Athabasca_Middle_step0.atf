@@ -1,6 +1,6 @@
 HATS_File_Version_7
 PROJ_FLAG 1
-PROJECT 
+PROJECT CTX_Athabasca_Middle.prj
 ATF_FILE CTX_Athabasca_Middle_step0.atf
 GP_FILE CTX_Athabasca_Middle.gpf
 STRAT_FILE apm.apm_strat
