@@ -3,7 +3,7 @@ import math
 
 def compute_covariance(lat, lon, rad, latsigma=10., lonsigma=10., radsigma=15., semimajor_axis=None):
     """
-    Given geospatial coordinates, desired ground distance accuracies in meters (sigmas), and an equatorial 
+    Given geospatial coordinates, ground location uncertainties in meters (sigmas), and an equatorial 
     radius, computes the rectangular covariance matrix using error propagation.
 
     Returns a 2x3 rectangular matrix containing the upper triangle of the rectangular covariance matrix.
