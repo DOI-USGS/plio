@@ -3,13 +3,15 @@ import math
 
 def compute_covariance(lat, lon, rad, latsigma=10., lonsigma=10., radsigma=15., semimajor_axis=None):
     """
-    Given geospatial coordinates, desired accuracy sigmas, and an equitorial radius, compute a 2x3
-    sigma covariange matrix.
+    Given geospatial coordinates, desired accuracy sigmas, and an equitorial radius, computes the rectangular
+    covariance matrix using error propagation.
+
+    Returns a 2x3 rectangular matrix containing the upper triangle of the rectangular covariance matrix.
 
     Parameters
     ----------
     lat : float
-          A point's latitude in degrees
+          A point's geocentric latitude in degrees
 
     lon : float
           A point's longitude in degrees
@@ -33,7 +35,14 @@ def compute_covariance(lat, lon, rad, latsigma=10., lonsigma=10., radsigma=15., 
     Returns
     -------
     rectcov : ndarray
-              (2,3) covariance matrix
+              upper triangle of the covariance matrix in rectangular coordinates stored in a 
+              rectangular (2,3) matrix. 
+              __          __            __         __
+              | c1  c2  c3 |           | c1  c2  c3 |
+              | c4  c5  c6 |    --->   | c5  c6  c9 |
+              | c7  c8  c9 |            __         __
+              __          __
+
 
     """
     lat = math.radians(lat)
@@ -48,13 +57,14 @@ def compute_covariance(lat, lon, rad, latsigma=10., lonsigma=10., radsigma=15., 
     # This is specific to each lon.
     scaled_lon_sigma = lonsigma / (math.cos(lat) * semimajor_axis)
 
-    # SetSphericalSigmas
+    # Calculate the covariance matrix in latitudinal coordinates
+    # assuming no correlation
     cov = np.eye(3,3)
     cov[0,0] = scaled_lat_sigma ** 2
     cov[1,1] = scaled_lon_sigma ** 2
     cov[2,2] = radsigma ** 2
 
-    # Approximate the Jacobian
+    # approximate the jacobian of the transformation from latitudinal to rectangular coordinates
     j = np.zeros((3,3))
     cosphi = math.cos(lat)
     sinphi = math.sin(lat)
@@ -72,8 +82,11 @@ def compute_covariance(lat, lon, rad, latsigma=10., lonsigma=10., radsigma=15., 
     j[2,1] = 0.
     j[2,2] = sinphi
 
+    # Conjugate the latitudinal covariance matrix by the jacobian
     mat = j.dot(cov)
     mat = mat.dot(j.T)
+
+    # Extract the upper triangle 
     rectcov = np.zeros((2,3))
     rectcov[0,0] = mat[0,0]
     rectcov[0,1] = mat[0,1]
