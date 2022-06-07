@@ -3,8 +3,8 @@ import math
 
 def compute_covariance(lat, lon, rad, latsigma=10., lonsigma=10., radsigma=15., semimajor_axis=None):
     """
-    Given geospatial coordinates, desired accuracy sigmas, and an equitorial radius, computes the rectangular
-    covariance matrix using error propagation.
+    Given geospatial coordinates, desired ground distance accuracies in meters (sigmas), and an equatorial 
+    radius, computes the rectangular covariance matrix using error propagation.
 
     Returns a 2x3 rectangular matrix containing the upper triangle of the rectangular covariance matrix.
 
@@ -20,16 +20,16 @@ def compute_covariance(lat, lon, rad, latsigma=10., lonsigma=10., radsigma=15., 
           The radius (z-value) of the point in meters
 
     latsigma : float
-               The desired latitude accuracy in meters (Default 10.0)
+               The ground distance uncertainty in the latitude direction in meters (Default 10.0)
 
     lonsigma : float
-               The desired longitude accuracy in meters (Default 10.0)
+               The ground distance uncertainty in the longitude direction in meters (Default 10.0)
 
     radsigma : float
-               The desired radius accuracy in meters (Defualt: 15.0)
+               The radius uncertainty in meters (Default: 15.0)
 
     semimajor_axis : float
-                     The semi-major or equitorial radius in meters. If not entered,
+                     The semi-major or equatorial radius in meters. If not entered,
                      the local radius will be used.
 
     Returns
@@ -64,7 +64,7 @@ def compute_covariance(lat, lon, rad, latsigma=10., lonsigma=10., radsigma=15., 
     cov[1,1] = scaled_lon_sigma ** 2
     cov[2,2] = radsigma ** 2
 
-    # approximate the jacobian of the transformation from latitudinal to rectangular coordinates
+    # Calculate the jacobian of the transformation from latitudinal to rectangular coordinates
     j = np.zeros((3,3))
     cosphi = math.cos(lat)
     sinphi = math.sin(lat)
@@ -82,7 +82,7 @@ def compute_covariance(lat, lon, rad, latsigma=10., lonsigma=10., radsigma=15., 
     j[2,1] = 0.
     j[2,2] = sinphi
 
-    # Conjugate the latitudinal covariance matrix by the jacobian
+    # Conjugate the latitudinal covariance matrix by the jacobian (error propagation formula)
     mat = j.dot(cov)
     mat = mat.dot(j.T)
 
