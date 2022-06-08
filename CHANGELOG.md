@@ -35,6 +35,8 @@ release.
 
 ## [Unreleased]
 
+### Fixed
+- Updated documentation string for `compute_covariance`. [#177](https://github.com/USGS-Astrogeology/plio/pull/177)
 
 ## [1.5.0]()
 
