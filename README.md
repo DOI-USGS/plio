@@ -59,3 +59,8 @@ To install the development version:
 ```
 conda install -c usgs-astrogeology/label/dev plio
 ```
+
+Docs
+====
+
+https://plio.readthedocs.io/en/latest/
