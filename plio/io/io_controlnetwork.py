@@ -333,14 +333,17 @@ class IsisStore(object):
             # Get the point specification from the protobuf
             point_spec = cnf.ControlPointFileEntryV0002()
 
+            # Set refrence row to minimize .iloc calls and improve run time
+            reference_row = g.iloc[0]
+
             # Set the ID and then loop over all of the attributes that the
             # point has and check for corresponding columns in the group and
             # set with the correct type
             #point_spec.id = _set_pid(i)
             point_spec.id = _set_pid(i)
-            point_spec.type = g.iloc[0].pointType
+            point_spec.type = reference_row.pointType
             try:
-                point_spec.referenceIndex = g.iloc[0].referenceIndex
+                point_spec.referenceIndex = reference_row.referenceIndex
             except:
                 warnings.warn(f'Unable to identify referenceIndex for point {point_spec.id}. Defaulting to index 0.')
                 point_spec.referenceIndex = 0
@@ -354,16 +357,16 @@ class IsisStore(object):
                         continue
                     # As per protobuf docs for assigning to a repeated field.
                     if df_attr == 'aprioriCovar' or df_attr == 'adjustedCovar':
-                        arr = g.iloc[0][df_attr]
+                        arr = reference_row[df_attr]
                         if isinstance(arr, np.ndarray):
                             arr = arr.ravel().tolist()
                         if arr:
                             point_spec.aprioriCovar.extend(arr)
                     # If field is repeated you must extend instead of assign
                     elif cnf._CONTROLPOINTFILEENTRYV0002.fields_by_name[attr].label == 3:
-                        getattr(point_spec, attr).extend(g.iloc[0][df_attr])
+                        getattr(point_spec, attr).extend(reference_row[df_attr])
                     else:
-                        setattr(point_spec, attr, attrtype(g.iloc[0][df_attr]))
+                        setattr(point_spec, attr, attrtype(reference_row[df_attr]))
 
             # A single extend call is cheaper than many add calls to pack points
             measure_iterable = []
