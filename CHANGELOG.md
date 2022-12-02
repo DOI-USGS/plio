@@ -37,6 +37,7 @@ release.
 
 ### Fixed
 - Updated documentation string for `compute_covariance`. [#177](https://github.com/USGS-Astrogeology/plio/pull/177)
+- Improved performance of `to_isis`. [#181](https://github.com/USGS-Astrogeology/plio/issues/181)
 
 ## [1.5.0]()
 
