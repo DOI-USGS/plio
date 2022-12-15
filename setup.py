@@ -22,12 +22,11 @@ def setup_package():
         zip_safe=True,
         scripts=['bin/socetnet2isis', 'bin/isisnet2socet'],
         install_requires=[
-            'gdal',
             'numpy',
             'pyproj',
             'pvl',
-            'protobuf',
             'h5py',
+            'protobuf',
             'pandas',
             'sqlalchemy',
             'pyyaml',
