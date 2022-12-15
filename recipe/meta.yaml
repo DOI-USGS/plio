@@ -47,6 +47,8 @@ requirements:
     - scipy
     - certifi
     - pyproj
+  run_contrained: 
+    - gdal 
 
 test:
   imports:
