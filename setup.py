@@ -33,6 +33,7 @@ def setup_package():
             'networkx',
             'affine',
             'scipy'],
+        extras_require={'io_gdal' : "gdal"},
         classifiers=[
             "Development Status :: 3 - Alpha",
             "Topic :: Utilities",
