@@ -37,7 +37,7 @@ release.
 
 ## [1.5.2]() 
 
-- Made gdal an option dependency. [#186](https://github.com/USGS-Astrogeology/plio/pull/186)
+- Made gdal an optional dependency. [#186](https://github.com/USGS-Astrogeology/plio/pull/186)
 
 ## [1.5.1]()
 
