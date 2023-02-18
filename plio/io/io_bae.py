@@ -243,12 +243,18 @@ def read_gpf(input_data,gxp=False):
         d = np.genfromtxt(input_data, skip_header=(l+1), dtype='unicode')
         d = d.reshape(-1, len(columns))
     else:
-        # Read GXP-style GPF a block at a time
-        lmax=( (l+1) + ((cnt-1)*8) + 2 )
-        for x in range(l+1,lmax,8):
+        x = l+1
+        for pt_idx in range(1, cnt+1):
+            # Read the first 4 lines of the point
             a = np.genfromtxt(input_data, skip_header=(x), max_rows=4, dtype='unicode')
-            b = np.genfromtxt(input_data, skip_header=(x+4), max_rows=3, dtype='unicode')
-            if x == (l+1):
+            if getline(input_data,x+5) in ['\n','\r\n']:
+                b = np.zeros(12)
+                x = x+5
+            else:
+                b = np.genfromtxt(input_data, skip_header=(x+4), max_rows=3, dtype='unicode')
+                x = x+8
+                
+            if pt_idx == 1 :
                 d = np.hstack([np.hstack(a),np.hstack(b)])
             else:
                 d = np.vstack(( d, np.hstack([np.hstack(a),np.hstack(b)])) )
