@@ -5,7 +5,12 @@
 Planetary Input / Output [![Join the chat at https://gitter.im/USGS-Astrogeology/plio](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/USGS-Astrogeology/plio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ===============================
 
-A planetary surface data input/output library written in Python. The release version of `plio` is avaiable via conda-forge. 
+A planetary surface data input/output library written in Python. The documentation is at:
+
+https://plio.readthedocs.io/en/latest/
+
+
+The release version of `plio` is avaiable via conda-forge. 
 
 Current build status
 ====================
@@ -59,8 +64,3 @@ To install the development version:
 ```
 conda install -c usgs-astrogeology/label/dev plio
 ```
-
-Docs
-====
-
-https://plio.readthedocs.io/en/latest/
