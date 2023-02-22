@@ -3,8 +3,8 @@
       "name": "plio",
       "organization": "U.S. Geological Survey",
       "description": "A planetary surface data input/output library written in Python.",
-      "version": "1.5.0",
-      "status": "Release",
+      "version": "1.5.3",
+      "status": "Development",
 
       "permissions": {
         "usageType": "openSource",
