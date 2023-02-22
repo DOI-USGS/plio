@@ -3,7 +3,7 @@
       "name": "plio",
       "organization": "U.S. Geological Survey",
       "description": "A planetary surface data input/output library written in Python.",
-      "version": "1.5.0",
+      "version": "1.5.2",
       "status": "Release",
 
       "permissions": {
@@ -11,14 +11,14 @@
         "licenses": [
           {
             "name": "Public Domain, CC0-1.0",
-            "URL": "https://code.usgs.gov/astrogeology/plio/-/blob/master/LICENSE.md"
+            "URL": "https://code.usgs.gov/astrogeology/plio/-/blob/v1.5.2/LICENSE.md"
           }
         ]
       },
   
       "homepageURL": "https://plio.readthedocs.io/en/latest/?badge=latest",
-      "downloadURL": "https://github.com/USGS-Astrogeology/plio/archive/refs/tags/v1.5.0.zip",
-      "disclaimerURL": "https://code.usgs.gov/astrogeology/plio/-/blob/master/DISCLAMER.md",
+      "downloadURL": "https://code.usgs.gov/astrogeology/plio/-/archive/v1.5.2/plio-v1.5.2.zip",
+      "disclaimerURL": "https://code.usgs.gov/astrogeology/plio/-/blob/v1.5.2/DISCLAIMER.md",
       "repositoryURL": "https://code.usgs.gov/astrogeology/plio/",
       "vcs": "git",
   
