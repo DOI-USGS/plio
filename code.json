@@ -11,14 +11,14 @@
         "licenses": [
           {
             "name": "Public Domain, CC0-1.0",
-            "URL": "https://code.usgs.gov/astrogeology/plio/-/blob/master/LICENSE.md"
+            "URL": "https://code.usgs.gov/astrogeology/plio/-/raw/main/LICENSE.md"
           }
         ]
       },
   
       "homepageURL": "https://plio.readthedocs.io/en/latest/?badge=latest",
-      "downloadURL": "https://github.com/USGS-Astrogeology/plio/archive/refs/tags/v1.5.0.zip",
-      "disclaimerURL": "https://code.usgs.gov/astrogeology/plio/-/blob/master/DISCLAMER.md",
+      "downloadURL": "https://code.usgs.gov/astrogeology/plio/-/archive/main/plio-main.zip",
+      "disclaimerURL": "https://code.usgs.gov/astrogeology/plio/-/raw/main/DISCLAMER.md",
       "repositoryURL": "https://code.usgs.gov/astrogeology/plio/",
       "vcs": "git",
   
