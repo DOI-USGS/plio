@@ -35,6 +35,8 @@ release.
 
 ## [Unreleased]
 
+
+## [1.5.3]()
 ### Fixed
 - Updated `read_gpf()` to correctly parse hybrid-style GPFs from Socet GXP. [#191](https://github.com/USGS-Astrogeology/plio/pull/191)
 
