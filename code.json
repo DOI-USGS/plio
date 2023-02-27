@@ -17,8 +17,8 @@
       },
   
       "homepageURL": "https://plio.readthedocs.io/en/latest/?badge=latest",
-      "downloadURL": "https://code.usgs.gov/astrogeology/plio/-/archive/v1.5.3/plio-main.zip",
-      "disclaimerURL": "https://code.usgs.gov/astrogeology/plio/-/raw/v1.5.3/DISCLAMER.md",
+      "downloadURL": "https://code.usgs.gov/astrogeology/plio/-/archive/v1.5.3/plio-v1.5.3.zip",
+      "disclaimerURL": "https://code.usgs.gov/astrogeology/plio/-/raw/v1.5.3/DISCLAIMER.md",
       "repositoryURL": "https://code.usgs.gov/astrogeology/plio.git",
       "vcs": "git",
   
