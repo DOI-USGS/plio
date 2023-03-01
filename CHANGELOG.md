@@ -36,7 +36,7 @@ release.
 ## [Unreleased]
 
 ### Fixed
-- Updated `create_pvl_header()` to add a newline (`\n`) character to the end of the pvl string. This ensures that the controls networks can be read back in using pvl 1.3.0 [#193](https://github.com/USGS-Astrogeology/plio/pull/193)
+- Updated `create_pvl_header()` to add a newline (`\n`) character to the end of the pvl string. This ensures that the control networks written, then read back in using pvl 1.3.0 [#193](https://github.com/USGS-Astrogeology/plio/pull/193)
 
 ## [1.5.3]()
 ### Fixed
