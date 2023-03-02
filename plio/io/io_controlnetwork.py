@@ -224,7 +224,7 @@ class IsisStore(object):
         Given an ISIS store, read the underlying ISIS3 compatible control network and
         return an IsisControlNetwork dataframe.
         """
-        pvl_header = pvl.load(self._path, grammar=pvl.grammar.ISISGrammar())
+        pvl_header = pvl.load(self._path)
         header_start_byte = find_in_dict(pvl_header, 'HeaderStartByte')
         header_bytes = find_in_dict(pvl_header, 'HeaderBytes')
         point_start_byte = find_in_dict(pvl_header, 'PointsStartByte')
@@ -499,4 +499,4 @@ class IsisStore(object):
                  )
         ])
 
-        return pvl.dumps(header, encoder=encoder)
+        return pvl.dumps(header, encoder=encoder) + "\n"
