@@ -1,7 +1,7 @@
 import pytest
 
 from plio.io import extract_metadata as em
-from plio.io import gdal
+from plio.io import gdal 
 
 @pytest.fixture
 def wkt_moon():
@@ -52,7 +52,7 @@ def test_export_to_proj4(srs_mars):
     Check that proj4 is not supporting Moon2000_Mercator
     """
     proj4 = srs_mars.ExportToProj4()
-    for element in '+proj=merc +lon_0=180 +lat_ts=0 +x_0=0 +y_0=0 +a=1737400 +b=1737400 +units=m +no_defs'.split():
+    for element in '+proj=merc +lon_0=180 +lat_ts=0 +x_0=0 +y_0=0 +R=1737400 +units=m +no_defs'.split():
         assert element in proj4
 
 @pytest.mark.skipif(gdal is None, reason="GDAL not installed")

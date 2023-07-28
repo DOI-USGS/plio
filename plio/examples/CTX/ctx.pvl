@@ -67,6 +67,8 @@ Object = IsisCube
   End_Group
 End_Object
 
+# Jigged
+
 Object = Label
   Bytes = 65536
 End_Object

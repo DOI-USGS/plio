@@ -36,6 +36,9 @@ release.
 ## [Unreleased]
 
 ### Fixed
+- Tests for gdal > 3 and pvl > 1.0. This includes fixing the `k` value on the MOLA polar stereographic test data and updating the proj string for GDAL > 3 (new fields are included).
+- Conditional GDAL import to support gdal > 3.0
+- `generate_isis_serial` to work on cubes that have been run through `jigsaw` by removing the custom `SerialNumberDecoder`. Fixes [#194](https://github.com/DOI-USGS/plio/issues/194)
 - Updated `create_pvl_header()` to add a newline (`\n`) character to the end of the pvl string. This ensures that the control networks can be written, then read back in using pvl 1.3.0 [#193](https://github.com/USGS-Astrogeology/plio/pull/193)
 
 ## [1.5.3]()
