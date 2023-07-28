@@ -1,9 +1,10 @@
 from sqlalchemy import Column, Integer, String, create_engine, orm
-from sqlalchemy.ext import declarative
+from sqlalchemy.orm import declarative_base
+from sqlalchemy import MetaData
 
 from plio.sqlalchemy_json.alchemy import NestedJsonObject
 
-Base = declarative.declarative_base()
+Base = declarative_base()
 
 
 def setup_db_session(db):
@@ -21,8 +22,8 @@ def setup_db_session(db):
        A SQLAlchemy session object
     """
     engine = create_engine('sqlite:///{}'.format(db))
-    Base.metadata.bind = engine
-    Base.metadata.create_all()
+    meta = MetaData()
+    meta.create_all(engine)
     return orm.sessionmaker(bind=engine)()
 
 
