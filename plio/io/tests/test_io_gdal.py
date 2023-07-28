@@ -231,13 +231,17 @@ class TestWriter(unittest.TestCase):
         DATUM["Moon_2000",
             SPHEROID["Moon_2000_IAU_IAG",1737400,0]],
         PRIMEM["Reference_Meridian",0],
-        UNIT["Degree",0.017453292519943295]],
-    PROJECTION["Mercator_2SP"],
+        UNIT["degree",0.0174532925199433,
+            AUTHORITY["EPSG","9122"]]],
+    PROJECTION["Mercator_1SP"],
     PARAMETER["central_meridian",180],
+    PARAMETER["scale_factor",1],
     PARAMETER["false_easting",0],
     PARAMETER["false_northing",0],
-    PARAMETER["standard_parallel_1",0],
-    UNIT["Meter",1]]"""
+    UNIT["metre",1,
+        AUTHORITY["EPSG","9001"]],
+    AXIS["Easting",EAST],
+    AXIS["Northing",NORTH]]"""
         dataset = io_gdal.GeoDataset('test.tif')
         test_srs = dataset.spatial_reference.__str__()
         self.assertEqual(test_srs.split(), expected_srs.split())
