@@ -8,7 +8,7 @@ with open('README.md', 'r') as f:
 def setup_package():
     setup(
         name = "plio",
-        version = '1.5.2',
+        version = '1.5.4',
         author = "USGS Astrogeology",
         author_email = "jlaura@usgs.gov",
         description = ("I/O API to support planetary data formats."),
@@ -35,12 +35,14 @@ def setup_package():
             'scipy'],
         extras_require={'io_gdal' : "gdal"},
         classifiers=[
-            "Development Status :: 3 - Alpha",
+            "Development Status :: 5 - Production/Stable",
             "Topic :: Utilities",
             "License :: Public Domain",
-            'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
             'Programming Language :: Python :: 3.8',
+            'Programming Language :: Python :: 3.9',
+            'Programming Language :: Python :: 3.10',
+            'Programming Language :: Python :: 3.11',
         ],
     )
 
