@@ -1,10 +1,8 @@
 name: plio
 channels:
   - conda-forge
-  - usgs-astrogeology
 dependencies:
-  - libgdal < 3 
-  - gdal < 3 
+  - gdal 
   - numpy 
   - pyproj 
   - h5py 
