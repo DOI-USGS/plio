@@ -39,7 +39,7 @@ class TestMercator(unittest.TestCase):
     """
 
     def test_scale(self):
-        self.assertEqual(self.dataset.scale, ('Meter', 1.0))
+        self.assertEqual(self.dataset.scale, ('metre', 1.0))
 
     def test_xy_extent(self):
         xy_extent = self.dataset.xy_extent

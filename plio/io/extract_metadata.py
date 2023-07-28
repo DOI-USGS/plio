@@ -1,5 +1,6 @@
-from plio.io import osr, conditional_gdal
-    
+
+from plio.io import conditional_gdal, osr
+
 import_options = ['ImportFromWkt', 'ImportFromProj4',
                   'ImportFromEPSG', 'ImportFromUSGS',
                   'ImportFromXML']
