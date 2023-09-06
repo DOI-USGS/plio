@@ -1,0 +1,16 @@
+name: plio
+channels:
+  - conda-forge
+  - usgs-astrogeology
+dependencies:
+  - affine
+  - h5py 
+  - networkx 
+  - nbsphinx
+  - numpy
+  - pandas
+  - protobuf
+  - pvl
+  - pyyaml
+  - sphinx=6.2.1
+  - sqlalchemy
