@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
        os: [ubuntu-latest, macos-latest]
-       python-version: ["3.6", "3.7", "3.8"]   
+       python-version: ["3.8", "3.9", "3.10", "3.11"]   
     defaults:
       run:
         shell: bash -l {0}
@@ -30,7 +30,7 @@ jobs:
           use-mamba: true
           channels: conda-forge, defaults
           channel-priority: strict
-          activate-environment: autocnet
+          activate-environment: plio
           environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
       - name: Check build environment
@@ -74,4 +74,3 @@ jobs:
         run: |
           cd docs
           sphinx-build -b html . public
-          
