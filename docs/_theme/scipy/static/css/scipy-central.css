@@ -793,3 +793,6 @@ div#spc-itemdisp-container h6 { font-size: 100%; }
 /* ---------------------- */
 /* Miscellaneous elements */
 /* ---------------------- */
+.bodywrapper {
+    min-height: 100vh;
+}
