@@ -64,3 +64,26 @@ To install the development version:
 ```
 conda install -c usgs-astrogeology/label/dev plio
 ```
+
+Building documentation
+======================
+
+Create the `plio` conda environment:
+
+```
+conda env create -f environment.yml
+```
+
+Activate the conda environment:
+
+```
+conda activate plio
+```
+
+Go into the `docs` directory and build the sphinx docs with:
+
+```
+sphinx-build -b html . public
+```
+
+This outputs the generated documentation into `docs/public` where you can open `public/index.html` in a browser to view PLIO docs locally. 

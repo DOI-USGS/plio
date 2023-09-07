@@ -18,3 +18,4 @@ dependencies:
   - pytest-cov 
   - coveralls 
   - nbsphinx
+  - sphinx=6.2.1
