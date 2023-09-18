@@ -100,7 +100,7 @@ def read_ipf_str(input_data):
                             max_rows = 1, delimiter = ',')
 
     d = [line.split() for line in open(input_data, 'r')]
-    d = np.hstack(np.array(d[3:]))
+    d = np.hstack(np.array(d[3:], dtype=object))
 
     d = d.reshape(-1, 12).astype('unicode')
 

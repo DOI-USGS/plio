@@ -34,6 +34,8 @@ release.
 -->
 
 ## [Unreleased]
+### Fixed
+- Fixed a bug in which read_ipf_str() returned a ValueError [#200](https://github.com/DOI-USGS/plio/issues/200)
 
 ## [1.5.4]()
 ### Fixed
