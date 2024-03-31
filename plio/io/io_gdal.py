@@ -506,14 +506,18 @@ class GeoDataset(object):
 
         """
         band = self.dataset.GetRasterBand(band)
-
+        offset = band.GetOffset()
+        offset = 0 if offset is None else offset
+        scale = band.GetScale()
+        scale = 1 if scale is None else scale
+        
         if dtype is None:
             dtype = GDAL2NP_CONVERSION[band.DataType]
 
         dtype = getattr(np, dtype)
 
         if not pixels:
-            array = band.ReadAsArray().astype(dtype)
+            array = (band.ReadAsArray().astype(dtype) + offset) * scale
             #if self.north_up == False:
             #    array = np.flipud(array)
         else:
@@ -534,7 +538,7 @@ class GeoDataset(object):
 
             if ystart + ycount > ymax:
                 ycount = ymax - ystart
-            array = band.ReadAsArray(xstart, ystart, xcount, ycount).astype(dtype)
+            array = (band.ReadAsArray(xstart, ystart, xcount, ycount).astype(dtype) + offset) * scale
 
         return array
 
