@@ -34,6 +34,8 @@ release.
 -->
 
 ## [Unreleased]
+### Fixed
+- Fixed a bug where scale and offset were not being read or applied to GeoDataset objects.
 
 ## [1.5.5]()
 ### Fixed
