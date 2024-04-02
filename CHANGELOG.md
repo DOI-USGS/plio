@@ -34,10 +34,11 @@ release.
 -->
 
 ## [Unreleased]
+### Fixed
+- Fixed a bug where scale and offset were not being read or applied to GeoDataset objects.
 
 ## [1.5.5]()
 ### Fixed
-- Fixed a bug where scale and offset were not being read or applied to GeoDataset objects.
 - Fixed a bug in which read_ipf_str() returned a ValueError [#200](https://github.com/DOI-USGS/plio/issues/200)
 
 ## [1.5.4]()
