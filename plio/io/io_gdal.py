@@ -517,7 +517,7 @@ class GeoDataset(object):
         dtype = getattr(np, dtype)
 
         if not pixels:
-            array = (band.ReadAsArray().astype(dtype) + offset) * scale
+            array = band.ReadAsArray().astype(dtype) * scale + offset
             #if self.north_up == False:
             #    array = np.flipud(array)
         else:
@@ -538,7 +538,7 @@ class GeoDataset(object):
 
             if ystart + ycount > ymax:
                 ycount = ymax - ystart
-            array = (band.ReadAsArray(xstart, ystart, xcount, ycount).astype(dtype) + offset) * scale
+            array = band.ReadAsArray(xstart, ystart, xcount, ycount).astype(dtype) * scale + offset
 
         return array
 
