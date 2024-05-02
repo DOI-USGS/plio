@@ -36,22 +36,28 @@ def get_isis_translation(label):
     if not isinstance(label, PVLModule):
         label = pvl.load(label)
 
-    # Grab the spacecraft name and run it through the ISIS lookup
-    spacecraft_name = find_in_dict(label, 'SpacecraftName')
-    for row in plio.data_session.query(StringToMission).filter(StringToMission.key==spacecraft_name):
-        spacecraft_name = row.value.lower()
-    # Try and pull an instrument identifier
-    try:
-        instrumentid = find_in_dict(label, 'InstrumentId').capitalize()
-    except:
-        instrumentid = None
+    if find_in_dict(label, 'CsmInfo'):
+        # This cube has been CSM inited, have to load the CSM translation table
+        translation = {"Keyword1": {"InputKey": "CSMPlatformID", "InputGroup": "IsisCube,CsmInfo", "InputPosition": ["IsisCube", "CsmInfo"], "OutputName": "Keyword1", "OutputPosition": ["Group", "SerialNumberKeywords"], "Translation": ["*", "*"]}, "Keyword2": {"InputKey": "CSMInstrumentId", "InputGroup": "IsisCube,CsmInfo", "InputPosition": ["IsisCube", "CsmInfo"], "OutputName": "Keyword2", "OutputPosition": ["Group", "SerialNumberKeywords"], "Translation": ["*", "*"]}, "Keyword3": {"InputKey": "ReferenceTime", "InputGroup": "IsisCube,CsmInfo", "InputPosition": ["IsisCube", "CsmInfo"], "OutputName": "Keyword3", "OutputPosition": ["Group", "SerialNumberKeywords"], "Translation": ["*", "*"]}}
+    else:
+        # Grab the spacecraft name and run it through the ISIS lookup
+        spacecraft_name = find_in_dict(label, 'SpacecraftName')
+        for row in plio.data_session.query(StringToMission).filter(StringToMission.key==spacecraft_name):
+            spacecraft_name = row.value.lower()
+        
+        # Try and pull an instrument identifier
+        try:
+            instrumentid = find_in_dict(label, 'InstrumentId').capitalize()
+        except:
+            instrumentid = None
 
-    translation = None
-    # Grab the translation PVL object using the lookup
-    for row in plio.data_session.query(Translations).filter(Translations.mission==spacecraft_name,
-                                                            Translations.instrument==instrumentid):
-        # Convert the JSON back to a PVL object
-        translation = PVLModule(row.translation)
+        translation = None
+        # Grab the translation PVL object using the lookup
+        for row in plio.data_session.query(Translations).filter(Translations.mission==spacecraft_name,
+                                                                Translations.instrument==instrumentid):
+            # Convert the JSON back to a PVL object
+            translation = PVLModule(row.translation)
+
     return translation
 
 
@@ -100,7 +106,7 @@ def generate_serial_number(label):
                 serial_entry = search_translation['*']
             if isinstance(serial_entry, datetime.datetime):
                 # PVL returns datetime objects now. Convert these to string and strip trailing zeros on microseconds.
-                serial_entry = serial_entry.strftime('%Y-%m-%dT%H:%M:%S.%f').rstrip('0')                
+                serial_entry = serial_entry.strftime('%Y-%m-%dT%H:%M:%SZ%f').rstrip('0')                
             serial_number.append(serial_entry)
         except:
             pass
