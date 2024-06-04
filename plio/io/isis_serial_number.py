@@ -106,7 +106,7 @@ def generate_serial_number(label):
                 serial_entry = search_translation['*']
             if isinstance(serial_entry, datetime.datetime):
                 # PVL returns datetime objects now. Convert these to string and strip trailing zeros on microseconds.
-                serial_entry = serial_entry.strftime('%Y-%m-%dT%H:%M:%SZ%f').rstrip('0')                
+                serial_entry = serial_entry.strftime('%Y-%m-%dT%H:%M:%S.%f').rstrip('0')                
             serial_number.append(serial_entry)
         except:
             pass
