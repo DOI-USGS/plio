@@ -34,8 +34,12 @@ release.
 -->
 
 ## [Unreleased]
+### Added
+- Hard coded support for `csminit`ed cubes that have serial numbers that differ from `spiceinit`ed cubes.
+- Added support for scale and offset for GeoDataset objects.
+
 ### Fixed
-- Fixed a bug where scale and offset were not being read or applied to GeoDataset objects.
+- Fixed a bug where scale and offset were being applied backwards to GeoDataset objects.
 
 ## [1.5.5]()
 ### Fixed

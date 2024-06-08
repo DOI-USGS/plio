@@ -6,6 +6,7 @@ try:
     gdal = importlib.import_module('osgeo.gdal')
     osr = importlib.import_module('osgeo.osr')
     ogr = importlib.import_module('osgeo.ogr')
+    gdal.UseExceptions()
 except:
     gdal = osr = ogr = None
 
