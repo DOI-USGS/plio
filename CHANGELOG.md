@@ -37,6 +37,7 @@ release.
 ### Added
 - Hard coded support for `csminit`ed cubes that have serial numbers that differ from `spiceinit`ed cubes.
 - Added support for scale and offset for GeoDataset objects.
+- The ability to write ISIS formated control networks to geoparquet. Geoparquet files are smaller, read/write faster, and interoperate in spatial tools like QGIS.
 
 ### Fixed
 - Fixed a bug where scale and offset were being applied backwards to GeoDataset objects.
