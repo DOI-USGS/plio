@@ -40,6 +40,8 @@ release.
 
 ### Fixed
 - Fixed a bug where scale and offset were being applied backwards to GeoDataset objects.
+- Copied and pieced together .proto files from ISIS3/src/control/objs/ControlNetVersioner to plio/plio/io. 
+- Regenerated _pb2.py files with protoc 28.2 to fix error with old-protoc-generated files. [#210](https://github.com/DOI-USGS/plio/issues/210)
 
 ## [1.5.5]()
 ### Fixed
