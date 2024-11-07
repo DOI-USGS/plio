@@ -1,0 +1,21 @@
+// Protocol buffer header descriptor for Isis Control Networks
+//
+// 2018-06-13 Jesse Mapel - Added flag to indicate it is a protobuf 2 file
+// 2024-11-07 Jacob Cain  - Copied into Plio from ISIS3/src/control/objs/ControlNetVersioner
+//                          Generated new _pb2.py with protoc 28.2
+
+syntax="proto2";
+
+package Isis;
+
+message ControlNetFileHeaderV0005 {
+//  Some fields of ControlNet
+  required string networkId    = 1;
+  required string targetName   = 2;
+  optional string created      = 3;
+  optional string lastModified = 4;
+  optional string description  = 5;
+  optional string userName     = 6;
+  optional int32  numPoints    = 7;
+  repeated double targetRadii = 10;
+}
