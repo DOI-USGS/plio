@@ -14,3 +14,4 @@ dependencies:
   - pyyaml
   - sphinx=6.2.1
   - sqlalchemy
+  - setuptools
