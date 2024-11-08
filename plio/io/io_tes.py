@@ -226,7 +226,8 @@ class Tes(object):
         with open(input_data, 'rb') as file:
             file.seek(data_start)
             buffer = file.read(nrecords*nbytes_per_rec)
-            array = np.frombuffer(buffer, dtype=numpy_dtypes[dataset.upper()]).byteswap().newbyteorder()
+            arrayFrBuf = np.frombuffer(buffer, dtype=numpy_dtypes[dataset.upper()])
+            array = arrayFrBuf.byteswap().view(arrayFrBuf.dtype.newbyteorder())
 
         df = pd.DataFrame(data=array, columns=columns[dataset.upper()])
 
