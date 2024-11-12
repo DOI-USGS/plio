@@ -20,7 +20,7 @@ requirements:
     - python
     - setuptools
     - numpy
-    - pvl >= 1.3.0
+    - pvl>=1.3.0
     - protobuf
     - icu
     - h5py
@@ -35,7 +35,7 @@ requirements:
     - python
     - setuptools
     - numpy
-    - pvl >= 1.3.0
+    - pvl>=1.3.0
     - protobuf
     - icu
     - h5py
