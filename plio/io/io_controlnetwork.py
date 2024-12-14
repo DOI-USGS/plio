@@ -351,6 +351,8 @@ class IsisStore(object):
                 # Un-mangle common attribute names between points and measures
                 df_attr = self.point_field_map.get(attr, attr)
                 if df_attr in g.columns:
+                    if df_attr == 'id':
+                        continue
                     if df_attr == 'pointLog':
                         # Currently pointLog is not supported.
                         warnings.warn('The pointLog field is currently unsupported. Any pointLog data will not be saved.')
