@@ -34,6 +34,8 @@ release.
 -->
 
 ## [Unreleased]
+### Fixed
+- Fixed a bug in which prefixes and suffixes were not properly prepended/appended to point_id [#213](https://github.com/DOI-USGS/plio/issues/213)
 
 # [1.6.0]()
 
