@@ -23,7 +23,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
       - name: Setup ENV
-        uses: goanpeca/setup-miniconda@v1
+        uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
           mamba-version: "*"
