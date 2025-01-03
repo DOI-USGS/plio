@@ -28,7 +28,7 @@ jobs:
           miniconda-version: "latest"
           mamba-version: "*"
           use-mamba: true
-          channels: conda-forge, defaults
+          channels: conda-forge
           channel-priority: strict
           activate-environment: plio
           environment-file: environment.yml
