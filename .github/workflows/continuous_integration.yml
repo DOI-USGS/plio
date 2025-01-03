@@ -23,7 +23,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
       - name: Setup ENV
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@3b0f2504dd76ef23b6d31f291f4913fb60ab5ff3
         with:
           miniconda-version: "latest"
           mamba-version: "*"
