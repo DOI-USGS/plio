@@ -23,12 +23,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
       - name: Setup ENV
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          miniconda-version: "latest"
-          mamba-version: "*"
           use-mamba: true
-          channels: conda-forge, defaults
+          channels: conda-forge
           channel-priority: strict
           activate-environment: plio
           environment-file: environment.yml
