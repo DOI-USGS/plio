@@ -7,7 +7,8 @@ import numpy as np
 import pvl
 import struct
 
-from plio.io import ControlNetFileV0002_pb2 as cnf
+from plio.io import ControlNetFileHeaderV0002_pb2 as cnh2
+from plio.io import ControlPointFileEntryV0002_pb2 as cnp2
 from plio.io import ControlNetFileHeaderV0005_pb2 as cnh5
 from plio.io import ControlPointFileEntryV0005_pb2 as cnp5
 from plio.utils.utils import xstr, find_in_dict
@@ -87,7 +88,7 @@ class MeasureLog():
         # imports were not working because it looks like these need to instantiate off
         # an object
         if version == 2:
-            log_message = cnf.ControlPointFileEntryV0002().Measure().MeasureLogData()
+            log_message = cnp2.ControlPointFileEntryV0002().Measure().MeasureLogData()
         elif version == 5:
             log_message = cnp5.ControlPointFileEntryV0005().Measure().MeasureLogData()
         log_message.doubleDataValue = self.value
@@ -193,9 +194,9 @@ class IsisStore(object):
               9: str,
               11: list,
               14: int}
-        self.header_attrs = [(i.name, bt[i.type]) for i in cnf._CONTROLNETFILEHEADERV0002.fields]
-        self.point_attrs = [(i.name, bt[i.type]) for i in cnf._CONTROLPOINTFILEENTRYV0002.fields]
-        self.measure_attrs = [(i.name, bt[i.type]) for i in cnf._CONTROLPOINTFILEENTRYV0002_MEASURE.fields]
+        self.header_attrs = [(i.name, bt[i.type]) for i in cnh2._CONTROLNETFILEHEADERV0002.fields]
+        self.point_attrs = [(i.name, bt[i.type]) for i in cnp2._CONTROLPOINTFILEENTRYV0002.fields]
+        self.measure_attrs = [(i.name, bt[i.type]) for i in cnp2._CONTROLPOINTFILEENTRYV0002_MEASURE.fields]
 
         self._path = path
         if not mode:
@@ -231,16 +232,16 @@ class IsisStore(object):
         version = find_in_dict(pvl_header, 'Version')
 
         if version == 2:
-            self.point_attrs = [i for i in cnf._CONTROLPOINTFILEENTRYV0002.fields_by_name if i != 'measures']
-            self.measure_attrs = [i for i in cnf._CONTROLPOINTFILEENTRYV0002_MEASURE.fields_by_name]
+            self.point_attrs = [i for i in cnp2._CONTROLPOINTFILEENTRYV0002.fields_by_name if i != 'measures']
+            self.measure_attrs = [i for i in cnp2._CONTROLPOINTFILEENTRYV0002_MEASURE.fields_by_name]
 
-            cp = cnf.ControlPointFileEntryV0002()
+            cp = cnp2.ControlPointFileEntryV0002()
             self._handle.seek(header_start_byte)
-            pbuf_header = cnf.ControlNetFileHeaderV0002()
+            pbuf_header = cnh2.ControlNetFileHeaderV0002()
             pbuf_header.ParseFromString(self._handle.read(header_bytes))
 
             self._handle.seek(point_start_byte)
-            cp = cnf.ControlPointFileEntryV0002()
+            cp = cnp2.ControlPointFileEntryV0002()
             pts = []
             for s in pbuf_header.pointMessageSizes:
                 cp.ParseFromString(self._handle.read(s))
@@ -331,7 +332,7 @@ class IsisStore(object):
         for i, g in df.groupby('id'):
 
             # Get the point specification from the protobuf
-            point_spec = cnf.ControlPointFileEntryV0002()
+            point_spec = cnp2.ControlPointFileEntryV0002()
 
             # Set refrence row to minimize .iloc calls and improve run time
             reference_row = g.iloc[0]
@@ -365,7 +366,7 @@ class IsisStore(object):
                         if arr:
                             point_spec.aprioriCovar.extend(arr)
                     # If field is repeated you must extend instead of assign
-                    elif cnf._CONTROLPOINTFILEENTRYV0002.fields_by_name[attr].label == 3:
+                    elif cnp2._CONTROLPOINTFILEENTRYV0002.fields_by_name[attr].label == 3:
                         getattr(point_spec, attr).extend(reference_row[df_attr])
                     else:
                         setattr(point_spec, attr, attrtype(reference_row[df_attr]))
@@ -382,7 +383,7 @@ class IsisStore(object):
                         if df_attr == 'measureLog':
                             [getattr(measure_spec, attr).extend([i.to_protobuf()]) for i in m[df_attr]]
                         # If field is repeated you must extend instead of assign
-                        elif cnf._CONTROLPOINTFILEENTRYV0002_MEASURE.fields_by_name[attr].label == 3:
+                        elif cnp2._CONTROLPOINTFILEENTRYV0002_MEASURE.fields_by_name[attr].label == 3:
                             getattr(measure_spec, attr).extend(m[df_attr])
                         else:
                             setattr(measure_spec, attr, attrtype(m[df_attr]))
@@ -429,7 +430,7 @@ class IsisStore(object):
         header_message_size : int
                               The size of the serialized header, in bytes
         """
-        raw_header_message = cnf.ControlNetFileHeaderV0002()
+        raw_header_message = cnh2.ControlNetFileHeaderV0002()
         raw_header_message.created = creation_date
         raw_header_message.lastModified = modified_date
         raw_header_message.networkId = networkid
