@@ -37,6 +37,9 @@ release.
 ### Fixed
 - Fixed a bug in which prefixes and suffixes were not properly prepended/appended to point_id [#213](https://github.com/DOI-USGS/plio/issues/213)
 
+### Changed
+- Changed protobuf dependency to 4.Y.Z and regenerated protobuf files [#217](https://github.com/DOI-USGS/plio/pull/217)
+
 # [1.6.0]()
 
 ### Added
