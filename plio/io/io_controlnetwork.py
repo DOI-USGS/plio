@@ -19,6 +19,7 @@ DEFAULTUSERNAME = 'None'
 def write_filelist(lst, path="fromlist.lis"):
     """
     Writes a filelist to a file so it can be used in ISIS3.
+
     Parameters
     ----------
     lst : list
@@ -157,6 +158,7 @@ def to_isis(obj, path, mode='wb', version=2,
 class IsisStore(object):
     """
     Class to manage IO of an ISIS control network (version 2).
+    
     Attributes
     ----------
     pointid : int
@@ -222,7 +224,8 @@ class IsisStore(object):
     def read(self):
         """
         Given an ISIS store, read the underlying ISIS3 compatible control network and
-        return an IsisControlNetwork dataframe.
+        return an IsisControlNetwork dataframe.  This operation converts ISIS (0.5, 0.5) 
+        origin pixels to (0, 0) origin pixels by subtracting (0.5, 0.5) from each pixel.
         """
         pvl_header = pvl.load(self._path)
         header_start_byte = find_in_dict(pvl_header, 'HeaderStartByte')
@@ -307,12 +310,16 @@ class IsisStore(object):
     def create_points(self, df, pointid_prefix, pointid_suffix):
         """
         Step through a control network (C) and return protocol buffer point objects
+        with the appropriate attributes: point_id, point_type, serial,
+        measure_type, x, y required.
+        The entries in the list must support grouping by the point_id attribute.
+        This operation adds (0.5, 0.5) to each pixel, since ISIS pixels 
+        are centered on (0.5, 0.5) and NDArrays are (0, 0) based.
+
         Parameters
         ----------
         df : DataFrame
-              with the appropriate attributes: point_id, point_type, serial,
-              measure_type, x, y required.
-              The entries in the list must support grouping by the point_id attribute.
+              
         Returns
         -------
         point_messages : list
@@ -410,6 +417,7 @@ class IsisStore(object):
         """
         Create the Google Protocol Buffer header using the
         protobuf spec.
+
         Parameters
         ----------
         networkid : str
@@ -422,6 +430,7 @@ class IsisStore(object):
                The name of the user / application that created the control network
         point_sizes : list
                       of the point sizes for each point message
+
         Returns
         -------
         header_message : str
@@ -449,6 +458,7 @@ class IsisStore(object):
                           creation_date, modified_date):
         """
         Create the PVL header object
+
         Parameters
         ----------
         version : int
@@ -467,6 +477,7 @@ class IsisStore(object):
                              Total size of the header in bytes
         points_bytes : int
                        The total number of bytes all points require
+
         Returns
         -------
          : object
