@@ -8,8 +8,7 @@ import numpy as np
 import pvl
 
 from plio.io import io_controlnetwork
-from plio.io import ControlNetFileHeaderV0002_pb2 as cnh2
-from plio.io import ControlPointFileEntryV0002_pb2 as cnp2
+from plio.io import ControlNetFileV0002_pb2 as cnf
 from plio.utils.utils import find_in_dict
 
 from plio.examples import get_path
@@ -108,7 +107,7 @@ def test_create_buffer_header(cnet_dataframe, tmpdir):
         
         f.seek(io_controlnetwork.HEADERSTARTBYTE)
         raw_header_message = f.read(cnet_dataframe.header_message_size)
-        header_protocol = cnh2.ControlNetFileHeaderV0002()
+        header_protocol = cnf.ControlNetFileHeaderV0002()
         header_protocol.ParseFromString(raw_header_message)
         #Non-repeating
         #self.assertEqual('None', header_protocol.networkId)
@@ -126,7 +125,7 @@ def test_create_point(cnet_dataframe, tmpdir):
     with open(tmpdir.join('test.net'), 'rb') as f:
         f.seek(cnet_dataframe.point_start_byte)
         for i, length in enumerate(cnet_dataframe.measure_size):
-            point_protocol = cnp2.ControlPointFileEntryV0002()
+            point_protocol = cnf.ControlPointFileEntryV0002()
             raw_point = f.read(length)
             point_protocol.ParseFromString(raw_point)
             assert str(i) == point_protocol.id
