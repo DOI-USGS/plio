@@ -40,13 +40,6 @@ jobs:
       - name: Test Python Package
         run: |
            pytest plio --cov-report=xml
-      - name: Upload Coverage
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
-          verbose: true
-        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8'
 
   Build-Docs:
     runs-on: ubuntu-latest
