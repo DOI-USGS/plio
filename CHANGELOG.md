@@ -35,6 +35,9 @@ release.
 
 ## [Unreleased]
 
+### Changed
+- Changed protobuf dependency to 6.Y.Z and regenerated protobuf files
+
 # [1.6.2]()
 
 ### Changed
