@@ -2,8 +2,10 @@ from enum import IntEnum
 from time import gmtime, strftime
 import warnings
 
+import geopandas as gpd
 import pandas as pd
 import numpy as np
+import pyproj
 import pvl
 import struct
 
@@ -11,6 +13,7 @@ from plio.io import ControlNetFileV0002_pb2 as cnf
 from plio.io import ControlNetFileHeaderV0005_pb2 as cnh5
 from plio.io import ControlPointFileEntryV0005_pb2 as cnp5
 from plio.utils.utils import xstr, find_in_dict
+from plio.utils.df_manipulation import add_latlon_to_network
 
 HEADERSTARTBYTE = 65536
 DEFAULTUSERNAME = 'None'
@@ -98,7 +101,6 @@ class MeasureLog():
     @classmethod
     def from_protobuf(cls, protobuf):
         return cls(protobuf.doubleDataType, protobuf.doubleDataValue)
-
 
 class IsisControlNetwork(pd.DataFrame):
 
@@ -513,3 +515,27 @@ class IsisStore(object):
         ])
 
         return pvl.dumps(header, encoder=encoder) + "\n"
+
+def to_parquet(obj, path, crs='IAU_2015:49900'):
+    def prepare_for_parquet(obj):
+        obj.loc[:, 'aprioriCovar'] = obj['aprioriCovar'].apply(lambda x: list(x))
+        obj.loc[:, 'adjustedCovar'] = obj['adjustedCovar'].apply(lambda x: list(x))
+        obj.loc[:, 'pointLog'] = obj['pointLog'].apply(lambda x: list(x))
+    
+        if not ('lon' in obj.columns) or not ('lat' in obj.columns):
+            add_latlon_to_network(obj, crs)
+    
+    prepare_for_parquet(obj)
+
+    network = gpd.GeoDataFrame(obj, geometry=gpd.points_from_xy(obj.lon, obj.lat))
+    network = network.set_crs(crs=crs, inplace=True)
+    network.to_parquet(path)
+
+def from_parquet(path):
+    return gpd.read_parquet(path)
+
+def isis2parquet(inpath, outpath, crs='IAU_2015:49900'):
+    to_parquet(from_isis(inpath), outpath, crs=crs)
+
+def parquet2isis(inpath, outpath, targetname, **kwargs):
+    to_isis(from_parquet(inpath), outpath, targetname, **kwargs)
